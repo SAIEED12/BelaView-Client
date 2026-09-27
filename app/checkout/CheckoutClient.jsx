@@ -10,7 +10,9 @@ import { createOrder, getCheckoutProduct } from "@/lib/actions/orders";
 import { useCart } from "@/components/cart/CartProvider";
 
 const DELIVERY_CHARGE = 60;
-const BD_PHONE_RE = /^01[3-9]\d{8}$/;
+const BD_PHONE_RE = /^(?:\+?88)?01[3-9]\d{8}$/;
+const normalizePhone = (value) =>
+  String(value ?? "").trim().replace(/[\s-]+/g, "");
 
 const inputClass =
   "w-full max-w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[#1A1A1A] placeholder:text-[#8A8A8A] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-sm";
@@ -175,7 +177,7 @@ export default function CheckoutClient() {
     try {
       const fullAddress = `${address.trim()}, ${city.trim()}`;
       const placed = await createOrder({
-        customer: { name: name.trim(), phone: phone.trim(), address: fullAddress },
+        customer: { name: name.trim(), phone: normalizePhone(phone), address: fullAddress },
         items: cartLines.map((l) => ({
           productId: l.productId,
           quantity: l.effectiveQty,
@@ -196,10 +198,11 @@ export default function CheckoutClient() {
 
   const errors = {};
   if (!name.trim()) errors.name = "Name is required.";
-  const phoneValue = phone.trim();
+  const phoneValue = normalizePhone(phone);
   if (!phoneValue) errors.phone = "Phone is required.";
   else if (!BD_PHONE_RE.test(phoneValue))
-    errors.phone = "Enter a valid BD mobile (e.g. 01XXXXXXXXX).";
+    errors.phone =
+      "Enter a valid BD mobile (e.g. 01XXXXXXXXX or +8801XXXXXXXXX). Dashes/spaces allowed.";
   if (!address.trim()) errors.address = "Address is required.";
   if (!city.trim()) errors.city = "City / district is required.";
   if (notes.trim().length > 500)
@@ -221,7 +224,7 @@ export default function CheckoutClient() {
     try {
       const fullAddress = `${address.trim()}, ${city.trim()}`;
       const placed = await createOrder({
-        customer: { name: name.trim(), phone: phone.trim(), address: fullAddress },
+        customer: { name: name.trim(), phone: normalizePhone(phone), address: fullAddress },
         items: [{ productId: paramProductId, quantity: clampedQty }],
         deliveryCharge: DELIVERY_CHARGE,
         note: notes,
@@ -249,7 +252,7 @@ export default function CheckoutClient() {
           {orderId ? <span className="block break-all sm:inline"> · Order ID: {orderId}</span> : ""}
         </p>
         <p className="w-full max-w-full font-semibold text-sm break-words text-[#525252]">
-          We will call {order?.customer?.phone || phone.trim()} to confirm delivery.
+          We will call {order?.customer?.phone || normalizePhone(phone)} to confirm delivery.
         </p>
         <div className="mt-2 mb-50 flex w-full flex-col justify-center gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <Link
@@ -426,8 +429,8 @@ export default function CheckoutClient() {
                   id="co-phone"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter your phone number"
-                  inputMode="numeric"
+                  placeholder="e.g. 01XXXXXXXXX or +8801XXXXXXXXX"
+                  inputMode="tel"
                   autoComplete="tel"
                   className={inputClass}
                 />

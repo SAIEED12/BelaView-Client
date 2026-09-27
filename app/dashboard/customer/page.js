@@ -102,7 +102,7 @@ export default async function CustomerDashboardHome() {
         </div>
         <div className="flex gap-2">
           <Link
-            href="/"
+            href="/products"
             className="rounded-full bg-brand px-4 py-2 text-xs font-semibold tracking-[0.12em] text-white no-underline transition-colors hover:bg-brand-dark"
           >
             SHOP NOW

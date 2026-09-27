@@ -29,9 +29,6 @@ const CustomerOrdersPage = async () => {
   }
 
   const list = Array.isArray(orders) ? orders : [];
-  const activeCount = list.filter((order) =>
-    ["pending", "confirmed", "shipped"].includes(order.orderStatus)
-  ).length;
 
   return (
     <div>
@@ -42,9 +39,6 @@ const CustomerOrdersPage = async () => {
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-full border border-line bg-white px-3 py-1.5 text-smoke">
             {list.length} total
-          </span>
-          <span className="rounded-full bg-stone-200 px-3 py-1.5 text-stone-700">
-            {activeCount} in progress
           </span>
         </div>
       </div>

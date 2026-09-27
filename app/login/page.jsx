@@ -103,8 +103,8 @@ function LoginForm() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#8A8A8A] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                placeholder="Enter your email"
+                className="w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#8A8A8A] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               />
             </div>
 
@@ -112,16 +112,11 @@ function LoginForm() {
               <div className="mb-1.5 flex items-center justify-between">
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-[#1A1A1A]"
+                  className="block text-sm font-medium text-ink"
                 >
                   Password
                 </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-brand hover:underline"
-                >
-                  Forgot password?
-                </Link>
+
               </div>
               <input
                 id="password"
@@ -129,7 +124,7 @@ function LoginForm() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 className="w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-[#8A8A8A] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
               />
             </div>
