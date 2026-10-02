@@ -8,18 +8,18 @@ import Link from "next/link";
 const slides = [
   {
     image: "/Hero.png",
-    title: "Your Perfect Place to Unwind",
+    title: "Welcome to our store",
     subtitle:
-      "Handcrafted swings designed for comfort, beauty, and everyday relaxation.",
+      "Where comfort, style, beauty, and everyday essentials come together in one place. ",
     cta: "Shop Swings",
     href: "/products",
   },
   {
     image:
       "https://images.unsplash.com/photo-1765135685377-b6175d4c2788?auto=format&fit=crop&w=2400&q=90",
-    title: "Crafted for Comfort",
+    title: "Explore our collection",
     subtitle:
-      "Beautifully woven and carefully crafted swings made for peaceful moments.",
+      "Beautifully crafted swing chairs and furniture, elegant sarees and fashion wear, and carefully selected cosmetics and beauty products.",
     cta: "Explore Collection",
     href: "/products",
   },

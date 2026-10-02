@@ -35,7 +35,7 @@ const Signup = () => {
         password: userData.password,
         callbackURL: "/dashboard",
       });
-      console.log("Signup response:", { data, error });
+      // console.log("Signup response:", { data, error });
 
       if (error) {
         setError("Something went wrong. Please try again.");
