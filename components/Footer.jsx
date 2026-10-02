@@ -162,7 +162,7 @@ export default function Footer() {
             <FooterColumn title="Support" links={supportLinks} />
 
           </div>
-            <div className>
+            <div className="mt-6 text-center md:mt-0 md:text-left">
               <h3 className="text-sm font-semibold text-white">
                 Get in touch
               </h3>
