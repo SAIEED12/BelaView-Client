@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Mail, Phone } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -170,6 +170,16 @@ export default function Footer() {
                   </a>
                 </li>
 
+                <li className="flex items-center justify-center gap-3 text-sm text-[#A8A8A8] md:justify-start">
+                  <MapPin size={15} />
+
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Rampura,+Banasree,+Dhaka-1219"
+                    className="transition-colors hover:text-brand-rose"
+                  >
+                    Rampura, Banasree, Dhaka-1219
+                  </a>
+                </li>
                 <li className="flex items-center justify-center gap-3 text-sm text-[#A8A8A8] md:justify-start">
                   <Phone size={15} />
 
