@@ -58,13 +58,15 @@ const shopLinks = [
   { label: "Home", href: "/" },
   { label: "All products", href: "/products" },
   { label: "Categories", href: "/categories" },
+  { label: "About us", href: "/about" },
+
 ];
 
-const companyLinks = [
-  { label: "Our story", href: "/our-story" },
-  { label: "Journal", href: "/journal" },
-  { label: "Careers", href: "/careers" },
-];
+// const companyLinks = [
+//   { label: "Our story", href: "/our-story" },
+//   { label: "Journal", href: "/journal" },
+//   { label: "Careers", href: "/careers" },
+// ];
 
 const supportLinks = [
   { label: "Contact us", href: "/contact" },
@@ -119,7 +121,7 @@ export default function Footer() {
             />
 
             <p className="text-md font-serif text-[#D4D4D4]">
-             All The Swings Of Your Choice
+             Style your home. Express yourself. Feel beautiful. 
             </p>
 
             <div className="mt-6 flex items-center justify-center gap-3 md:justify-start">
@@ -153,13 +155,14 @@ export default function Footer() {
           <FooterColumn title="Shop" links={shopLinks} />
 
           {/* Company */}
-          <FooterColumn title="Company" links={companyLinks} />
+          {/* <FooterColumn title="Company" links={companyLinks} /> */}
 
           {/* Support */}
           <div className="text-center md:text-left">
             <FooterColumn title="Support" links={supportLinks} />
 
-            <div className="mt-8">
+          </div>
+            <div className>
               <h3 className="text-sm font-semibold text-white">
                 Get in touch
               </h3>
@@ -183,12 +186,11 @@ export default function Footer() {
                     href="tel:+8801965599181"
                     className="transition-colors hover:text-brand-rose"
                   >
-                    +880 1965599181
+                    +8801965599181
                   </a>
                 </li>
               </ul>
             </div>
-          </div>
         </div>
 
         {/* Divider */}
@@ -196,21 +198,21 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="mt-6 flex flex-col-reverse items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
-          <p className="text-xs text-[#8A8A8A]">
+          <p className="text-xs text-fog">
             © {new Date().getFullYear()} BelaView. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6">
             <a
               href="/privacy"
-              className="text-xs text-[#8A8A8A] transition-colors hover:text-brand-rose"
+              className="text-xs text-fog transition-colors hover:text-brand-rose"
             >
               Privacy
             </a>
 
             <a
               href="/terms"
-              className="text-xs text-[#8A8A8A] transition-colors hover:text-brand-rose"
+              className="text-xs text-fog transition-colors hover:text-brand-rose"
             >
               Terms
             </a>

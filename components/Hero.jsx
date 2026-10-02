@@ -26,9 +26,9 @@ const slides = [
   {
     image:
       "https://images.unsplash.com/photo-1647996091785-c1ec68da320c?q=80&w=2400&auto=format&fit=crop",
-    title: "Bring Nature Home",
+    title: "Style your home",
     subtitle:
-      "Natural materials, timeless craftsmanship, and effortless elegance.",
+      "We focus on bringing you products that combine quality, style, comfort, and value for everyday living.",
     cta: "Discover More",
     href: "/products",
   },
