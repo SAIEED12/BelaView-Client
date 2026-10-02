@@ -62,16 +62,10 @@ const shopLinks = [
 
 ];
 
-// const companyLinks = [
-//   { label: "Our story", href: "/our-story" },
-//   { label: "Journal", href: "/journal" },
-//   { label: "Careers", href: "/careers" },
-// ];
-
 const supportLinks = [
   { label: "Contact us", href: "/contact" },
   { label: "Shipping & delivery", href: "/shipping" },
-  { label: "Care guide", href: "/care-guide" },
+  { label: "Return Policy", href: "/return-policy" },
   { label: "FAQs", href: "/faq" },
 ];
 
@@ -153,9 +147,6 @@ export default function Footer() {
 
           {/* Shop */}
           <FooterColumn title="Shop" links={shopLinks} />
-
-          {/* Company */}
-          {/* <FooterColumn title="Company" links={companyLinks} /> */}
 
           {/* Support */}
           <div className="text-center md:text-left">

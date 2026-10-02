@@ -106,21 +106,15 @@ const AboutPage = () => {
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link
                 href="/products"
-                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-brand"
               >
                 Shop the collection
               </Link>
-              <a
-                href="#collections"
-                className="text-sm font-semibold text-ink underline decoration-line underline-offset-4 transition-colors hover:text-brand hover:decoration-brand"
-              >
-                See what we offer
-              </a>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-[2rem] bg-mist">
+            <div className="relative aspect-3/4 overflow-hidden rounded-[2rem] bg-mist">
               <Image
                 src="/Hero1.jpg"
                 alt="Handcrafted swing chair"
@@ -130,7 +124,7 @@ const AboutPage = () => {
                 className="object-cover"
               />
             </div>
-            <div className="relative mt-10 aspect-[3/4] overflow-hidden rounded-[2rem] bg-mist">
+            <div className="relative mt-10 aspect-3/4 overflow-hidden rounded-[2rem] bg-mist">
               <Image
                 src="/Hero2.jpg"
                 alt="Cozy home corner with swing"
@@ -195,7 +189,7 @@ const AboutPage = () => {
               className="grid items-center gap-8 md:grid-cols-2 md:gap-14"
             >
               <div
-                className={`relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-mist ${
+                className={`relative aspect-4/3 overflow-hidden rounded-[2rem] bg-mist ${
                   i % 2 === 1 ? "md:order-2" : ""
                 }`}
               >
@@ -222,7 +216,7 @@ const AboutPage = () => {
                   {item.examples.map((ex) => (
                     <li
                       key={ex}
-                      className="rounded-full border border-line px-3 py-1 text-sm text-ink"
+                      className="rounded-full border border-line px-3 py-1 text-sm text-ink font-semibold"
                     >
                       {ex}
                     </li>
@@ -230,7 +224,7 @@ const AboutPage = () => {
                 </ul>
                 <Link
                   href="/products"
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-offset-4 focus-visible:outline-brand"
                 >
                   Browse {item.title.toLowerCase()}
                   <ArrowRight size={14} aria-hidden="true" />
@@ -263,40 +257,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section
-        aria-label="Frequently asked questions"
-        className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[1fr_1.6fr] lg:gap-16 lg:px-8"
-      >
-        <div>
-          <h2 className="font-serif text-3xl leading-tight text-ink sm:text-4xl">
-            Questions, answered
-          </h2>
-          <p className="mt-3 max-w-sm text-base leading-relaxed text-smoke">
-            Can&apos;t find what you need? Contact us and we will help.
-          </p>
-        </div>
-
-        <div className="divide-y divide-line border-y border-line">
-          {faqs.map((f) => (
-            <details key={f.q} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand [&::-webkit-details-marker]:hidden">
-                {f.q}
-                <span
-                  aria-hidden="true"
-                  className="text-xl leading-none text-brand transition-transform group-open:rotate-45"
-                >
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-smoke sm:text-base">
-                {f.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 md:pb-20 lg:px-8">
         <div className="rounded-[2rem] bg-ink px-6 py-14 text-center sm:px-12 md:py-16">
@@ -310,13 +270,13 @@ const AboutPage = () => {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
               href="/products"
-              className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex items-center rounded-full bg-brand px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Shop the collection
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="inline-flex items-center rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Contact us
             </Link>
