@@ -14,13 +14,7 @@ const fileKey = (f) => `${f.name}-${f.size}-${f.lastModified}`;
 const toMaterialsString = (materials) =>
   Array.isArray(materials) ? materials.filter(Boolean).join(", ") : (materials ?? "");
 
-/**
- * Shared product form used by Add and Update modals.
- * - Prefills fields from `initialValues`.
- * - Shows `existingImages` (kept unless removed) + newly picked files.
- * - New files sync into the `images` file input so parents can read
- *   everything from FormData; kept URLs go through hidden `keptImages`.
- */
+
 export function ProductForm({
   formId,
   initialValues = {},
@@ -124,7 +118,7 @@ export function ProductForm({
           <Label htmlFor={imageInputId} className={labelClassName}>
             Images
           </Label>
-          <span className="text-xs text-[#8A8A8A]">
+          <span className="text-xs text-fog">
             Up to {MAX_IMAGES} · {totalImages}/{MAX_IMAGES} selected
           </span>
         </div>
@@ -140,18 +134,18 @@ export function ProductForm({
           tabIndex={isFull ? -1 : 0}
           aria-disabled={isFull}
           onChange={handleImageChange}
-          className={`block w-full cursor-pointer rounded-xl border border-dashed border-[#E5E5E5] bg-white p-2 text-sm text-[#1A1A1A] file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-[#1A1A1A] file:px-4 file:py-2 file:text-xs file:font-semibold file:tracking-[0.1em] file:text-white file:transition-colors hover:file:bg-brand ${
+          className={`block w-full cursor-pointer rounded-xl border border-dashed border-line bg-white p-2 text-sm text-ink file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-ink file:px-4 file:py-2 file:text-xs file:font-semibold file:tracking-widest file:text-white file:transition-colors hover:file:bg-brand ${
             isFull ? "pointer-events-none opacity-60" : ""
           }`}
         />
-        <p className="text-xs text-[#8A8A8A]">
+        <p className="text-xs text-fog">
           {isFull
             ? "Maximum reached. Remove an image to add another."
             : "The first image is used as the cover."}
         </p>
 
         {keptExisting.length > 0 && (
-          <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-[#E5E5E5] bg-white p-2">
+          <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-line bg-white p-2">
             {keptExisting.map((src, index) => (
               <div key={src} className="relative">
                 <img
@@ -160,7 +154,7 @@ export function ProductForm({
                   className="h-28 w-full rounded-lg object-cover"
                 />
                 {index === 0 && previews.length === 0 && (
-                  <span className="absolute top-2 left-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold tracking-[0.1em] text-white uppercase">
+                  <span className="absolute top-2 left-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold tracking-widest text-white uppercase">
                     Cover
                   </span>
                 )}
@@ -179,7 +173,7 @@ export function ProductForm({
         )}
 
         {previews.length > 0 && (
-          <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-[#E5E5E5] bg-white p-2">
+          <div className="mt-2 grid grid-cols-2 gap-2 rounded-xl border border-line bg-white p-2">
             {previews.map((src, index) => (
               <div key={src} className="relative">
                 <img
@@ -188,7 +182,7 @@ export function ProductForm({
                   className="h-28 w-full rounded-lg object-cover"
                 />
                 {keptExisting.length === 0 && index === 0 && (
-                  <span className="absolute top-2 left-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold tracking-[0.1em] text-white uppercase">
+                  <span className="absolute top-2 left-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-semibold tracking-widest text-white uppercase">
                     Cover
                   </span>
                 )}
