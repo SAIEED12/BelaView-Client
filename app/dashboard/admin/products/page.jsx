@@ -3,6 +3,7 @@ import { AddProductModal } from "@/components/dashboard/AddProductModal";
 import { ProductTable } from "@/components/dashboard/ProductTable";
 import { ProductSearchInput } from "@/components/products/ProductSearchInput";
 import { getAdminProducts } from "@/lib/actions/products";
+import { getCategories } from "@/lib/actions/categories";
 
 const PAGE_SIZE = 20;
 
@@ -31,11 +32,12 @@ const AdminProductsPage = async ({ searchParams }) => {
     result = { products: [], total: 0, page, limit: PAGE_SIZE, totalPages: 1 };
   }
   const list = Array.isArray(result.products) ? result.products : [];
+  const { categories } = await getCategories();
   return (
     <div>
       <div className="flex justify-between items-center my-5">
         <h1 className="truncate font-serif text-xl text-ink md:text-3xl">Products</h1>
-        <AddProductModal />
+        <AddProductModal categories={categories} />
       </div>
       <Suspense>
         <ProductSearchInput
@@ -54,6 +56,7 @@ const AdminProductsPage = async ({ searchParams }) => {
         page={result.page}
         limit={result.limit}
         totalPages={result.totalPages}
+        categories={categories}
       />
     </div>
   );

@@ -1,9 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { AddToCartButton } from "@/components/cart/AddToCartButton";
-import { WishlistHeartButton } from "@/components/wishlist/WishlistHeartButton";
 import { ProductSearchInput } from "@/components/products/ProductSearchInput";
+import { ProductGrid } from "@/components/products/ProductCard";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductFilterDrawer } from "@/components/products/ProductFilterDrawer";
 import { PaginationControls } from "@/components/PaginationControls";
@@ -16,6 +14,15 @@ const getParam = (query, key) => {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 };
 
+const getListParam = (query, key) => {
+  const value = query?.[key];
+  const entries = Array.isArray(value) ? value : value !== undefined ? [value] : [];
+  return entries
+    .flatMap((entry) => String(entry).split(","))
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+};
+
 const AllProductsPage = async ({ searchParams }) => {
   const searchQuery = await searchParams;
   const rawSearch = getParam(searchQuery, "search");
@@ -24,11 +31,8 @@ const AllProductsPage = async ({ searchParams }) => {
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const searchText = rawSearch.trim();
 
-  const rawCategories = searchQuery?.category;
-  const categoryList = (Array.isArray(rawCategories) ? rawCategories : rawCategories !== undefined ? [rawCategories] : [])
-    .flatMap((entry) => String(entry).split(","))
-    .map((entry) => entry.trim())
-    .filter(Boolean);
+  const categoryList = getListParam(searchQuery, "category");
+  const subcategoryList = getListParam(searchQuery, "subcategory");
   const rawMinPrice = getParam(searchQuery, "minPrice").trim();
   const rawMaxPrice = getParam(searchQuery, "maxPrice").trim();
   const inStock = getParam(searchQuery, "inStock").trim().toLowerCase() === "true";
@@ -38,6 +42,7 @@ const AllProductsPage = async ({ searchParams }) => {
   const params = new URLSearchParams();
   if (searchText) params.set("search", searchText);
   for (const category of categoryList) params.append("category", category);
+  for (const subcategory of subcategoryList) params.append("subcategory", subcategory);
   if (rawMinPrice) params.set("minPrice", rawMinPrice);
   if (rawMaxPrice) params.set("maxPrice", rawMaxPrice);
   if (inStock) params.set("inStock", "true");
@@ -83,6 +88,7 @@ const AllProductsPage = async ({ searchParams }) => {
   const filterProps = {
     facets,
     selectedCategories: categoryList,
+    selectedSubcategories: subcategoryList,
     minPrice: rawMinPrice,
     maxPrice: rawMaxPrice,
     inStock,
@@ -103,7 +109,7 @@ const AllProductsPage = async ({ searchParams }) => {
 
       <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
         <aside aria-label="Product filters" className="hidden lg:block">
-          <div className="lg:sticky lg:top-24 rounded-2xl border border-line bg-white p-5">
+          <div className="lg:sticky lg:top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-line bg-white p-5">
             <Suspense>
               <ProductFilters {...filterProps} />
             </Suspense>
@@ -117,76 +123,23 @@ const AllProductsPage = async ({ searchParams }) => {
             </p>
           ) : null}
 
+          <ProductGrid
+            products={products}
+            showCategory
+            emptyMessage={
+              searchText
+                ? `No products found for "${searchText}".`
+                : "No products match the selected filters."
+            }
+          />
           {products.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-line bg-white px-6 py-10 text-center">
-              <p className="text-sm text-smoke">
-                {searchText
-                  ? `No products found for "${searchText}".`
-                  : "No products match the selected filters."}{" "}
-                <Link href="/products" className="font-semibold text-brand hover:underline">
-                  Clear search and filters
-                </Link>
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {products.map((product) => (
-                <article
-                  key={String(product._id)}
-                  className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg"
-                >
-                  <div className="relative aspect-square w-full overflow-hidden bg-mist">
-                    {product.image && (
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        unoptimized
-                        sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    )}
-                  </div>
+            <p className="mt-4 text-center text-sm text-smoke">
+              <Link href="/products" className="font-semibold text-brand hover:underline">
+                Clear search and filters
+              </Link>
+            </p>
+          ) : null}
 
-                  <div className="flex flex-1 flex-col gap-2 p-8">
-                    <h2 className="text-lg font-semibold text-ink">
-                      {product.name}
-                    </h2>
-                    <p className="text-sm text-smoke">
-                      {product.category && (
-                        <span className="mr-1.5 text-xs font-semibold uppercase ">
-                          CATEGORY: {product.category.replace("-", " ")}
-                        </span>
-                      )}
-                    </p>
-
-                    <div className="mt-auto flex flex-row items-center justify-between gap-3 pt-3">
-                      <span className="text-2xl font-semibold text-brand">
-                        ৳{Number(product.price).toLocaleString()}
-                      </span>
-                      <WishlistHeartButton
-                        productId={String(product._id)}
-                        name={product.name}
-                      />
-                    </div>
-                    <Link
-                      href={`/products/${product._id}`}
-                      className="block w-full rounded-full bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark sm:w-auto sm:py-2"
-                    >
-                      View Details
-                    </Link>
-                    <AddToCartButton
-                      productId={String(product._id)}
-                      name={product.name}
-                      price={product.price}
-                      image={product.image || ""}
-                      stock={Number(product.stock ?? 1)}
-                    />
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
           <Suspense>
             <PaginationControls page={currentPage} totalPages={totalPages} label="Products pagination" />
           </Suspense>

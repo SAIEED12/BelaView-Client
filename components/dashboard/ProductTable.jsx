@@ -27,7 +27,7 @@ const getPageItems = (page, totalPages) => {
   return items;
 };
 
-export function ProductTable({ products, total = 0, page = 1, limit = 20, totalPages = 1 }) {
+export function ProductTable({ products, total = 0, page = 1, limit = 20, totalPages = 1, categories = [] }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -176,6 +176,7 @@ export function ProductTable({ products, total = 0, page = 1, limit = 20, totalP
 
       <UpdateProductModal
         product={editingProduct}
+        categories={categories}
         isOpen={editingProduct !== null}
         onOpenChange={(open) => {
           if (!open) setEditingProduct(null);

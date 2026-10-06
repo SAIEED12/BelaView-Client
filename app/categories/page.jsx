@@ -1,18 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { groupProductsByCategory } from "@/lib/categories";
-
-const SERVER_URL = process.env.SERVER_URL;
+import {
+  categoryHref,
+  getCategoryTree,
+  subcategoryHref,
+} from "@/lib/categories";
 
 export const metadata = {
   title: "Categories | BelaView",
-  description: "Browse products by category.",
+  description: "Browse products by category and sub-category.",
 };
 
 const AllCategoriesPage = async () => {
-  const res = await fetch(`${SERVER_URL}/products`, { cache: "no-store" });
-  const products = res.ok ? await res.json() : [];
-  const categories = groupProductsByCategory(products);
+  const categories = await getCategoryTree();
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -25,43 +25,72 @@ const AllCategoriesPage = async () => {
 
       {categories.length === 0 ? (
         <p className="text-smoke">
-          No categories found. Add a product with a category to get started.
+          No categories found yet. Categories are created by the store owner.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {categories.map((category) => (
-            <Link
-              key={category.slug}
-              href={`/categories/${category.slug}`}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white no-underline transition-shadow hover:shadow-lg"
+        <div className="flex flex-col gap-6">
+          {categories.map((parent) => (
+            <section
+              key={parent.slug}
+              className="overflow-hidden rounded-2xl border border-line bg-white"
             >
-              <div className="relative aspect-4/3 w-full overflow-hidden bg-mist">
-                {category.coverImage ? (
-                  <Image
-                    src={category.coverImage}
-                    alt={category.name}
-                    fill
-                    unoptimized
-                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                ) : null}
+              <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
+                <Link
+                  href={categoryHref(parent)}
+                  className="group relative block bg-mist no-underline md:aspect-square"
+                >
+                  {parent.image ? (
+                    <Image
+                      src={parent.image}
+                      alt={parent.name}
+                      fill
+                      unoptimized
+                      sizes="(min-width: 768px) 220px, 100vw"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : null}
+                </Link>
+
+                <div className="flex flex-col gap-3 p-6 md:p-8">
+                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                    <h2 className="font-serif text-2xl text-ink">
+                      <Link
+                        href={categoryHref(parent)}
+                        className="text-ink no-underline hover:text-brand"
+                      >
+                        {parent.name}
+                      </Link>
+                    </h2>
+                    <p className="text-xs font-semibold uppercase tracking-[0.14em] text-smoke">
+                      {parent.productCount ?? 0}{" "}
+                      {(parent.productCount ?? 0) === 1 ? "product" : "products"}
+                    </p>
+                  </div>
+
+                  {parent.subcategories?.length > 0 ? (
+                    <ul className="flex flex-wrap gap-2 pt-1">
+                      {parent.subcategories.map((sub) => (
+                        <li key={sub.slug}>
+                          <Link
+                            href={subcategoryHref(parent, sub)}
+                            className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-ink no-underline transition-colors hover:border-brand hover:bg-brand-soft hover:text-brand"
+                          >
+                            {sub.name}
+                            <span className="text-[10px] font-semibold text-fog">
+                              {sub.productCount ?? 0}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-smoke">
+                      No sub-categories yet.
+                    </p>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-1 flex-col gap-1 p-6">
-                <h2 className="text-lg font-semibold text-ink">
-                  {category.name}
-                </h2>
-                <p className="text-sm text-smoke">
-                  {category.count} {category.count === 1 ? "product" : "products"}
-                  {category.minPrice !== null
-                    ? ` · from ৳${Number(category.minPrice).toLocaleString()}`
-                    : ""}
-                </p>
-                <span className="mt-3 text-xs font-semibold tracking-[0.12em] text-brand">
-                  VIEW PRODUCTS →
-                </span>
-              </div>
-            </Link>
+            </section>
           ))}
         </div>
       )}

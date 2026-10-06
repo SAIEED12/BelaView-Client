@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { imageUpload } from "@/lib/imageUpload";
 import { MAX_IMAGES, ProductForm } from "./ProductForm";
 
-export function UpdateProductModal({ product, isOpen, onOpenChange }) {
+export function UpdateProductModal({ product, categories = [], isOpen, onOpenChange }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState(null);
@@ -84,7 +84,7 @@ export function UpdateProductModal({ product, isOpen, onOpenChange }) {
         });
       } catch (err) {
         console.error("Update product failed:", err);
-        setError("Couldn't update the product. Please try again.");
+        setError(err?.message || "Couldn't update the product. Please try again.");
         return;
       }
 
@@ -135,6 +135,7 @@ export function UpdateProductModal({ product, isOpen, onOpenChange }) {
                 imagesRequired={false}
                 isPending={isPending}
                 error={error}
+                categories={categories}
                 onSubmit={onSubmit}
               />
             </Modal.Body>

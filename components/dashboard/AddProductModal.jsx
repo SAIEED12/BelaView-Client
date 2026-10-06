@@ -8,7 +8,7 @@ import { imageUpload } from "@/lib/imageUpload";
 import { MAX_IMAGES, ProductForm } from "./ProductForm";
 import toast from "react-hot-toast";
 
-export function AddProductModal() {
+export function AddProductModal({ categories = [] }) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -122,6 +122,7 @@ export function AddProductModal() {
                 imagesRequired
                 isPending={isPending}
                 error={error}
+                categories={categories}
                 onSubmit={onSubmit}
               />
             </Modal.Body>

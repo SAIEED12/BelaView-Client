@@ -2,7 +2,6 @@ import Hero from "@/components/Hero";
 import ShopByCategory from "@/components/home/ShopByCategory";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import WhyBelaView from "@/components/home/WhyBelaView";
-import { groupProductsByCategory } from "@/lib/categories";
 
 const SERVER_URL = process.env.SERVER_URL;
 
@@ -21,12 +20,11 @@ async function getProducts() {
 
 export default async function Home() {
   const products = await getProducts();
-  const groups = groupProductsByCategory(products);
 
   return (
     <div className="bg-white flex min-h-screen flex-col">
       <Hero />
-      <ShopByCategory groups={groups} />
+      <ShopByCategory products={products} />
       <FeaturedProducts products={products} />
       <WhyBelaView />
     </div>

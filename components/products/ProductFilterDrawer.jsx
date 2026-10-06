@@ -7,13 +7,21 @@ import { ProductFilters, countActiveFilters } from "./ProductFilters";
 export function ProductFilterDrawer({
   facets,
   selectedCategories = [],
+  selectedSubcategories = [],
   minPrice = "",
   maxPrice = "",
   inStock = false,
   sort = "newest",
 }) {
   const [open, setOpen] = useState(false);
-  const activeCount = countActiveFilters({ categories: selectedCategories, minPrice, maxPrice, inStock, sort });
+  const activeCount = countActiveFilters({
+    categories: selectedCategories,
+    subcategories: selectedSubcategories,
+    minPrice,
+    maxPrice,
+    inStock,
+    sort,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -80,6 +88,7 @@ export function ProductFilterDrawer({
               <ProductFilters
                 facets={facets}
                 selectedCategories={selectedCategories}
+                selectedSubcategories={selectedSubcategories}
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 inStock={inStock}

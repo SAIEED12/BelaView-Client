@@ -1,7 +1,8 @@
 "use client";
 import { X } from "lucide-react";
 import { Input, Label, TextArea, TextField } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { slugifyCategory } from "@/lib/categories";
 
 export const MAX_IMAGES = 4;
 
@@ -14,6 +15,20 @@ const fileKey = (f) => `${f.name}-${f.size}-${f.lastModified}`;
 const toMaterialsString = (materials) =>
   Array.isArray(materials) ? materials.filter(Boolean).join(", ") : (materials ?? "");
 
+// Products saved before categories existed store free text. Resolve it against
+// the current list so legacy products keep their value until the admin picks
+// a real category.
+const matchCategorySlug = (categories, value) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  const list = Array.isArray(categories) ? categories : [];
+  const wanted = slugifyCategory(raw);
+  return (
+    list.find((entry) => entry?.slug === raw)?.slug ??
+    list.find((entry) => slugifyCategory(entry?.name) === wanted)?.slug ??
+    ""
+  );
+};
 
 export function ProductForm({
   formId,
@@ -22,12 +37,42 @@ export function ProductForm({
   imagesRequired = true,
   isPending = false,
   error = null,
+  categories = [],
   onSubmit,
   imageInputId = "product-image",
 }) {
   const [files, setFiles] = useState([]); // File[] (max 4 total with kept)
   const [previews, setPreviews] = useState([]); // object URLs, same order as files
   const [keptExisting, setKeptExisting] = useState(existingImages);
+
+  const legacyCategory = useMemo(() => {
+    const raw = String(initialValues.category ?? "").trim();
+    if (!raw) return "";
+    return matchCategorySlug(categories, raw) ? "" : raw;
+  }, [categories, initialValues.category]);
+
+  const [selectedCategory, setSelectedCategory] = useState(
+    () => matchCategorySlug(categories, initialValues.category) || legacyCategory,
+  );
+  const [selectedSubcategory, setSelectedSubcategory] = useState(() => {
+    const raw = String(initialValues.subcategory ?? "").trim();
+    if (!raw) return "";
+    const parent = (Array.isArray(categories) ? categories : []).find(
+      (entry) => entry?.slug === matchCategorySlug(categories, initialValues.category),
+    );
+    const subs = Array.isArray(parent?.subcategories) ? parent.subcategories : [];
+    // Drop a stored sub-category that no longer exists so the select stays valid.
+    return subs.some((entry) => entry?.slug === raw || slugifyCategory(entry?.name) === slugifyCategory(raw))
+      ? raw
+      : "";
+  });
+
+  const subcategories = useMemo(() => {
+    const parent = (Array.isArray(categories) ? categories : []).find(
+      (entry) => entry?.slug === selectedCategory,
+    );
+    return Array.isArray(parent?.subcategories) ? parent.subcategories : [];
+  }, [categories, selectedCategory]);
 
   const inputRef = useRef(null);
   const previewsRef = useRef([]);
@@ -214,19 +259,67 @@ export function ProductForm({
         />
       </TextField>
 
-      <div className="flex flex-col gap-2">
-        <TextField
-          className="flex w-full flex-col gap-1.5"
-          name="category"
-          defaultValue={initialValues.category ?? ""}
-          isRequired
-        >
-          <Label className={labelClassName}>Category</Label>
-          <Input
-            placeholder="e.g. Baskets, Home Decor, Hanging Swing Chairs etc."
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor={`${formId}-category`} className={labelClassName}>
+            Category
+          </label>
+          <select
+            id={`${formId}-category`}
+            name="category"
+            required
+            value={selectedCategory}
+            disabled={isPending}
+            onChange={(event) => {
+              setSelectedCategory(event.target.value);
+              // A sub-category only makes sense under its own parent.
+              setSelectedSubcategory("");
+            }}
             className={inputClassName}
-          />
-        </TextField>
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {legacyCategory ? (
+              <option value={legacyCategory}>
+                {legacyCategory} (not linked to a category)
+              </option>
+            ) : null}
+            {categories.map((entry) => (
+              <option key={entry.slug} value={entry.slug}>
+                {entry.name}
+              </option>
+            ))}
+          </select>
+          {categories.length === 0 ? (
+            <p className="text-xs text-fog">
+              No categories yet — create one under Categories in the sidebar.
+            </p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor={`${formId}-subcategory`} className={labelClassName}>
+            Sub-category
+          </label>
+          <select
+            id={`${formId}-subcategory`}
+            name="subcategory"
+            value={selectedSubcategory}
+            disabled={isPending || !selectedCategory || subcategories.length === 0}
+            onChange={(event) => setSelectedSubcategory(event.target.value)}
+            className={`${inputClassName} disabled:cursor-not-allowed disabled:bg-[#F5F5F5] disabled:text-[#8A8A8A]`}
+          >
+            <option value="">
+              {subcategories.length === 0 ? "No sub-categories" : "No sub-category"}
+            </option>
+            {subcategories.map((entry) => (
+              <option key={entry.slug} value={entry.slug}>
+                {entry.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

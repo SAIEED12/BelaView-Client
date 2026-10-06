@@ -12,8 +12,16 @@ export const SORT_OPTIONS = [
   { id: "name", label: "Name A–Z" },
 ];
 
-export const countActiveFilters = ({ categories, minPrice, maxPrice, inStock, sort }) =>
+export const countActiveFilters = ({
+  categories,
+  subcategories,
+  minPrice,
+  maxPrice,
+  inStock,
+  sort,
+}) =>
   (Array.isArray(categories) ? categories.length : 0) +
+  (Array.isArray(subcategories) ? subcategories.length : 0) +
   (minPrice || maxPrice ? 1 : 0) +
   (inStock ? 1 : 0) +
   (sort && sort !== "newest" ? 1 : 0);
@@ -21,9 +29,15 @@ export const countActiveFilters = ({ categories, minPrice, maxPrice, inStock, so
 const sectionTitleClassName =
   "text-xs font-semibold uppercase tracking-[0.14em] text-ink";
 
+const facetSlug = (entry) => String(entry?.slug ?? entry?.name ?? "");
+
+const facetSubcategories = (entry) =>
+  Array.isArray(entry?.subcategories) ? entry.subcategories : [];
+
 export function ProductFilters({
   facets,
   selectedCategories = [],
+  selectedSubcategories = [],
   minPrice = "",
   maxPrice = "",
   inStock = false,
@@ -37,7 +51,14 @@ export function ProductFilters({
   const timerRef = useRef(null);
   const searchParamsRef = useRef(searchParams?.toString() ?? "");
   const committedRef = useRef(
-    JSON.stringify({ minPrice, maxPrice, selectedCategories, inStock, sort }),
+    JSON.stringify({
+      minPrice,
+      maxPrice,
+      selectedCategories,
+      selectedSubcategories,
+      inStock,
+      sort,
+    }),
   );
 
   useEffect(() => {
@@ -46,13 +67,20 @@ export function ProductFilters({
 
   // Sync only on external URL changes (back/forward, clear-all), never while typing.
   useEffect(() => {
-    const snapshot = JSON.stringify({ minPrice, maxPrice, selectedCategories, inStock, sort });
+    const snapshot = JSON.stringify({
+      minPrice,
+      maxPrice,
+      selectedCategories,
+      selectedSubcategories,
+      inStock,
+      sort,
+    });
     if (snapshot !== committedRef.current) {
       committedRef.current = snapshot;
       setMinValue(minPrice);
       setMaxValue(maxPrice);
     }
-  }, [minPrice, maxPrice, selectedCategories, inStock, sort]);
+  }, [minPrice, maxPrice, selectedCategories, selectedSubcategories, inStock, sort]);
 
   useEffect(() => {
     return () => {
@@ -77,19 +105,49 @@ export function ProductFilters({
     minPrice: overrides.minPrice ?? minValue,
     maxPrice: overrides.maxValue ?? maxValue,
     selectedCategories: overrides.selectedCategories ?? selectedCategories,
+    selectedSubcategories:
+      overrides.selectedSubcategories ?? selectedSubcategories,
     inStock: overrides.inStock ?? inStock,
     sort: overrides.sort ?? sort,
   });
 
-  const toggleCategory = (name) => {
+  const setListParam = (params, key, values) => {
+    params.delete(key);
+    for (const value of values) params.append(key, value);
+  };
+
+  const toggleCategory = (slug) => {
     const current = Array.isArray(selectedCategories) ? selectedCategories : [];
-    const next = current.includes(name)
-      ? current.filter((c) => c !== name)
-      : [...current, name];
-    commitSnapshot(snapshotOf({ selectedCategories: next }));
+    const next = current.includes(slug)
+      ? current.filter((value) => value !== slug)
+      : [...current, slug];
+    // Deselecting a parent must also drop its selected sub-categories.
+    const subs = Array.isArray(selectedSubcategories) ? selectedSubcategories : [];
+    const parent = categories.find((entry) => facetSlug(entry) === slug);
+    const childSlugs = new Set(facetSubcategories(parent).map(facetSlug));
+    const nextSubs = current.includes(slug)
+      ? subs.filter((value) => !childSlugs.has(value))
+      : subs;
+    commitSnapshot(snapshotOf({ selectedCategories: next, selectedSubcategories: nextSubs }));
     navigate((params) => {
-      params.delete("category");
-      for (const c of next) params.append("category", c);
+      setListParam(params, "category", next);
+      setListParam(params, "subcategory", nextSubs);
+    });
+  };
+
+  const toggleSubcategory = (parentSlug, subSlug) => {
+    const current = Array.isArray(selectedSubcategories) ? selectedSubcategories : [];
+    const next = current.includes(subSlug)
+      ? current.filter((value) => value !== subSlug)
+      : [...current, subSlug];
+    const parents = Array.isArray(selectedCategories) ? selectedCategories : [];
+    const nextParents = parents.includes(parentSlug)
+      ? parents
+      : [...parents, parentSlug];
+    commitSnapshot(snapshotOf({ selectedCategories: nextParents, selectedSubcategories: next }));
+    navigate((params) => {
+      setListParam(params, "category", nextParents);
+      setListParam(params, "subcategory", next);
     });
   };
 
@@ -142,11 +200,19 @@ export function ProductFilters({
 
   const handleClearAll = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    commitSnapshot({ minPrice: "", maxPrice: "", selectedCategories: [], inStock: false, sort: "newest" });
+    commitSnapshot({
+      minPrice: "",
+      maxPrice: "",
+      selectedCategories: [],
+      selectedSubcategories: [],
+      inStock: false,
+      sort: "newest",
+    });
     setMinValue("");
     setMaxValue("");
     navigate((params) => {
       params.delete("category");
+      params.delete("subcategory");
       params.delete("minPrice");
       params.delete("maxPrice");
       params.delete("inStock");
@@ -155,7 +221,14 @@ export function ProductFilters({
   };
 
   const categories = Array.isArray(facets?.categories) ? facets.categories : [];
-  const activeCount = countActiveFilters({ categories: selectedCategories, minPrice, maxPrice, inStock, sort });
+  const activeCount = countActiveFilters({
+    categories: selectedCategories,
+    subcategories: selectedSubcategories,
+    minPrice,
+    maxPrice,
+    inStock,
+    sort,
+  });
 
   return (
     <div className="space-y-6">
@@ -193,21 +266,47 @@ export function ProductFilters({
       {categories.length > 0 ? (
         <fieldset>
           <legend className={`${sectionTitleClassName} mb-2`}>Category</legend>
-          <ul className="space-y-1.5">
+          <ul className="space-y-1">
             {categories.map((category) => {
-              const name = String(category.name ?? "");
-              const checked = selectedCategories.includes(name);
+              const slug = facetSlug(category);
+              if (!slug) return null;
+              const checked = selectedCategories.includes(slug);
+              const subs = facetSubcategories(category);
               return (
-                <li key={name}>
-                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-sm text-ink transition-colors hover:bg-mist">
+                <li key={slug}>
+                  <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-sm font-semibold text-ink transition-colors hover:bg-mist">
                     <input
                       type="checkbox"
                       checked={checked}
-                      onChange={() => toggleCategory(name)}
+                      onChange={() => toggleCategory(slug)}
                       className="h-4 w-4 shrink-0 cursor-pointer accent-ink"
                     />
-                    <span className="flex-1 truncate">{name.replace(/-/g, " ")}</span>
+                    <span className="flex-1 truncate">{category.name ?? slug}</span>
+                    <span className="shrink-0 text-xs text-fog">{category.count ?? 0}</span>
                   </label>
+                  {subs.length > 0 ? (
+                    <ul className="ml-6 mt-0.5 space-y-0.5 border-l border-line pl-3">
+                      {subs.map((sub) => {
+                        const subSlug = facetSlug(sub);
+                        if (!subSlug) return null;
+                        const subChecked = selectedSubcategories.includes(subSlug);
+                        return (
+                          <li key={subSlug}>
+                            <label className="flex cursor-pointer items-center gap-2.5 rounded-lg px-1 py-1 text-sm text-smoke transition-colors hover:bg-mist">
+                              <input
+                                type="checkbox"
+                                checked={subChecked}
+                                onChange={() => toggleSubcategory(slug, subSlug)}
+                                className="h-3.5 w-3.5 shrink-0 cursor-pointer accent-ink"
+                              />
+                              <span className="flex-1 truncate">{sub.name ?? subSlug}</span>
+                              <span className="shrink-0 text-xs text-fog">{sub.count ?? 0}</span>
+                            </label>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
                 </li>
               );
             })}
