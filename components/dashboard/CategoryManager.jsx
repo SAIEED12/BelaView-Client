@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, Pencil, Plus, Trash2, Wand2, X } from "lucide-react";
+import { ChevronDown, ChevronRight, ImagePlus, Pencil, Plus, Trash2, Wand2, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { imageUpload } from "@/lib/imageUpload";
 import {
   createCategory,
   createSubcategory,
@@ -30,8 +31,30 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryImageUrl, setNewCategoryImageUrl] = useState("");
+  const [newCategoryFile, setNewCategoryFile] = useState(null);
+  const [newCategoryPreview, setNewCategoryPreview] = useState(null);
 
   const [editingParent, setEditingParent] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (newCategoryPreview) URL.revokeObjectURL(newCategoryPreview);
+      if (editingParent?.preview) URL.revokeObjectURL(editingParent.preview);
+    };
+  }, [newCategoryPreview, editingParent?.preview]);
+
+  const resolveCategoryImage = async ({ file, imageUrl, removeImage }) => {
+    if (removeImage) return null;
+    if (file instanceof File && file.size > 0) {
+      const uploaded = await imageUpload(file);
+      const url = uploaded?.url ?? "";
+      if (!url) throw new Error("Image upload failed. Please try again.");
+      return url;
+    }
+    const trimmed = String(imageUrl ?? "").trim();
+    return trimmed ? trimmed : undefined;
+  };
   const [editingSub, setEditingSub] = useState(null);
   const [addingSubFor, setAddingSubFor] = useState(null);
   const [subDraft, setSubDraft] = useState("");
@@ -66,30 +89,70 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
     }
   };
 
+  const resetNewCategoryForm = () => {
+    setNewCategoryName("");
+    setNewCategoryImageUrl("");
+    if (newCategoryPreview) URL.revokeObjectURL(newCategoryPreview);
+    setNewCategoryFile(null);
+    setNewCategoryPreview(null);
+    setIsAddingCategory(false);
+  };
+
+  const handleNewCategoryFile = (file) => {
+    if (!(file instanceof File) || file.size === 0) return;
+    if (newCategoryPreview) URL.revokeObjectURL(newCategoryPreview);
+    setNewCategoryFile(file);
+    setNewCategoryPreview(URL.createObjectURL(file));
+  };
+
+  const handleEditingParentFile = (file) => {
+    if (!(file instanceof File) || file.size === 0) return;
+    setEditingParent((prev) => {
+      if (!prev) return prev;
+      if (prev.preview) URL.revokeObjectURL(prev.preview);
+      return { ...prev, file, preview: URL.createObjectURL(file), removeImage: false };
+    });
+  };
+
   const handleAddCategory = async (event) => {
     event.preventDefault();
     const name = newCategoryName.trim();
     if (!name) return;
-    const ok = await run(
-      "add-category",
-      () => createCategory({ name }),
-      `Category “${name}” created`,
-    );
-    if (ok) {
-      setNewCategoryName("");
-      setIsAddingCategory(false);
-    }
+    const ok = await run("add-category", async () => {
+      const image = await resolveCategoryImage({
+        file: newCategoryFile,
+        imageUrl: newCategoryImageUrl,
+        removeImage: false,
+      });
+      const payload = { name };
+      if (image !== undefined) payload.image = image;
+      await createCategory(payload);
+    }, `Category “${name}” created`);
+    if (ok) resetNewCategoryForm();
   };
 
   const handleSaveParent = async (category) => {
     const name = editingParent?.name?.trim();
     if (!name) return;
-    const ok = await run(
-      `parent-${category._id}`,
-      () => updateCategory(category._id, { name }),
-      `Category renamed to “${name}”`,
-    );
-    if (ok) setEditingParent(null);
+    const ok = await run(`parent-${category._id}`, async () => {
+      const image = await resolveCategoryImage({
+        file: editingParent?.file,
+        imageUrl: editingParent?.imageUrl,
+        removeImage: editingParent?.removeImage,
+      });
+      const payload = { name };
+      // undefined = unchanged, null = removed, string = new image.
+      if (image !== undefined) payload.image = image;
+      else if (editingParent?.removeImage) payload.image = null;
+      else if (String(editingParent?.imageUrl ?? "").trim() === "" && category?.image) {
+        payload.image = null;
+      }
+      await updateCategory(category._id, payload);
+    }, `Category saved as “${name}”`);
+    if (ok) {
+      if (editingParent?.preview) URL.revokeObjectURL(editingParent.preview);
+      setEditingParent(null);
+    }
   };
 
   const handleAddSub = async (category) => {
@@ -218,23 +281,91 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
                   {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 </button>
 
-                {isEditingParent ? (
-                  <input
-                    autoFocus
-                    value={editingParent.name}
-                    onChange={(event) =>
-                      setEditingParent((prev) => ({ ...prev, name: event.target.value }))
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") {
-                        event.preventDefault();
-                        handleSaveParent(category);
-                      }
-                      if (event.key === "Escape") setEditingParent(null);
-                    }}
-                    className={`${inputClassName} max-w-xs`}
-                    aria-label={`Rename ${category.name}`}
+                {category.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={category.image}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-xl border border-line object-cover"
                   />
+                ) : (
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-sm font-semibold text-smoke">
+                    {String(category.name ?? "?").trim().charAt(0).toUpperCase() || "?"}
+                  </span>
+                )}
+
+                {isEditingParent ? (
+                  <div className="min-w-0 flex-1">
+                    <input
+                      autoFocus
+                      value={editingParent.name}
+                      onChange={(event) =>
+                        setEditingParent((prev) => ({ ...prev, name: event.target.value }))
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          handleSaveParent(category);
+                        }
+                        if (event.key === "Escape") setEditingParent(null);
+                      }}
+                      className={`${inputClassName} max-w-xs`}
+                      aria-label={`Rename ${category.name}`}
+                    />
+                    <div className="mt-2 flex max-w-xs items-center gap-2">
+                      {(editingParent.preview || (!editingParent.removeImage && String(editingParent.imageUrl ?? "").trim())) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={editingParent.preview || String(editingParent.imageUrl).trim()}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-xl border border-line object-cover"
+                        />
+                      ) : null}
+                      <input
+                        value={editingParent.imageUrl ?? ""}
+                        onChange={(event) =>
+                          setEditingParent((prev) => ({
+                            ...prev,
+                            imageUrl: event.target.value,
+                            removeImage: false,
+                          }))
+                        }
+                        placeholder="Image URL (optional)"
+                        className={inputClassName}
+                        aria-label={`Image URL for ${category.name}`}
+                      />
+                    </div>
+                    <div className="mt-2 flex max-w-xs flex-wrap items-center gap-2">
+                      <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-brand hover:underline">
+                        <ImagePlus size={14} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(event) => handleEditingParentFile(event.target.files?.[0])}
+                        />
+                        {editingParent.file ? "Change file…" : "Upload…"}
+                      </label>
+                      {editingParent.file || String(editingParent.imageUrl ?? "").trim() || category.image ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingParent((prev) => {
+                              if (!prev) return prev;
+                              if (prev.preview) URL.revokeObjectURL(prev.preview);
+                              return { ...prev, file: null, preview: null, imageUrl: "", removeImage: true };
+                            })
+                          }
+                          className="text-xs font-semibold text-fog hover:text-brand hover:underline"
+                        >
+                          Remove image
+                        </button>
+                      ) : null}
+                    </div>
+                    {editingParent.file ? (
+                      <p className="mt-1 max-w-xs truncate text-xs text-fog">{editingParent.file.name} (uploads on Save)</p>
+                    ) : null}
+                  </div>
                 ) : (
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-ink">{category.name}</p>
@@ -277,9 +408,18 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
                       </a>
                       <button
                         type="button"
-                        onClick={() => setEditingParent({ id: category._id, name: category.name })}
+                        onClick={() =>
+                          setEditingParent({
+                            id: category._id,
+                            name: category.name,
+                            imageUrl: category.image ?? "",
+                            file: null,
+                            preview: null,
+                            removeImage: false,
+                          })
+                        }
                         className={ghostButtonClassName}
-                        aria-label={`Rename ${category.name}`}
+                        aria-label={`Edit ${category.name}`}
                       >
                         <Pencil size={15} />
                       </button>
@@ -435,34 +575,68 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
       {isAddingCategory ? (
         <form
           onSubmit={handleAddCategory}
-          className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-white px-4 py-3.5 sm:px-5"
+          className="flex flex-col gap-3 rounded-2xl border border-line bg-white px-4 py-3.5 sm:px-5"
         >
-          <input
-            autoFocus
-            value={newCategoryName}
-            onChange={(event) => setNewCategoryName(event.target.value)}
-            placeholder="Category name, e.g. Swing Chair"
-            className={`${inputClassName} max-w-sm`}
-            aria-label="New category name"
-          />
-          <button
-            type="submit"
-            disabled={pending === "add-category"}
-            className={saveButtonClassName}
-          >
-            {pending === "add-category" ? "Adding…" : "Add"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setIsAddingCategory(false);
-              setNewCategoryName("");
-            }}
-            className={cancelButtonClassName}
-            aria-label="Cancel adding category"
-          >
-            <X size={15} />
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            {(newCategoryPreview || String(newCategoryImageUrl ?? "").trim()) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={newCategoryPreview || String(newCategoryImageUrl).trim()}
+                alt=""
+                className="h-10 w-10 shrink-0 rounded-xl border border-line object-cover"
+              />
+            ) : null}
+            <input
+              autoFocus
+              value={newCategoryName}
+              onChange={(event) => setNewCategoryName(event.target.value)}
+              placeholder="Category name, e.g. Swing Chair"
+              className={`${inputClassName} max-w-sm flex-1`}
+              aria-label="New category name"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={newCategoryImageUrl}
+              onChange={(event) => setNewCategoryImageUrl(event.target.value)}
+              placeholder="Image URL (optional)"
+              className={`${inputClassName} max-w-sm flex-1`}
+              aria-label="New category image URL"
+            />
+            <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-brand hover:underline">
+              <ImagePlus size={14} />
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(event) => handleNewCategoryFile(event.target.files?.[0])}
+              />
+              {newCategoryFile ? "Change file…" : "Upload…"}
+            </label>
+            {newCategoryFile ? (
+              <span className="max-w-xs truncate text-xs text-fog">{newCategoryFile.name} (uploads on Add)</span>
+            ) : null}
+          </div>
+          {!process.env.NEXT_PUBLIC_IMAGEBB_API_KEY ? (
+            <p className="text-xs text-fog">File upload needs an image host key — you can still paste an image URL.</p>
+          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="submit"
+              disabled={pending === "add-category"}
+              className={saveButtonClassName}
+            >
+              {pending === "add-category" ? "Adding…" : "Add"}
+            </button>
+            <button
+              type="button"
+              onClick={resetNewCategoryForm}
+              className={cancelButtonClassName}
+              aria-label="Cancel adding category"
+            >
+              <X size={15} />
+            </button>
+          </div>
         </form>
       ) : (
         <button

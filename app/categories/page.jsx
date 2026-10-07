@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  buildCategoryStats,
   categoryHref,
   getCategoryTree,
   subcategoryHref,
@@ -11,8 +12,28 @@ export const metadata = {
   description: "Browse products by category and sub-category.",
 };
 
+const SERVER_URL = process.env.SERVER_URL;
+
+const getSampleProducts = async () => {
+  try {
+    const response = await fetch(`${SERVER_URL}/products?page=1&limit=50`, {
+      next: { revalidate: 300 },
+    });
+    if (!response.ok) return [];
+    const data = await response.json();
+    if (data && typeof data === "object" && !Array.isArray(data)) {
+      return Array.isArray(data.products) ? data.products : [];
+    }
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+};
+
 const AllCategoriesPage = async () => {
   const categories = await getCategoryTree();
+  const sampleProducts = await getSampleProducts();
+  const stats = buildCategoryStats(categories, sampleProducts);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -29,7 +50,10 @@ const AllCategoriesPage = async () => {
         </p>
       ) : (
         <div className="flex flex-col gap-6">
-          {categories.map((parent) => (
+          {categories.map((parent) => {
+            const cover =
+              parent.image || stats.get(parent.slug)?.coverImage || null;
+            return (
             <section
               key={parent.slug}
               className="overflow-hidden rounded-2xl border border-line bg-white"
@@ -37,18 +61,22 @@ const AllCategoriesPage = async () => {
               <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
                 <Link
                   href={categoryHref(parent)}
-                  className="group relative block bg-mist no-underline md:aspect-square"
+                  className="group relative block aspect-[16/9] bg-mist no-underline md:aspect-square"
                 >
-                  {parent.image ? (
+                  {cover ? (
                     <Image
-                      src={parent.image}
+                      src={cover}
                       alt={parent.name}
                       fill
                       unoptimized
                       sizes="(min-width: 768px) 220px, 100vw"
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-                  ) : null}
+                  ) : (
+                    <span className="absolute inset-0 flex items-center justify-center font-serif text-5xl text-fog">
+                      {String(parent.name ?? "?").trim().charAt(0).toUpperCase() || "?"}
+                    </span>
+                  )}
                 </Link>
 
                 <div className="flex flex-col gap-3 p-6 md:p-8">
@@ -91,7 +119,8 @@ const AllCategoriesPage = async () => {
                 </div>
               </div>
             </section>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>
