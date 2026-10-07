@@ -208,19 +208,15 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
           return (
             <div key={category._id} className="rounded-2xl border border-line bg-white">
               <div className="flex flex-wrap items-center gap-3 px-4 py-3.5 sm:px-5">
-                {subs.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => toggleExpanded(category._id)}
-                    aria-expanded={isOpen}
-                    aria-label={`Toggle sub-categories of ${category.name}`}
-                    className={ghostButtonClassName}
-                  >
-                    {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                  </button>
-                ) : (
-                  <span className="w-8" />
-                )}
+                <button
+                  type="button"
+                  onClick={() => toggleExpanded(category._id)}
+                  aria-expanded={isOpen}
+                  aria-label={`Toggle sub-categories of ${category.name}`}
+                  className={ghostButtonClassName}
+                >
+                  {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
 
                 {isEditingParent ? (
                   <input
@@ -243,7 +239,7 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-ink">{category.name}</p>
                     <p className="truncate text-xs text-fog">
-                      /{category.slug} · {category.productCount ?? 0} product
+                     {category.productCount ?? 0} product
                       {(category.productCount ?? 0) === 1 ? "" : "s"}
                     </p>
                   </div>
@@ -302,6 +298,9 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
 
               {isOpen ? (
                 <div className="border-t border-line px-4 py-3.5 sm:px-5">
+                  {subs.length === 0 && !isAddingSub ? (
+                    <p className="text-xs text-fog">No sub-categories yet.</p>
+                  ) : null}
                   <ul className="flex flex-col gap-1.5">
                     {subs.map((sub) => {
                       const isEditingSub = editingSub?.id === sub._id;
@@ -330,7 +329,7 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
                                 {sub.name}
                               </span>
                               <span className="shrink-0 text-xs text-fog">
-                                /{sub.slug} · {sub.productCount ?? 0}
+                                 {sub.productCount ?? 0}
                               </span>
                             </>
                           )}
@@ -383,7 +382,10 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
 
                   {isAddingSub ? (
                     <form
-                      onSubmit={(event) => handleAddSub(category)}
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        handleAddSub(category);
+                      }}
                       className="mt-3 flex items-center gap-2"
                     >
                       <input
