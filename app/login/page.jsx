@@ -73,10 +73,10 @@ function LoginForm() {
           <blockquote className="max-w-md text-center">
             <span className="mx-auto mb-5 block h-px w-12 bg-brand-rose" />
             <p className="font-serif text-3xl leading-snug text-white drop-shadow-md">
-              ঘরকে চলতে দিন আপনার ছন্দে।
+              Let your home move to your rhythm.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-white/85 drop-shadow-sm">
-              হাতে তৈরি দোলনা, যা থামা, খেলা আর প্রিয়জনের জন্য জায়গা করে দেয়।
+              Handcrafted swings made for rest, play, and time with loved ones.
             </p>
           </blockquote>
         </div>

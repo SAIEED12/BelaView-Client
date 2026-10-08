@@ -70,10 +70,10 @@ const Signup = () => {
           <blockquote className="max-w-md text-center">
             <span className="mx-auto mb-5 block h-px w-12 bg-brand-rose" />
             <p className="font-serif text-3xl leading-snug text-white drop-shadow-md">
-              হাতের ছোঁয়ায় তৈরি, ভালোবাসায় গড়া।
+              Handmade with care, crafted with love.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-white/85 drop-shadow-sm">
-              প্রতিটি দোলনা বুনে দেয় আপনার ঘরের গল্প।
+              Every swing weaves into your home&apos;s story.
             </p>
           </blockquote>
         </div>
