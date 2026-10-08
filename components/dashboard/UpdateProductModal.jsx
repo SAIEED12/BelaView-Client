@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { imageUpload } from "@/lib/imageUpload";
 import { MAX_IMAGES, ProductForm } from "./ProductForm";
+import { DEFAULT_POLICIES } from "@/lib/productPolicies";
 
 export function UpdateProductModal({ product, categories = [], isOpen, onOpenChange }) {
   const router = useRouter();
@@ -136,6 +137,7 @@ export function UpdateProductModal({ product, categories = [], isOpen, onOpenCha
                 isPending={isPending}
                 error={error}
                 categories={categories}
+                policyDefaults={DEFAULT_POLICIES}
                 onSubmit={onSubmit}
               />
             </Modal.Body>

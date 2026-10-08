@@ -40,6 +40,7 @@ export function ProductForm({
   categories = [],
   onSubmit,
   imageInputId = "product-image",
+  policyDefaults = {},
 }) {
   const [files, setFiles] = useState([]); // File[] (max 4 total with kept)
   const [previews, setPreviews] = useState([]); // object URLs, same order as files
@@ -157,6 +158,89 @@ export function ProductForm({
           className={`${inputClassName} min-h-24 resize-y`}
         />
       </TextField>
+
+      <TextField
+        className="flex w-full flex-col gap-1.5"
+        name="disclaimer"
+        defaultValue={
+          typeof initialValues.disclaimer === "string" &&
+          initialValues.disclaimer.trim()
+            ? initialValues.disclaimer
+            : (policyDefaults.disclaimer ?? "")
+        }
+      >
+        <Label className={labelClassName}>
+          Disclaimer <span className="font-normal text-fog">(optional)</span>
+        </Label>
+        <TextArea
+          placeholder="e.g. Pictures are clicked in daylight; colour may vary slightly"
+          rows={2}
+          className={`${inputClassName} min-h-16 resize-y`}
+        />
+      </TextField>
+
+      <TextField
+        className="flex w-full flex-col gap-1.5"
+        name="note"
+        defaultValue={
+          typeof initialValues.note === "string" && initialValues.note.trim()
+            ? initialValues.note
+            : (policyDefaults.note ?? "")
+        }
+      >
+        <Label className={labelClassName}>
+          Note <span className="font-normal text-fog">(optional)</span>
+        </Label>
+        <TextArea
+          placeholder="e.g. Every product is made in your choice of size and color"
+          rows={2}
+          className={`${inputClassName} min-h-16 resize-y`}
+        />
+      </TextField>
+
+      <TextField
+        className="flex w-full flex-col gap-1.5"
+        name="deliveryPayment"
+        defaultValue={
+          typeof initialValues.deliveryPayment === "string" &&
+          initialValues.deliveryPayment.trim()
+            ? initialValues.deliveryPayment
+            : (policyDefaults.deliveryPayment ?? "")
+        }
+      >
+        <Label className={labelClassName}>
+          Delivery and Payment{" "}
+          <span className="font-normal text-fog">(optional)</span>
+        </Label>
+        <TextArea
+          placeholder="e.g. 20% advance on order, home delivery all over Bangladesh…"
+          rows={3}
+          className={`${inputClassName} min-h-20 resize-y`}
+        />
+      </TextField>
+
+      <TextField
+        className="flex w-full flex-col gap-1.5"
+        name="returnPolicy"
+        defaultValue={
+          typeof initialValues.returnPolicy === "string" &&
+          initialValues.returnPolicy.trim()
+            ? initialValues.returnPolicy
+            : (policyDefaults.returnPolicy ?? "")
+        }
+      >
+        <Label className={labelClassName}>
+          Return Policy <span className="font-normal text-fog">(optional)</span>
+        </Label>
+        <TextArea
+          placeholder="e.g. Check in front of delivery person; made-to-order is non-returnable…"
+          rows={3}
+          className={`${inputClassName} min-h-20 resize-y`}
+        />
+      </TextField>
+      <p className="-mt-3 text-xs text-fog">
+        These four sections appear on the product details page only when filled.
+      </p>
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline justify-between">

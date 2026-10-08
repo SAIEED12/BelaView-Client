@@ -6,6 +6,7 @@ import ProductGallery from "@/components/ProductGallery";
 import PurchasePanel from "@/components/PurchasePanel";
 import RelatedProducts from "@/components/RelatedProducts";
 import ProductTabs from "@/components/ProductTabs";
+import { getVisiblePolicies } from "@/lib/productPolicies";
 const SERVER_URL = process.env.SERVER_URL;
 
 const TRUST_ITEMS = [
@@ -76,6 +77,8 @@ const tabs = [
       : materials,
   },
 ].filter((tab) => tab.content);
+
+  const policies = getVisiblePolicies(product);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -151,6 +154,25 @@ const tabs = [
 
       {/* Tabs */}
       <ProductTabs tabs={tabs} />
+
+      {/* Optional policy sections — only rendered when the admin filled them */}
+      {policies.length > 0 ? (
+        <section aria-label="Product policies" className="mt-10 grid gap-4">
+          {policies.map((policy) => (
+            <div
+              key={policy.field}
+              className="rounded-2xl border border-line bg-white p-5 sm:p-6"
+            >
+              <h2 className="text-sm font-semibold tracking-wide text-ink uppercase">
+                {policy.title}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-smoke">
+                {policy.content}
+              </p>
+            </div>
+          ))}
+        </section>
+      ) : null}
 
       {/* Related products */}
       <RelatedProducts products={related} />
