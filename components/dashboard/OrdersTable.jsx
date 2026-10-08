@@ -3,8 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Pagination, Table } from "@heroui/react";
-import { Ban, Eye } from "lucide-react";
+import { Ban, Download, Eye } from "lucide-react";
+import toast from "react-hot-toast";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
+import { getAllOrdersForExport } from "@/lib/actions/orders";
+import { buildOrdersFilename, downloadCsv, ordersToCsv } from "@/lib/export-orders-csv";
 import { OrderCancelModal } from "./OrderCancelModal";
 import { OrderDetailsModal } from "./OrderDetailsModal";
 
@@ -45,13 +48,19 @@ export function OrdersTable({
   totalPages = 1,
   initialStatus = "all",
   initialQuery = "",
+  initialDate = "",
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(initialQuery);
+  const [date, setDate] = useState(initialDate);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
   const timerRef = useRef(null);
   const lastCommittedQueryRef = useRef(initialQuery);
+  const lastCommittedDateRef = useRef(initialDate);
+  const lastCommittedStatusRef = useRef(initialStatus);
   const searchParamsRef = useRef(searchParams?.toString() ?? "");
 
   useEffect(() => {
@@ -64,6 +73,17 @@ export function OrdersTable({
       setQuery(initialQuery);
     }
   }, [initialQuery]);
+
+  useEffect(() => {
+    if (initialDate !== lastCommittedDateRef.current) {
+      lastCommittedDateRef.current = initialDate;
+      setDate(initialDate);
+    }
+  }, [initialDate]);
+
+  useEffect(() => {
+    lastCommittedStatusRef.current = initialStatus;
+  }, [initialStatus]);
 
   useEffect(() => {
     return () => {
@@ -106,6 +126,7 @@ export function OrdersTable({
     const next = e.target.value;
     if (timerRef.current) clearTimeout(timerRef.current);
     lastCommittedQueryRef.current = query.trim();
+    lastCommittedStatusRef.current = next;
     const params = new URLSearchParams(searchParamsRef.current);
     if (next && next !== "all") {
       params.set("status", next);
@@ -115,6 +136,60 @@ export function OrdersTable({
     params.delete("page");
     const nextQuery = params.toString();
     router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  };
+
+  const commitDate = (next) => {
+    const value = typeof next === "string" ? next : "";
+    if (timerRef.current) clearTimeout(timerRef.current);
+    lastCommittedQueryRef.current = query.trim();
+    lastCommittedDateRef.current = value;
+    setDate(value);
+    const params = new URLSearchParams(searchParamsRef.current);
+    if (value) {
+      params.set("date", value);
+    } else {
+      params.delete("date");
+    }
+    params.delete("page");
+    const nextQuery = params.toString();
+    router.replace(nextQuery ? `${pathname}?${nextQuery}` : pathname, { scroll: false });
+  };
+
+  const handleDateChange = (e) => {
+    commitDate(e.target.value);
+  };
+
+  const clearDate = () => {
+    commitDate("");
+  };
+
+  const handleExport = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    setExportError("");
+    try {
+      // Committed filter values so the CSV matches the table exactly,
+      // even if the URL hasn't updated yet.
+      const liveStatus = lastCommittedStatusRef.current ?? "all";
+      const liveQ = lastCommittedQueryRef.current ?? "";
+      const liveDate = lastCommittedDateRef.current ?? "";
+      const all = await getAllOrdersForExport({
+        status: liveStatus,
+        q: liveQ,
+        date: liveDate,
+      });
+      downloadCsv(
+        buildOrdersFilename({ date: liveDate, status: liveStatus, q: liveQ }),
+        ordersToCsv(all),
+      );
+      toast.success(`Exported ${all.length} order${all.length === 1 ? "" : "s"} to CSV`);
+    } catch (err) {
+      const message = err?.message || "Export failed. Please try again.";
+      setExportError(message);
+      toast.error(message);
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const goToPage = (nextPage) => {
@@ -171,10 +246,57 @@ export function OrdersTable({
             </option>
           ))}
         </select>
-        <p className="text-sm text-brand font-semibold sm:ml-auto">
-          Showing {start}–{end} of {safeTotal} orders
-        </p>
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <label htmlFor="orders-date" className="sr-only">
+            Filter by date
+          </label>
+          <input
+            id="orders-date"
+            type="date"
+            value={date}
+            onChange={handleDateChange}
+            aria-label="Filter orders by date"
+            className="w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:w-42"
+          />
+          {date ? (
+            <button
+              type="button"
+              onClick={clearDate}
+              aria-label="Clear date filter"
+              title="Clear date filter"
+              className="shrink-0 cursor-pointer rounded-full px-2 py-1 text-xs font-semibold text-smoke underline-offset-2 outline-none hover:text-brand hover:underline focus-visible:ring-2 focus-visible:ring-brand/40"
+            >
+              Clear
+            </button>
+          ) : null}
+        </div>
+        <div className="flex w-full flex-wrap items-center gap-2 sm:ml-auto sm:w-auto">
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={isExporting || safeTotal === 0}
+            aria-label="Download filtered orders as CSV"
+            title={
+              safeTotal === 0
+                ? "No orders to export"
+                : "Download all filtered orders as CSV"
+            }
+            className="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-xs font-semibold tracking-[0.08em] text-white transition-colors outline-none hover:bg-brand-dark focus-visible:ring-2 focus-visible:ring-brand/40 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Download size={14} strokeWidth={2} />
+            {isExporting ? "EXPORTING…" : "EXPORT CSV"}
+          </button>
+          <p className="text-sm text-brand font-semibold">
+            Showing {start}–{end} of {safeTotal} orders
+          </p>
+        </div>
       </div>
+
+      {exportError ? (
+        <p role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          {exportError}
+        </p>
+      ) : null}
 
       <Table>
         <Table.ScrollContainer>

@@ -27,11 +27,14 @@ const AdminOrdersPage = async ({ searchParams }) => {
   const rawPage = Array.isArray(query?.page) ? query.page[0] : query?.page;
   const rawStatus = Array.isArray(query?.status) ? query.status[0] : query?.status;
   const rawQ = Array.isArray(query?.q) ? query.q[0] : query?.q;
+  const rawDate = Array.isArray(query?.date) ? query.date[0] : query?.date;
   const parsedPage = Number.parseInt(rawPage, 10);
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const statusText = typeof rawStatus === "string" ? rawStatus.trim().toLowerCase() : "";
   const status = statusText === "" || statusText === "all" ? "all" : statusText;
   const q = typeof rawQ === "string" ? rawQ.trim() : "";
+  const dateText = typeof rawDate === "string" ? rawDate.trim() : "";
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(dateText) ? dateText : "";
 
   let result = {
     orders: [],
@@ -45,7 +48,7 @@ const AdminOrdersPage = async ({ searchParams }) => {
   let loadError = "";
 
   try {
-    const data = await getOrders({ page, limit: PAGE_SIZE, status, q });
+    const data = await getOrders({ page, limit: PAGE_SIZE, status, q, date });
     if (data && typeof data === "object" && !Array.isArray(data)) {
       result = data;
     } else {
@@ -91,6 +94,7 @@ const AdminOrdersPage = async ({ searchParams }) => {
         totalPages={result.totalPages}
         initialStatus={ORDER_STATUSES.includes(status) ? status : "all"}
         initialQuery={q}
+        initialDate={date}
       />
     </div>
   );
