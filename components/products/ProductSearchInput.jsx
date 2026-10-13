@@ -10,6 +10,7 @@ export function ProductSearchInput({
   initialValue = "",
   placeholder = "Search products by name or category...",
   className = "",
+  compact = false,
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -81,9 +82,9 @@ export function ProductSearchInput({
     <div role="search" className={`w-full ${className || "mb-6"}`.trim()}>
       <div className="relative w-full">
         <Search
-          size={16}
+          size={compact ? 14 : 16}
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-smoke"
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-smoke ${compact ? "left-3" : "left-4"}`}
         />
         <input
           type="text"
@@ -95,16 +96,20 @@ export function ProductSearchInput({
           autoComplete="off"
           inputMode="search"
           enterKeyHint="search"
-          className="w-full rounded-xl border border-line bg-white py-2.5 pr-10 pl-10 text-sm text-ink outline-none placeholder:text-smoke focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-base [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden [&::-webkit-search-results-decoration]:hidden"
+          className={
+            compact
+              ? "h-9 w-full rounded-full border border-line bg-white pr-9 pl-9 text-base text-ink outline-none placeholder:text-xs placeholder:text-smoke focus:border-brand focus:ring-2 focus:ring-brand/20 md:h-11 md:pl-10 md:text-sm [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden [&::-webkit-search-results-decoration]:hidden"
+              : "w-full rounded-xl border border-line bg-white py-2.5 pr-10 pl-10 text-sm text-ink outline-none placeholder:text-smoke focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-base [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden [&::-webkit-search-results-button]:hidden [&::-webkit-search-results-decoration]:hidden"
+          }
         />
         {value ? (
           <button
             type="button"
             onClick={handleClear}
             aria-label="Clear search"
-            className="absolute top-1/2 right-3 inline-flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
+            className={`absolute top-1/2 inline-flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink ${compact ? "right-2 h-6 w-6" : "right-3 h-7 w-7"}`}
           >
-            <X size={15} />
+            <X size={compact ? 13 : 15} />
           </button>
         ) : null}
       </div>

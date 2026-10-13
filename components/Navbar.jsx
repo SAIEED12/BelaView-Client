@@ -140,7 +140,66 @@ export default function Navbar() {
             </span>
           </Link>
 
-        <ul className="hidden items-center gap-10 md:flex">
+        <div className="hidden min-w-0 flex-1 px-8 md:block">
+          <Suspense>
+            <div className="mx-auto w-full max-w-xl">
+              <ProductSearchInput className="mb-0" />
+            </div>
+          </Suspense>
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+
+          {/* Login link*/}
+          {user ? (
+            <Link
+              href={dashboardHref}
+              className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+            >
+              WELCOME, {user.name}!
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+            >
+              LOGIN
+            </Link>
+          )
+
+        }
+          {/* Sign Up / Sign Out */}
+          {user ? (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className="cursor-pointer rounded-full bg-ink px-4 py-2 text-xs font-semibold tracking-[0.15em] text-white no-underline hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
+            </button>
+          ) : (
+            <Link
+              href="/signup"
+              className="rounded-full bg-ink px-4 py-2 text-xs font-semibold tracking-[0.15em] text-white no-underline hover:bg-brand"
+            >
+              SIGN UP
+            </Link>
+          )}
+
+        {/* Cart Drawer */}
+        <CartDrawer />
+        
+        </div>
+
+        <div className="md:hidden">
+          <CartDrawer compact />
+        </div>
+      </header>
+
+      {/* Desktop links row — below header */}
+      <div className="hidden border-t border-line/70 md:block">
+        <ul className="mx-auto flex max-w-6xl items-center justify-center gap-10 px-6 py-2.5">
           <li>
             <Link href="/" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
               HOME
@@ -249,57 +308,20 @@ export default function Navbar() {
             </li>
           )}
         </ul>
+      </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+      {/* Mobile search — below header */}
+      <div className="border-t border-line/70 px-4 py-2 md:hidden">
+        <Suspense>
+          <ProductSearchInput
+            compact
+            placeholder="Search products..."
+            className="mb-0 w-full max-w-sm mx-auto"
+          />
+        </Suspense>
+      </div>
 
-          {/* Login link*/}
-          {user ? (
-            <Link
-              href={dashboardHref}
-              className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
-            >
-              WELCOME, {user.name}!
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
-            >
-              LOGIN
-            </Link>
-          )
-
-        }
-          {/* Sign Up / Sign Out */}
-          {user ? (
-            <button
-              type="button"
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className="cursor-pointer rounded-full bg-ink px-4 py-2 text-xs font-semibold tracking-[0.15em] text-white no-underline hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
-            </button>
-          ) : (
-            <Link
-              href="/signup"
-              className="rounded-full bg-ink px-4 py-2 text-xs font-semibold tracking-[0.15em] text-white no-underline hover:bg-brand"
-            >
-              SIGN UP
-            </Link>
-          )}
-
-        {/* Cart Drawer */}
-        <CartDrawer />
-        
-        </div>
-
-        <div className="md:hidden">
-          <CartDrawer compact />
-        </div>
-      </header>
-
-      {/* Mobile quick links — visible below the logo */}
+      {/* Mobile quick links — below search */}
       <div className="overflow-x-auto border-t border-line/70 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
         <ul className="mx-auto flex w-max items-center gap-6 px-4 py-2.5 whitespace-nowrap sm:gap-8">
           <li>
@@ -318,24 +340,6 @@ export default function Navbar() {
             </Link>
           </li>
         </ul>
-      </div>
-
-      {/* Mobile search — below quick links */}
-      <div className="border-t border-line/70 px-4 pt-2.5 pb-3 md:hidden">
-        <Suspense>
-          <ProductSearchInput className="mb-0" />
-        </Suspense>
-      </div>
-
-      {/* Desktop search — below header */}
-      <div className="hidden border-t border-line/70 md:block">
-        <div className="mx-auto max-w-6xl px-6 py-2.5">
-          <Suspense>
-            <div className="mx-auto w-full max-w-xl">
-              <ProductSearchInput className="mb-0" />
-            </div>
-          </Suspense>
-        </div>
       </div>
     </nav>
 
