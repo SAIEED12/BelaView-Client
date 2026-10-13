@@ -105,15 +105,15 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-line bg-white/85 backdrop-blur-md shadow-sm shadow-black/5">
       <header className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-4">
+        <div className="flex shrink-0 items-center gap-4">
           <button
-            className="md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-mist active:bg-mist md:hidden"
             onClick={handleToggleMobileMenu}
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
             <span className="sr-only">Menu</span>
-            <svg className="h-6 w-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -360,7 +360,7 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setIsMenuOpen(false)}
                 aria-label="Close menu"
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
+                className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -374,14 +374,14 @@ export default function Navbar() {
                   <Link
                     href={dashboardHref}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                    className="block py-2 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
                   >
                     WELCOME, {user.name}!
                   </Link>
                   <Link
                     href={dashboardHref}
                     onClick={() => setIsMenuOpen(false)}
-                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                    className="block py-2 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
                   >
                     DASHBOARD
                   </Link>
@@ -399,7 +399,7 @@ export default function Navbar() {
                   <Link
                     href="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                    className="block py-2 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
                   >
                     LOGIN
                   </Link>
@@ -451,7 +451,7 @@ export default function Navbar() {
                               onClick={() => setOpenMobileCategory(isOpen ? null : category.slug)}
                               aria-expanded={isOpen}
                               aria-label={`Toggle sub-categories of ${category.name}`}
-                              className="cursor-pointer px-3 py-3 text-fog hover:text-brand"
+                              className="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-fog hover:text-brand"
                             >
                               <svg
                                 width="10"
