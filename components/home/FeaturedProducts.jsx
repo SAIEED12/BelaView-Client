@@ -39,7 +39,7 @@ export default function FeaturedProducts({ products = [] }) {
           </Link>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
           {items.map((product) => (
             <article
               key={String(product._id)}
@@ -52,20 +52,20 @@ export default function FeaturedProducts({ products = [] }) {
                     alt={product.name}
                     fill
                     unoptimized
-                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    sizes="(max-width: 639px) 50vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : null}
               </div>
-              <div className="flex flex-1 flex-col gap-2 p-6">
+              <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-6">
                 {product.category ? (
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-fog">
                     {String(product.category).replace(/-/g, " ")}
                   </p>
                 ) : null}
-                <h3 className="text-base font-semibold text-ink">{product.name}</h3>
-                <div className="mt-auto flex items-center justify-between gap-3 pt-2">
-                  <span className="text-xl font-semibold text-brand">
+                <h3 className="line-clamp-2 text-sm font-semibold text-ink sm:text-base">{product.name}</h3>
+                <div className="mt-auto flex items-center justify-between gap-2 pt-1 sm:gap-3 sm:pt-2">
+                  <span className="text-lg font-semibold text-brand sm:text-xl">
                     ৳{Number(product.price).toLocaleString()}
                   </span>
                   <WishlistHeartButton productId={String(product._id)} name={product.name} />

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link } from "@heroui/react";
 import { useSession, authClient } from "@/lib/auth-client";
 import { usePathname, useRouter } from "next/navigation";
@@ -7,6 +7,7 @@ import { getDashboardPathByRole } from "@/lib/dashboard-nav";
 import { getCategories } from "@/lib/actions/categories";
 import Image from "next/image";
 import { CartDrawer } from "./cart/Drawer";
+import { ProductSearchInput } from "./products/ProductSearchInput";
 
 export default function Navbar() {
   const router = useRouter();
@@ -86,7 +87,7 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 w-full border-b border-line bg-white/85 backdrop-blur-md shadow-sm shadow-black/5">
-      <header className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6">
+      <header className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-4">
           <button
             className="md:hidden"
@@ -103,11 +104,23 @@ export default function Navbar() {
               )}
             </svg>
           </button>
-
-          <Link href="/" className="text-lg font-bold tracking-[0.15em] text-ink no-underline">
-            <Image src="/logo.png" alt="BelaView Logo" width={70} height={70} className="rounded-full bg-white object-contain"></Image>
-          </Link>
         </div>
+
+          <Link
+            href="/"
+            className="absolute left-1/2 flex -translate-x-1/2 items-center gap-2 text-ink no-underline md:static md:translate-x-0 md:gap-3"
+          >
+            <Image
+              src="/logo.png"
+              alt="BelaView Logo"
+              width={70}
+              height={70}
+              className="h-11 w-11 rounded-full bg-white object-contain md:h-[70px] md:w-[70px]"
+            />
+            <span className="text-base font-bold tracking-[0.15em] md:text-lg">
+              BelaView
+            </span>
+          </Link>
 
         <ul className="hidden items-center gap-10 md:flex">
           <li>
@@ -267,6 +280,24 @@ export default function Navbar() {
           <CartDrawer compact />
         </div>
       </header>
+
+      {/* Mobile search — below header */}
+      <div className="border-t border-line/70 px-4 pt-2.5 pb-3 md:hidden">
+        <Suspense>
+          <ProductSearchInput className="mb-0" />
+        </Suspense>
+      </div>
+
+      {/* Desktop search — below header */}
+      <div className="hidden border-t border-line/70 md:block">
+        <div className="mx-auto max-w-6xl px-6 py-2.5">
+          <Suspense>
+            <div className="mx-auto w-full max-w-xl">
+              <ProductSearchInput className="mb-0" />
+            </div>
+          </Suspense>
+        </div>
+      </div>
 
       {isMenuOpen && (
         <div className="border-t border-line md:hidden">

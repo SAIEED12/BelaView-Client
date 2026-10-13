@@ -9,11 +9,14 @@ const DEBOUNCE_MS = 150;
 export function ProductSearchInput({
   initialValue = "",
   placeholder = "Search products by name or category...",
+  className = "",
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState(initialValue);
+  const [value, setValue] = useState(
+    () => initialValue || searchParams?.get("search") || ""
+  );
   const timerRef = useRef(null);
   const lastCommittedRef = useRef(initialValue);
   const searchParamsRef = useRef(searchParams?.toString() ?? "");
@@ -37,8 +40,17 @@ export function ProductSearchInput({
   }, []);
 
   const commitSearch = (raw) => {
-    const params = new URLSearchParams(searchParamsRef.current);
     const trimmed = String(raw ?? "").trim();
+    lastCommittedRef.current = trimmed;
+    // Used globally in the navbar: searches always run on /products.
+    if (pathname !== "/products") {
+      const params = new URLSearchParams();
+      if (trimmed) params.set("search", trimmed);
+      const query = params.toString();
+      router.push(query ? `/products?${query}` : "/products");
+      return;
+    }
+    const params = new URLSearchParams(searchParamsRef.current);
     if (trimmed) {
       params.set("search", trimmed);
     } else {
@@ -46,7 +58,6 @@ export function ProductSearchInput({
     }
     // New queries always start at page 1
     params.delete("page");
-    lastCommittedRef.current = trimmed;
     const query = params.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, {
       scroll: false,
@@ -67,7 +78,7 @@ export function ProductSearchInput({
   };
 
   return (
-    <div role="search" className="mb-6 w-full">
+    <div role="search" className={`w-full ${className || "mb-6"}`.trim()}>
       <div className="relative w-full">
         <Search
           size={16}

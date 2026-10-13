@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { ProductSearchInput } from "@/components/products/ProductSearchInput";
 import { ProductGrid } from "@/components/products/ProductCard";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductFilterDrawer } from "@/components/products/ProductFilterDrawer";
@@ -97,11 +96,7 @@ const AllProductsPage = async ({ searchParams }) => {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="mb-8 font-serif text-3xl text-ink">All Products</h1>
-
-      <Suspense>
-        <ProductSearchInput initialValue={searchText} />
-      </Suspense>
+      <h1 className="mb-6 font-serif text-3xl text-ink">All Products</h1>
 
       <Suspense>
         <ProductFilterDrawer {...filterProps} />

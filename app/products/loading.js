@@ -31,7 +31,7 @@ export default function Loading() {
           </aside>
           <div className="min-w-0">
             <SkeletonBlock className="mb-4 h-4 w-52" />
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
               {[0, 1, 2, 3, 4, 5, 6, 7].map((key) => (
                 <ProductCardSkeleton key={key} />
               ))}

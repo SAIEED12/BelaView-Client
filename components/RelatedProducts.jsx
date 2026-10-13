@@ -10,7 +10,7 @@ const RelatedProducts = ({ products = [] }) => {
         You may also like
       </h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {products.map((product) => (
           <article
             key={String(product._id)}
@@ -23,14 +23,14 @@ const RelatedProducts = ({ products = [] }) => {
                   alt={product.name}
                   fill
                   unoptimized
-                  sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  sizes="(max-width: 639px) 50vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               )}
             </div>
 
-            <div className="flex flex-1 flex-col gap-2 p-4">
-              <h3 className="text-lg font-semibold text-ink">
+            <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
+              <h3 className="line-clamp-2 text-sm font-semibold text-ink sm:text-lg">
                 {product.name}
               </h3>
               <p className="line-clamp-2 text-xs font-semibold text-smoke">

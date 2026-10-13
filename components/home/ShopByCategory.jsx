@@ -39,7 +39,7 @@ export default async function ShopByCategory({ products = [], limit = 6 }) {
         </Link>
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
         {visible.map((parent) => {
           const stat = stats.get(parent.slug) ?? {};
           const count = Number(stat.count ?? parent.productCount ?? 0);
@@ -56,7 +56,7 @@ export default async function ShopByCategory({ products = [], limit = 6 }) {
                     alt={parent.name}
                     fill
                     unoptimized
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    sizes="(max-width: 639px) 50vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : null}
@@ -71,10 +71,10 @@ export default async function ShopByCategory({ products = [], limit = 6 }) {
                 aria-label={parent.name}
               />
 
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 p-5">
-                <div className="flex items-end justify-between gap-3">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 p-3 sm:p-5">
+                <div className="flex items-end justify-between gap-2 sm:gap-3">
                   <div>
-                    <h3 className="font-serif text-xl text-white">{parent.name}</h3>
+                    <h3 className="font-serif text-base text-white sm:text-xl">{parent.name}</h3>
                     <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-white/70">
                       {count} {count === 1 ? "product" : "products"}
                       {Number.isFinite(stat.minPrice)

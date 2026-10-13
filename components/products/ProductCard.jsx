@@ -21,14 +21,14 @@ export default function ProductCard({ product, showCategory = false }) {
             alt={product.name}
             fill
             unoptimized
-            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            sizes="(max-width: 639px) 50vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-8">
-        <h2 className="text-lg font-semibold text-ink">{product.name}</h2>
+      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-8">
+        <h2 className="line-clamp-2 text-sm font-semibold text-ink sm:text-lg">{product.name}</h2>
         {showCategory && (categoryLabel || subcategoryLabel) ? (
           <p className="text-sm text-smoke">
             <span className="mr-1.5 text-xs font-semibold uppercase">
@@ -42,8 +42,8 @@ export default function ProductCard({ product, showCategory = false }) {
           </p>
         ) : null}
 
-        <div className="mt-auto flex flex-row items-center justify-between gap-3 pt-3">
-          <span className="text-2xl font-semibold text-brand">
+        <div className="mt-auto flex flex-row items-center justify-between gap-2 pt-2 sm:gap-3 sm:pt-3">
+          <span className="text-lg font-semibold text-brand sm:text-2xl">
             ৳{Number(product.price).toLocaleString()}
           </span>
           <WishlistHeartButton productId={id} name={product.name} />
@@ -79,7 +79,7 @@ export const ProductGrid = ({ products = [], showCategory = false, emptyMessage 
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
       {products.map((product) => (
         <ProductCard
           key={String(product?._id ?? product?.id ?? "")}

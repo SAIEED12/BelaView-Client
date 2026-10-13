@@ -36,7 +36,7 @@ export default function Loading() {
           </div>
         </div>
         <SkeletonBlock className="mt-10 h-40 w-full rounded-2xl" />
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {[0, 1, 2, 3].map((key) => (
             <ProductCardSkeleton key={key} />
           ))}
