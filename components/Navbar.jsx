@@ -103,6 +103,7 @@ export default function Navbar() {
   };
 
   return (
+    <>
     <nav className="sticky top-0 z-40 w-full border-b border-line bg-white/85 backdrop-blur-md shadow-sm shadow-black/5">
       <header className="relative mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex shrink-0 items-center gap-4">
@@ -336,6 +337,7 @@ export default function Navbar() {
           </Suspense>
         </div>
       </div>
+    </nav>
 
       {isMenuOpen && (
         <div
@@ -500,6 +502,6 @@ export default function Navbar() {
         </div>
       )}
 
-    </nav>
+    </>
   );
 }
