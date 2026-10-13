@@ -43,7 +43,7 @@ export default function FeaturedProducts({ products = [] }) {
           {items.map((product) => (
             <article
               key={String(product._id)}
-              className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg"
+              className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg"
             >
               <div className="relative aspect-square w-full overflow-hidden bg-mist">
                 {product.image ? (
@@ -63,7 +63,7 @@ export default function FeaturedProducts({ products = [] }) {
                     {String(product.category).replace(/-/g, " ")}
                   </p>
                 ) : null}
-                <h3 className="line-clamp-2 text-sm font-semibold text-ink sm:text-base">{product.name}</h3>
+                <h3 className="line-clamp-2 text-sm font-semibold break-words text-ink sm:text-base">{product.name}</h3>
                 <div className="mt-auto flex items-center justify-between gap-2 pt-1 sm:gap-3 sm:pt-2">
                   <span className="text-lg font-semibold text-brand sm:text-xl">
                     ৳{Number(product.price).toLocaleString()}

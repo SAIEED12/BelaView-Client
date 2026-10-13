@@ -14,7 +14,7 @@ const RelatedProducts = ({ products = [] }) => {
         {products.map((product) => (
           <article
             key={String(product._id)}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg"
+            className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg"
           >
             <div className="relative aspect-square w-full overflow-hidden bg-mist">
               {product.image && (
@@ -30,7 +30,7 @@ const RelatedProducts = ({ products = [] }) => {
             </div>
 
             <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-4">
-              <h3 className="line-clamp-2 text-sm font-semibold text-ink sm:text-lg">
+              <h3 className="line-clamp-2 text-sm font-semibold break-words text-ink sm:text-lg">
                 {product.name}
               </h3>
               <p className="line-clamp-2 text-xs font-semibold text-smoke">

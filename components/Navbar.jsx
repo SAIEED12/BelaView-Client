@@ -300,8 +300,8 @@ export default function Navbar() {
       </header>
 
       {/* Mobile quick links — visible below the logo */}
-      <div className="border-t border-line/70 md:hidden">
-        <ul className="flex items-center justify-center gap-8 whitespace-nowrap px-4 py-2.5">
+      <div className="overflow-x-auto border-t border-line/70 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+        <ul className="mx-auto flex w-max items-center gap-6 px-4 py-2.5 whitespace-nowrap sm:gap-8">
           <li>
             <Link href="/" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
               HOME

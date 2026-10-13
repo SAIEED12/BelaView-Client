@@ -4,6 +4,7 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import FloatingMessenger from "@/components/FloatingMessenger";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
@@ -35,6 +36,7 @@ export default function RootLayout({ children }) {
           <WishlistProvider>
             <Navbar />
             {children}
+            <FloatingMessenger />
           </WishlistProvider>
         </CartProvider>
         <Footer />
