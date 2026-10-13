@@ -16,6 +16,9 @@ export default function Navbar() {
   // Derived from the pathname so navigating away closes the menu without an effect.
   const [menuOpenAt, setMenuOpenAt] = useState(null);
   const [openCategory, setOpenCategory] = useState(null);
+  // Mobile categories drawer uses its own expanded state so it never
+  // fights the desktop CATEGORIES dropdown above.
+  const [openMobileCategory, setOpenMobileCategory] = useState(null);
   // Loaded on first open so the shared navbar doesn't fetch on every page.
   const [categories, setCategories] = useState(null);
   const categoryMenuRef = useRef(null);
@@ -63,6 +66,20 @@ export default function Navbar() {
     };
   }, [isCategoryMenuOpen]);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isMenuOpen]);
+
   if(pathname.includes("dashboard")) {
     return null;
   }
@@ -92,10 +109,10 @@ export default function Navbar() {
           <button
             className="md:hidden"
             onClick={handleToggleMobileMenu}
-            aria-label="Toggle menu"
+            aria-label="Toggle categories"
             aria-expanded={isMenuOpen}
           >
-            <span className="sr-only">Menu</span>
+            <span className="sr-only">Categories</span>
             <svg className="h-6 w-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -281,7 +298,71 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile search — below header */}
+      {/* Mobile quick links — everything that lived in the hamburger,
+          now always visible below the logo */}
+      <div className="border-t border-line/70 md:hidden">
+        <ul className="flex items-center gap-5 overflow-x-auto whitespace-nowrap px-4 py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <li>
+            <Link href="/" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+              HOME
+            </Link>
+          </li>
+          <li>
+            <Link href="/products" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+              ALL PRODUCTS
+            </Link>
+          </li>
+          <li>
+            <Link href="/categories" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+              CATEGORIES
+            </Link>
+          </li>
+          {user && (
+            <li>
+              <Link href={dashboardHref} className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+                DASHBOARD
+              </Link>
+            </li>
+          )}
+          {user ? (
+            <>
+              <li>
+                <Link href={dashboardHref} className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+                  WELCOME, {user.name}!
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={isSigningOut}
+                  className="cursor-pointer rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
+                </button>
+              </li>
+            </>
+          ) : (
+            <>
+              <li>
+                <Link href="/login" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+                  LOGIN
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/signup"
+                  className="rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white no-underline hover:bg-brand"
+                >
+                  SIGN UP
+                </Link>
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
+
+      {/* Mobile search — below quick links */}
       <div className="border-t border-line/70 px-4 pt-2.5 pb-3 md:hidden">
         <Suspense>
           <ProductSearchInput className="mb-0" />
@@ -300,48 +381,71 @@ export default function Navbar() {
       </div>
 
       {isMenuOpen && (
-        <div className="border-t border-line md:hidden">
-          <ul className="flex flex-col gap-2 p-4">
-            <li>
-              <Link href="/" className="block py-2 text-sm tracking-widest text-ink no-underline">
-                HOME
-              </Link>
-            </li>
-            <li>
-              <Link href="/products" className="block py-2 text-sm tracking-widest text-ink no-underline">
-                ALL PRODUCTS
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/categories"
-                className="block py-2 text-sm tracking-widest text-ink no-underline"
-                onClick={() => setIsMenuOpen(false)}
-              >
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Categories"
+          className="fixed inset-0 z-50 md:hidden"
+        >
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label="Close categories"
+            onClick={() => setIsMenuOpen(false)}
+            className="absolute inset-0 cursor-default bg-black/40 backdrop-blur-sm"
+          />
+          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <h2 className="text-xs font-semibold tracking-[0.2em] text-ink">
                 CATEGORIES
-              </Link>
-              {hasCategories ? (
-                <ul className="mb-1 ml-3 border-l border-line pl-4">
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(false)}
+                aria-label="Close categories"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-3 py-3">
+              {!categories ? (
+                <ul aria-label="Loading categories" className="flex flex-col gap-2">
+                  {[0, 1, 2, 3, 4].map((key) => (
+                    <li key={key} className="h-11 animate-pulse rounded-xl bg-mist" />
+                  ))}
+                </ul>
+              ) : !hasCategories ? (
+                <p className="px-2 py-6 text-center text-sm text-smoke">
+                  No categories yet.
+                </p>
+              ) : (
+                <ul>
                   {categories.map((category) => {
-                    const isOpen = openCategory === category.slug;
+                    const isOpen = openMobileCategory === category.slug;
                     const subs = Array.isArray(category.subcategories) ? category.subcategories : [];
                     return (
-                      <li key={category.slug} className="py-1">
+                      <li key={category.slug} className="border-b border-line last:border-b-0">
                         <div className="flex items-center">
                           <Link
                             href={`/categories/${category.slug}`}
-                            className="flex-1 py-1.5 text-xs tracking-widest text-ink no-underline"
+                            className="flex-1 px-2 py-3 text-xs font-semibold tracking-[0.1em] text-ink no-underline hover:text-brand"
                             onClick={() => setIsMenuOpen(false)}
                           >
                             {String(category.name).toUpperCase()}
+                            <span className="ml-2 font-normal text-fog">
+                              ({category.productCount ?? 0})
+                            </span>
                           </Link>
                           {subs.length > 0 ? (
                             <button
                               type="button"
-                              onClick={() => setOpenCategory(isOpen ? null : category.slug)}
+                              onClick={() => setOpenMobileCategory(isOpen ? null : category.slug)}
                               aria-expanded={isOpen}
                               aria-label={`Toggle sub-categories of ${category.name}`}
-                              className="cursor-pointer px-2 py-1.5 text-fog"
+                              className="cursor-pointer px-3 py-3 text-fog hover:text-brand"
                             >
                               <svg
                                 width="10"
@@ -356,13 +460,13 @@ export default function Navbar() {
                             </button>
                           ) : null}
                         </div>
-                        {isOpen ? (
-                          <ul>
+                        {isOpen && subs.length > 0 ? (
+                          <ul className="pb-2 pl-2">
                             {subs.map((sub) => (
                               <li key={sub.slug}>
                                 <Link
                                   href={`/categories/${category.slug}/${sub.slug}`}
-                                  className="block py-1.5 text-xs text-smoke no-underline"
+                                  className="block px-2 py-2 text-xs text-smoke no-underline hover:text-brand"
                                   onClick={() => setIsMenuOpen(false)}
                                 >
                                   {sub.name}
@@ -375,48 +479,18 @@ export default function Navbar() {
                     );
                   })}
                 </ul>
-              ) : null}
-            </li>
-            {user && (
-              <li>
-                <Link href={dashboardHref} className="block py-2 text-sm tracking-widest text-ink no-underline">
-                  DASHBOARD
-                </Link>
-              </li>
-            )}
-
-            <li className="mt-2 border-t border-line pt-3">
-              {user ? (
-                <Link href={dashboardHref}
-                 className="block py-2 text-sm tracking-widest text-ink no-underline">
-                  WELCOME, {user.name}!
-                </Link>
-              ) : (
-                <Link href="/login" className="block py-2 text-sm tracking-widest text-ink no-underline">
-                  LOGIN
-                </Link>
               )}
-            </li>
-            <li>
-              {user ? (
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                  className="block w-full cursor-pointer rounded-full bg-ink px-4 py-2 text-center text-sm font-semibold tracking-widest text-white hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
-                </button>
-              ) : (
-                <Link
-                  href="/signup"
-                  className="block rounded-full bg-ink px-4 py-2 text-center text-sm font-semibold tracking-widest text-white no-underline hover:bg-brand"
-                >
-                  SIGN UP
-                </Link>
-              )}
-            </li>
-          </ul>
+            </div>
+            <div className="border-t border-line px-5 py-4">
+              <Link
+                href="/categories"
+                onClick={() => setIsMenuOpen(false)}
+                className="block rounded-xl bg-ink px-4 py-2.5 text-center text-xs font-semibold tracking-[0.12em] text-white no-underline hover:bg-brand"
+              >
+                VIEW ALL CATEGORIES
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
