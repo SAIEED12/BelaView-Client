@@ -109,10 +109,10 @@ export default function Navbar() {
           <button
             className="md:hidden"
             onClick={handleToggleMobileMenu}
-            aria-label="Toggle categories"
+            aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
           >
-            <span className="sr-only">Categories</span>
+            <span className="sr-only">Menu</span>
             <svg className="h-6 w-6 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -298,10 +298,9 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile quick links — everything that lived in the hamburger,
-          now always visible below the logo */}
+      {/* Mobile quick links — visible below the logo */}
       <div className="border-t border-line/70 md:hidden">
-        <ul className="flex items-center gap-5 overflow-x-auto whitespace-nowrap px-4 py-2.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <ul className="flex items-center justify-center gap-8 whitespace-nowrap px-4 py-2.5">
           <li>
             <Link href="/" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
               HOME
@@ -317,48 +316,6 @@ export default function Navbar() {
               CATEGORIES
             </Link>
           </li>
-          {user && (
-            <li>
-              <Link href={dashboardHref} className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
-                DASHBOARD
-              </Link>
-            </li>
-          )}
-          {user ? (
-            <>
-              <li>
-                <Link href={dashboardHref} className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
-                  WELCOME, {user.name}!
-                </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                  className="cursor-pointer rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
-                </button>
-              </li>
-            </>
-          ) : (
-            <>
-              <li>
-                <Link href="/login" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
-                  LOGIN
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/signup"
-                  className="rounded-full bg-ink px-3 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-white no-underline hover:bg-brand"
-                >
-                  SIGN UP
-                </Link>
-              </li>
-            </>
-          )}
         </ul>
       </div>
 
@@ -384,25 +341,25 @@ export default function Navbar() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Categories"
+          aria-label="Menu"
           className="fixed inset-0 z-50 md:hidden"
         >
           <button
             type="button"
             tabIndex={-1}
-            aria-label="Close categories"
+            aria-label="Close menu"
             onClick={() => setIsMenuOpen(false)}
             className="absolute inset-0 cursor-default bg-black/40 backdrop-blur-sm"
           />
           <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <h2 className="text-xs font-semibold tracking-[0.2em] text-ink">
-                CATEGORIES
+                MENU
               </h2>
               <button
                 type="button"
                 onClick={() => setIsMenuOpen(false)}
-                aria-label="Close categories"
+                aria-label="Close menu"
                 className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,7 +367,56 @@ export default function Navbar() {
                 </svg>
               </button>
             </div>
+            {/* Account section */}
+            <div className="border-b border-line px-5 py-4">
+              {user ? (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href={dashboardHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                  >
+                    WELCOME, {user.name}!
+                  </Link>
+                  <Link
+                    href={dashboardHref}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                  >
+                    DASHBOARD
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className="mt-1 w-full cursor-pointer rounded-full bg-ink px-4 py-2 text-center text-xs font-semibold tracking-[0.12em] text-white hover:bg-brand disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {isSigningOut ? "SIGNING OUT..." : "SIGN OUT"}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block py-1 text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand"
+                  >
+                    LOGIN
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block rounded-full bg-ink px-4 py-2 text-center text-xs font-semibold tracking-[0.12em] text-white no-underline hover:bg-brand"
+                  >
+                    SIGN UP
+                  </Link>
+                </div>
+              )}
+            </div>
             <div className="flex-1 overflow-y-auto px-3 py-3">
+              <h3 className="px-2 pt-1 pb-2 text-[11px] font-semibold tracking-[0.2em] text-smoke">
+                CATEGORIES
+              </h3>
               {!categories ? (
                 <ul aria-label="Loading categories" className="flex flex-col gap-2">
                   {[0, 1, 2, 3, 4].map((key) => (
