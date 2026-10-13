@@ -145,11 +145,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Shop */}
-          <FooterColumn title="Shop" links={shopLinks} />
+          {/* Shop — desktop only */}
+          <div className="hidden md:block">
+            <FooterColumn title="Shop" links={shopLinks} />
+          </div>
 
-          {/* Support */}
-          <div className="text-center md:text-left">
+          {/* Support — desktop only */}
+          <div className="hidden text-center md:block md:text-left">
             <FooterColumn title="Support" links={supportLinks} />
 
           </div>
@@ -203,7 +205,50 @@ export default function Footer() {
             © {new Date().getFullYear()} BelaView. All rights reserved.
           </p>
 
-          <div className="flex items-center gap-6">
+          {/* Mobile bottom links — support row, then centered Privacy/Terms */}
+          <div className="flex flex-col items-center gap-2 md:hidden">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+              <a
+                href="/contact"
+                className="text-xs text-fog transition-colors hover:text-brand-rose"
+              >
+                Contact us
+              </a>
+
+              <a
+                href="/shipping"
+                className="text-xs text-fog transition-colors hover:text-brand-rose"
+              >
+                Shipping &amp; delivery
+              </a>
+
+              <a
+                href="/return-policy"
+                className="text-xs text-fog transition-colors hover:text-brand-rose"
+              >
+                Return Policy
+              </a>
+            </div>
+
+            <div className="flex items-center justify-center gap-6">
+              <a
+                href="/privacy"
+                className="text-xs text-fog transition-colors hover:text-brand-rose"
+              >
+                Privacy
+              </a>
+
+              <a
+                href="/terms"
+                className="text-xs text-fog transition-colors hover:text-brand-rose"
+              >
+                Terms
+              </a>
+            </div>
+          </div>
+
+          {/* Desktop bottom links */}
+          <div className="hidden items-center gap-6 md:flex">
             <a
               href="/privacy"
               className="text-xs text-fog transition-colors hover:text-brand-rose"
