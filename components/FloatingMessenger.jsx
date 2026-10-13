@@ -4,24 +4,23 @@ import { usePathname } from "next/navigation";
 
 export default function FloatingMessenger() {
   const pathname = usePathname();
-  const username = process.env.NEXT_PUBLIC_MESSENGER_USERNAME;
+
 
   if (pathname.includes("dashboard")) return null;
-  if (!username) return null;
-
+ 
   return (
     <a
-      href={`https://m.me/${username}`}
+      href="https://m.me/119744022748237"
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on Messenger"
       title="Chat on Messenger"
-      className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg shadow-black/25 transition-transform hover:scale-110 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0084FF] sm:bottom-6 sm:right-6"
+      className="fixed bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg shadow-black/25 transition-transform hover:scale-110 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0084FF] sm:bottom-6 sm:right-6"
       style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
     >
       <svg
-        width="30"
-        height="30"
+        width="20"
+        height="20"
         viewBox="0 0 24 24"
         fill="currentColor"
         aria-hidden="true"

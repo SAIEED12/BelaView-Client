@@ -102,9 +102,9 @@ export default function CategoryCarousel({ items = [] }) {
                         : ""}
                     </p>
                   </div>
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors group-hover:bg-brand">
+                  {/* <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors group-hover:bg-brand">
                     <ArrowUpRight size={18} />
-                  </span>
+                  </span> */}
                 </div>
 
                 {item.subs.length > 0 ? (
