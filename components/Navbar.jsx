@@ -133,7 +133,7 @@ export default function Navbar() {
               alt="BelaView Logo"
               width={70}
               height={70}
-              className="h-11 w-11 rounded-full bg-white object-contain md:h-[70px] md:w-[70px]"
+              className="h-11 w-11 rounded-full bg-white object-contain md:h-17.5 md:w-17.5"
             />
             <span className="text-base font-bold tracking-[0.15em] md:text-lg">
               BelaView
@@ -245,7 +245,7 @@ export default function Navbar() {
                         <div className="flex items-center">
                           <Link
                             href={href}
-                            className="flex-1 px-3 py-2.5 text-xs font-semibold tracking-[0.1em] text-ink no-underline hover:bg-mist hover:text-brand"
+                            className="flex-1 px-3 py-2.5 text-xs font-semibold tracking-widest text-ink no-underline hover:bg-mist hover:text-brand"
                           >
                             {String(category.name).toUpperCase()}
                             <span className="ml-2 font-normal text-fog">
