@@ -207,7 +207,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link href="/products" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
-              ALL PRODUCTS
+              PRODUCTS
             </Link>
           </li>
           <li className="relative" ref={categoryMenuRef}>
@@ -300,6 +300,13 @@ export default function Navbar() {
               </div>
             ) : null}
           </li>
+          {user?.role !== "admin" && (
+            <li>
+              <Link href="/about" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
+                ABOUT US
+              </Link>
+            </li>
+          )}
           {user && (
             <li>
               <Link href={dashboardHref} className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
@@ -331,7 +338,7 @@ export default function Navbar() {
           </li>
           <li>
             <Link href="/products" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
-              ALL PRODUCTS
+              PRODUCTS
             </Link>
           </li>
           <li>
@@ -339,6 +346,13 @@ export default function Navbar() {
               CATEGORIES
             </Link>
           </li>
+          {user?.role !== "admin" && (
+            <li>
+              <Link href="/about" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+                ABOUT US
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

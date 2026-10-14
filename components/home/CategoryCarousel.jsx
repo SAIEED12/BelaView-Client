@@ -49,7 +49,7 @@ export default function CategoryCarousel({ items = [] }) {
         }}
         onSlideChange={syncNav}
         onResize={syncNav}
-        slidesPerView={1.15}
+        slidesPerView={2}
         spaceBetween={12}
         speed={500}
         loop
@@ -76,52 +76,21 @@ export default function CategoryCarousel({ items = [] }) {
                     alt={item.name}
                     fill
                     unoptimized
-                    sizes="(max-width: 639px) 80vw, (min-width: 1024px) 30vw, 45vw"
+                    sizes="(max-width: 639px) 50vw, (min-width: 1024px) 30vw, 45vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : null}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               </div>
 
-              {/* Whole-card link sits under the content so sub-category
-                  links stay independently clickable. */}
               <Link
                 href={item.href}
                 className="absolute inset-0 z-0 no-underline"
                 aria-label={item.name}
               />
-
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex flex-col gap-2 p-3 sm:p-5">
-                <div className="flex items-end justify-between gap-2 sm:gap-3">
-                  <div>
-                    <h3 className="font-serif text-base text-white sm:text-xl">{item.name}</h3>
-                    <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-white/70">
-                      {item.count} {item.count === 1 ? "product" : "products"}
-                      {Number.isFinite(item.minPrice)
-                        ? ` · from ৳${Number(item.minPrice).toLocaleString()}`
-                        : ""}
-                    </p>
-                  </div>
-                  {/* <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md transition-colors group-hover:bg-brand">
-                    <ArrowUpRight size={18} />
-                  </span> */}
-                </div>
-
-                {item.subs.length > 0 ? (
-                  <ul className="relative z-20 flex flex-wrap gap-1.5 pt-1">
-                    {item.subs.map((sub) => (
-                      <li key={sub.slug}>
-                        <Link
-                          href={sub.href}
-                          className="pointer-events-auto inline-block rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold text-white no-underline backdrop-blur-md transition-colors hover:bg-brand"
-                        >
-                          {sub.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
+              <h3 className="absolute bottom-0 left-0 right-0 z-10 p-3 sm:p-5">
+                <span className="font-serif text-base text-white sm:text-xl">{item.name}</span>
+              </h3>
             </div>
           </SwiperSlide>
         ))}
