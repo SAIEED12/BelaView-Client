@@ -457,7 +457,7 @@ export default function Navbar() {
                         <div className="flex items-center">
                           <Link
                             href={`/categories/${category.slug}`}
-                            className="flex-1 px-2 py-3 text-xs font-semibold tracking-[0.1em] text-ink no-underline hover:text-brand"
+                            className="flex-1 px-2 py-3 text-xs font-semibold tracking-widest text-ink no-underline hover:text-brand"
                             onClick={() => setIsMenuOpen(false)}
                           >
                             {String(category.name).toUpperCase()}

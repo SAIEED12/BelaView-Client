@@ -69,7 +69,7 @@ export default function CategoryCarousel({ items = [] }) {
         {items.map((item) => (
           <SwiperSlide key={item.slug} className="h-auto!">
             <div className="group relative h-full overflow-hidden rounded-2xl bg-mist">
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
+              <div className="relative aspect-4/3 w-full overflow-hidden">
                 {item.coverImage ? (
                   <Image
                     src={item.coverImage}
@@ -80,7 +80,7 @@ export default function CategoryCarousel({ items = [] }) {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : null}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
               </div>
 
               <Link
