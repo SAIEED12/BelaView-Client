@@ -68,30 +68,29 @@ export default function CategoryCarousel({ items = [] }) {
       >
         {items.map((item) => (
           <SwiperSlide key={item.slug} className="h-auto!">
-            <div className="group relative h-full overflow-hidden rounded-2xl bg-mist">
-              <div className="relative aspect-4/3 w-full overflow-hidden">
-                {item.coverImage ? (
-                  <Image
-                    src={item.coverImage}
-                    alt={item.name}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 639px) 50vw, (min-width: 1024px) 30vw, 45vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                ) : null}
-                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
+            <Link
+              href={item.href}
+              className="group block no-underline"
+              aria-label={item.name}
+            >
+              <div className="relative overflow-hidden rounded-2xl bg-mist">
+                <div className="relative aspect-4/3 w-full overflow-hidden">
+                  {item.coverImage ? (
+                    <Image
+                      src={item.coverImage}
+                      alt={item.name}
+                      fill
+                      unoptimized
+                      sizes="(max-width: 639px) 50vw, (min-width: 1024px) 30vw, 45vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : null}
+                </div>
               </div>
-
-              <Link
-                href={item.href}
-                className="absolute inset-0 z-0 no-underline"
-                aria-label={item.name}
-              />
-            </div>
-              <h3 className="absolute bottom-0 left-0 right-0 z-10 p-3 sm:p-5">
-                <span className="inline-flex max-w-full items-center rounded-full border border-line bg-[#e2d6d6] px-4 py-1.5 font-serif text-base text-black shadow-lg sm:text-md">{item.name}</span>
+              <h3 className="mt-3 text-center font-serif text-base text-ink transition-colors group-hover:text-brand">
+                {item.name}
               </h3>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

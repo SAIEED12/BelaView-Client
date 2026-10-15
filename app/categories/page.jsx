@@ -56,7 +56,7 @@ const AllCategoriesPage = async () => {
             return (
             <section
               key={parent.slug}
-              className="overflow-hidden rounded-2xl border border-line bg-white"
+              className="overflow-hidden rounded-2xl bg-[#D9C6B0] shadow-md shadow-black/5"
             >
               <div className="grid gap-0 md:grid-cols-[220px_minmax(0,1fr)]">
                 <Link

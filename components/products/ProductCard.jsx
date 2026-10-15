@@ -27,7 +27,8 @@ export default function ProductCard({ product, showCategory = false }) {
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-8">
+      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-8">
+        <h2 className=" text-sm font-semibold stext-ink sm:text-lg">{product.name}</h2>
         {showCategory && (categoryLabel || subcategoryLabel) ? (
           <p className="text-sm text-smoke">
             <span className="mr-1.5 text-xs font-semibold ">
@@ -38,7 +39,6 @@ export default function ProductCard({ product, showCategory = false }) {
                 · {subcategoryLabel}
               </span>
             ) : null}
-            <h2 className=" text-sm font-semibold stext-ink sm:text-lg">{product.name}</h2>
           </p>
         ) : null}
 
@@ -50,7 +50,7 @@ export default function ProductCard({ product, showCategory = false }) {
         </div>
         <Link
           href={`/products/${id}`}
-          className="block w-full rounded-full bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark sm:w-auto sm:py-2"
+          className="block w-full rounded-lg bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark sm:w-auto sm:py-2"
         >
           View Details
         </Link>

@@ -22,7 +22,7 @@ export default async function Home() {
   const products = await getProducts();
 
   return (
-    <div className="bg-[#e2d6d6] flex min-h-screen flex-col">
+    <div className="bg-[#D9C6B0] flex min-h-screen flex-col">
       <Hero />
       <ShopByCategory products={products} />
       <FeaturedProducts products={products} />

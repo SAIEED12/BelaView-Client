@@ -56,7 +56,7 @@ function WhatsAppIcon({ size = 24, ...props }) {
 
 const shopLinks = [
   { label: "Home", href: "/" },
-  { label: "All products", href: "/products" },
+  { label: "Products", href: "/products" },
   { label: "Categories", href: "/categories" },
   { label: "About us", href: "/about" },
 
@@ -147,18 +147,16 @@ export default function Footer() {
 
           {/* Shop — desktop only */}
           <div className="hidden md:block">
-            <FooterColumn title="Shop" links={shopLinks} />
+            <FooterColumn  links={shopLinks} />
           </div>
 
           {/* Support — desktop only */}
           <div className="hidden text-center md:block md:text-left">
-            <FooterColumn title="Support" links={supportLinks} />
+            <FooterColumn  links={supportLinks} />
 
           </div>
             <div className="mt-6 text-center md:mt-0 md:text-left">
-              <h3 className="text-sm font-semibold text-white">
-                Get in touch
-              </h3>
+
 
               <ul className="mt-4 space-y-3">
                 <li className="flex items-center justify-center gap-3 text-sm text-[#A8A8A8] md:justify-start">

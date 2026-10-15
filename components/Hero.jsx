@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const slides = [
   {
-    image: "/Hero.png",
+    image: "/11.png",
     title: "Welcome to our store",
     subtitle:
       "Where comfort, style, beauty, and everyday essentials come together in one place. ",
