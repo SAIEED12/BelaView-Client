@@ -7,7 +7,27 @@ export function SkeletonBlock({ className = "" }) {
   );
 }
 
-export function ProductCardSkeleton() {
+export function ProductCardSkeleton({ compact = false }) {
+  if (compact) {
+    return (
+      <div
+        aria-hidden="true"
+        className="flex flex-col rounded-xl border border-line bg-white p-2.5 sm:p-3"
+      >
+        <div className="aspect-square w-full animate-pulse rounded-lg bg-mist" />
+        <div className="flex flex-col gap-2 pt-2.5">
+          <div className="h-3.5 w-1/2 animate-pulse rounded-xl bg-line/70" />
+          <div className="h-4 w-3/4 animate-pulse rounded-xl bg-mist" />
+          <div className="h-5 w-24 animate-pulse rounded-xl bg-mist" />
+          <div className="flex items-center gap-2 pt-2">
+            <div className="h-9 flex-1 animate-pulse rounded-lg bg-line/70" />
+            <div className="h-9 w-9 animate-pulse rounded-lg bg-mist" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       aria-hidden="true"

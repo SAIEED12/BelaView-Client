@@ -11,56 +11,52 @@ export default function ProductCard({ product, showCategory = false }) {
   const subcategoryLabel = product?.subcategory
     ? formatLabel(product.subcategory)
     : "";
+  const cardLabel = subcategoryLabel || categoryLabel;
 
   return (
-    <article className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-white transition-shadow hover:shadow-lg">
-      <div className="relative aspect-square w-full overflow-hidden bg-mist">
+    <article className="group flex min-w-0 flex-col rounded-xl border border-line bg-white p-2.5 transition-shadow hover:shadow-lg sm:p-3 gap-1">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-mist ">
         {product.image && (
           <Image
             src={product.image}
             alt={product.name}
             fill
             unoptimized
-            sizes="(max-width: 639px) 50vw, (min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw"
+            sizes="(max-width: 639px) 50vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         )}
-      </div>
-
-      <div className="flex flex-1 flex-col gap-1.5 p-3 sm:p-8">
-        <h2 className=" text-sm font-semibold stext-ink sm:text-lg">{product.name}</h2>
-        {showCategory && (categoryLabel || subcategoryLabel) ? (
-          <p className="text-sm text-smoke">
-            <span className="mr-1.5 text-xs font-semibold ">
-               {categoryLabel}
-            </span>
-            {subcategoryLabel ? (
-              <span className="mr-1.5 text-xs font-semibold ">
-                · {subcategoryLabel}
-              </span>
-            ) : null}
-          </p>
-        ) : null}
-
-        <div className="mt-auto flex flex-row items-center justify-between gap-2 pt-2 sm:gap-3 sm:pt-3">
-          <span className="text-lg font-semibold text-brand sm:text-xl">
-            ৳{Number(product.price).toLocaleString()}
-          </span>
+        <div className="absolute bottom-2 right-2 z-10 rounded-full bg-white/85 shadow-md backdrop-blur-sm ">
           <WishlistHeartButton productId={id} name={product.name} />
         </div>
-        <Link
-          href={`/products/${id}`}
-          className="block w-full rounded-lg bg-brand px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark sm:w-auto sm:py-2"
-        >
-          View Details
-        </Link>
-        <AddToCartButton
-          productId={id}
-          name={product.name}
-          price={product.price}
-          image={product.image || ""}
-          stock={Number(product.stock ?? 1)}
-        />
+      </div>
+
+      <div className="flex flex-col gap-1 pt-2.5">
+        {showCategory ? (
+          <p className="truncate text-xs font-semibold text-fog">{cardLabel || "\u00A0"}</p>
+        ) : null}
+        <h2 className="text-sm min-h-[2.75em] font-semibold text-ink sm:text-sm">
+          {product.name}
+        </h2>
+        <span className="text-[17px] font-bold text-brand sm:text-sm mt-2">
+          ৳{Number(product.price).toLocaleString()}
+        </span>
+        <div className="flex items-center gap-2 pt-0.5">
+          <Link
+            href={`/products/${id}`}
+            className="flex h-7 flex-1 items-center justify-center rounded-lg bg-brand px-0.5 text-[11px] font-semibold tracking-normal text-white uppercase transition-colors hover:bg-brand-dark sm:px-2 sm:text-xs sm:tracking-[0.06em]"
+          >
+            View Details
+          </Link>
+          <AddToCartButton
+            iconOnly
+            productId={id}
+            name={product.name}
+            price={product.price}
+            image={product.image || ""}
+            stock={Number(product.stock ?? 1)}
+          />
+        </div>
       </div>
     </article>
   );
@@ -79,7 +75,7 @@ export const ProductGrid = ({ products = [], showCategory = false, emptyMessage 
     );
   }
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3 2xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-7 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
         <ProductCard
           key={String(product?._id ?? product?.id ?? "")}
