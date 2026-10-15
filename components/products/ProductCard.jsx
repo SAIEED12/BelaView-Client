@@ -33,7 +33,7 @@ export default function ProductCard({ product, showCategory = false }) {
 
       <div className="flex flex-col gap-1 pt-2.5">
         {showCategory ? (
-          <p className="truncate text-xs font-semibold text-fog">{cardLabel || "\u00A0"}</p>
+          <p className="truncate text-[12px]  font-semibold text-fog capitalize">{cardLabel || " "}</p>
         ) : null}
         <h2 className="text-sm min-h-[2.75em] font-semibold text-ink sm:text-sm">
           {product.name}
