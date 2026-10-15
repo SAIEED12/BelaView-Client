@@ -26,7 +26,7 @@ export default function DashboardShell({
   const sidebarProps = { navSections, badge, basePath };
 
   return (
-    <div className="flex min-h-screen bg-[#FAFAFA] text-[#1A1A1A]">
+    <div className="flex min-h-screen bg-cream text-[#1A1A1A]">
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-[#E5E5E5] lg:block">
         <Sidebar {...sidebarProps} />

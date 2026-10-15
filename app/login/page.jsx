@@ -54,7 +54,7 @@ function LoginForm() {
 
 
   return (
-    <div className="flex w-full flex-col bg-white lg:min-h-screen lg:flex-row">
+    <div className="flex w-full flex-col bg-cream lg:min-h-screen lg:flex-row">
       {/* Left image panel */}
       <div className="relative hidden w-1/2 overflow-hidden lg:block">
         <Image

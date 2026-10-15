@@ -88,10 +88,10 @@ export default function CategoryCarousel({ items = [] }) {
                 className="absolute inset-0 z-0 no-underline"
                 aria-label={item.name}
               />
-              <h3 className="absolute bottom-0 left-0 right-0 z-10 p-3 sm:p-5">
-                <span className="font-serif text-base text-white sm:text-xl">{item.name}</span>
-              </h3>
             </div>
+              <h3 className="absolute bottom-0 left-0 right-0 z-10 p-3 sm:p-5">
+                <span className="inline-flex max-w-full items-center rounded-full border border-line bg-[#e2d6d6] px-4 py-1.5 font-serif text-base text-black shadow-lg sm:text-md">{item.name}</span>
+              </h3>
           </SwiperSlide>
         ))}
       </Swiper>

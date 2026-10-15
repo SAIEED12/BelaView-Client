@@ -7,7 +7,7 @@ import {
 export default function Loading() {
   return (
     <LoadingRegion label="Loading homepage…">
-      <div className="flex min-h-screen flex-col bg-white">
+      <div className="flex min-h-screen flex-col bg-cream">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <SkeletonBlock className="mt-6 h-[320px] rounded-2xl md:h-[420px]" />
           <div className="grid grid-cols-2 gap-4 py-10 sm:grid-cols-4">

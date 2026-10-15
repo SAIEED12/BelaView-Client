@@ -35,7 +35,7 @@ const AdminProductsPage = async ({ searchParams }) => {
   const { categories } = await getCategories();
   return (
     <div>
-      <div className="flex justify-between items-center my-5">
+      <div className="flex justify-between items-center my-5 ">
         <h1 className="truncate font-serif text-xl text-ink md:text-3xl">Products</h1>
         <AddProductModal categories={categories} />
       </div>

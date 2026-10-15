@@ -27,7 +27,7 @@ const sections = [
 
 export default function PrivacyPolicy() {
   return (
-    <div className="bg-white">
+    <div className="bg-cream">
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-brand">Privacy policy</p>

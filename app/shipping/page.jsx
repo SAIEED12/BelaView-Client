@@ -31,7 +31,7 @@ const channelLink =
 
 const ShippingAndDelivery = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-cream">
       {/* Intro */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="max-w-3xl">

@@ -88,7 +88,7 @@ const faqs = [
 
 const AboutPage = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-cream">
       {/* Hero */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
