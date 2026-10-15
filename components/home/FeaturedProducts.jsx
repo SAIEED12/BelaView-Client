@@ -8,7 +8,7 @@ import { WishlistHeartButton } from "@/components/wishlist/WishlistHeartButton";
 export default function FeaturedProducts({ products = [] }) {
   const items = useMemo(() => {
     const list = Array.isArray(products) ? [...products] : [];
-    // Newest first — ObjectId strings are roughly time-ordered.
+    // Newest first
     list.sort((a, b) => String(b?._id ?? "").localeCompare(String(a?._id ?? "")));
     return list.slice(0, 8);
   }, [products]);
@@ -63,7 +63,7 @@ export default function FeaturedProducts({ products = [] }) {
                     {String(product.category).replace(/-/g, " ")}
                   </p>
                 ) : null}
-                <h3 className="line-clamp-2 text-sm font-semibold break-words text-ink sm:text-base">{product.name}</h3>
+                <h3 className="line-clamp-2 text-sm font-semibold wrap-break-words text-ink sm:text-base">{product.name}</h3>
                 <div className="mt-auto flex items-center justify-between gap-2 pt-1 sm:gap-3 sm:pt-2">
                   <span className="text-lg font-semibold text-brand sm:text-xl">
                     ৳{Number(product.price).toLocaleString()}

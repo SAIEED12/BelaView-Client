@@ -28,22 +28,22 @@ export default function ProductCard({ product, showCategory = false }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 p-3 sm:gap-2 sm:p-8">
-        <h2 className="line-clamp-2 text-sm font-semibold break-words text-ink sm:text-lg">{product.name}</h2>
         {showCategory && (categoryLabel || subcategoryLabel) ? (
           <p className="text-sm text-smoke">
-            <span className="mr-1.5 text-xs font-semibold uppercase">
-              CATEGORY: {categoryLabel}
+            <span className="mr-1.5 text-xs font-semibold ">
+               {categoryLabel}
             </span>
             {subcategoryLabel ? (
-              <span className="mr-1.5 text-xs font-semibold uppercase">
+              <span className="mr-1.5 text-xs font-semibold ">
                 · {subcategoryLabel}
               </span>
             ) : null}
+            <h2 className=" text-sm font-semibold stext-ink sm:text-lg">{product.name}</h2>
           </p>
         ) : null}
 
         <div className="mt-auto flex flex-row items-center justify-between gap-2 pt-2 sm:gap-3 sm:pt-3">
-          <span className="text-lg font-semibold text-brand sm:text-2xl">
+          <span className="text-lg font-semibold text-brand sm:text-xl">
             ৳{Number(product.price).toLocaleString()}
           </span>
           <WishlistHeartButton productId={id} name={product.name} />
