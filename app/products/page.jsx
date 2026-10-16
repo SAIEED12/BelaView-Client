@@ -1,8 +1,12 @@
-import Link from "next/link";
 import { Suspense } from "react";
 import { ProductGrid } from "@/components/products/ProductCard";
-import { ProductFilters } from "@/components/products/ProductFilters";
-import { ProductFilterDrawer } from "@/components/products/ProductFilterDrawer";
+import { ActiveFilters } from "@/components/products/ActiveFilters";
+import { EmptyProductsState } from "@/components/products/EmptyProductsState";
+import { FilterNavigationProvider } from "@/components/products/FilterNavigationProvider";
+import { FilterSidebar } from "@/components/products/FilterSidebar";
+import { MobileFilterDrawer } from "@/components/products/MobileFilterDrawer";
+import { PendingResults } from "@/components/products/PendingResults";
+import { SortDropdown } from "@/components/products/SortDropdown";
 import { PaginationControls } from "@/components/PaginationControls";
 
 const SERVER_URL = process.env.SERVER_URL;
@@ -98,48 +102,48 @@ const AllProductsPage = async ({ searchParams }) => {
     <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 ">
       <h1 className="mb-6 font-serif text-3xl text-ink">All Products</h1>
 
-      <Suspense>
-        <ProductFilterDrawer {...filterProps} />
-      </Suspense>
+      <Suspense fallback={null}>
+        <FilterNavigationProvider>
+          <div className="lg:grid lg:grid-cols-[270px_minmax(0,1fr)] lg:gap-8">
+            <aside aria-label="Product filters" className="hidden lg:block">
+              <FilterSidebar {...filterProps} />
+            </aside>
 
-      <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
-        <aside aria-label="Product filters" className="hidden lg:block">
-          <div className="lg:sticky lg:top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-line bg-white p-5">
-            <Suspense>
-              <ProductFilters {...filterProps} />
-            </Suspense>
+            <div className="min-w-0">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                {total > 0 ? (
+                  <p className="text-sm font-semibold text-brand">
+                    Showing {start}–{end} of {total} products
+                  </p>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <MobileFilterDrawer {...filterProps} />
+                  <SortDropdown sort={sort} />
+                </div>
+              </div>
+
+              <ActiveFilters {...filterProps} />
+
+              <PendingResults>
+                <ProductGrid
+                  products={products}
+                  showCategory
+                  emptyState={<EmptyProductsState searchText={searchText} />}
+                />
+                <Suspense>
+                  <PaginationControls
+                    page={currentPage}
+                    totalPages={totalPages}
+                    label="Products pagination"
+                  />
+                </Suspense>
+              </PendingResults>
+            </div>
           </div>
-        </aside>
-
-        <div className="min-w-0">
-          {total > 0 ? (
-            <p className="mb-4 text-sm text-brand font-semibold">
-              Showing {start}–{end} of {total} products
-            </p>
-          ) : null}
-
-          <ProductGrid
-            products={products}
-            showCategory
-            emptyMessage={
-              searchText
-                ? `No products found for "${searchText}".`
-                : "No products match the selected filters."
-            }
-          />
-          {products.length === 0 ? (
-            <p className="mt-4 text-center text-sm text-smoke">
-              <Link href="/products" className="font-semibold text-brand hover:underline">
-                Clear search and filters
-              </Link>
-            </p>
-          ) : null}
-
-          <Suspense>
-            <PaginationControls page={currentPage} totalPages={totalPages} label="Products pagination" />
-          </Suspense>
-        </div>
-      </div>
+        </FilterNavigationProvider>
+      </Suspense>
     </main>
   );
 };

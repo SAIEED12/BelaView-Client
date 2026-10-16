@@ -41,7 +41,7 @@ export default function ProductCard({ product, showCategory = false }) {
         {showCategory ? (
           <p className="truncate text-[12px]  font-semibold text-fog capitalize">{cardLabel || " "}</p>
         ) : null}
-        <h2 className="text-sm min-h-[2.75em] font-semibold text-ink sm:text-sm">
+        <h2 className="text-sm line-clamp-1 font-bold text-ink sm:text-sm">
           {product.name}
         </h2>
         <span className="text-[17px] font-bold text-brand sm:text-sm mt-2">
@@ -72,8 +72,9 @@ function formatLabel(value) {
   return String(value).replace(/-/g, " ");
 }
 
-export const ProductGrid = ({ products = [], showCategory = false, emptyMessage = "No products found." }) => {
+export const ProductGrid = ({ products = [], showCategory = false, emptyMessage = "No products found.", emptyState = null }) => {
   if (!products.length) {
+    if (emptyState) return emptyState;
     return (
       <div className="rounded-2xl border border-dashed border-line bg-white px-6 py-10 text-center">
         <p className="text-sm text-smoke">{emptyMessage}</p>

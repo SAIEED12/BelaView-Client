@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { ProductFilters, countActiveFilters } from "./ProductFilters";
+import { clearFilterParams, countActiveFilters } from "@/lib/productFilters";
+import { FilterSidebar } from "./FilterSidebar";
+import { useFilterNavigation } from "./FilterNavigationProvider";
 
-export function ProductFilterDrawer({
+export function MobileFilterDrawer({
   facets,
   selectedCategories = [],
   selectedSubcategories = [],
@@ -13,6 +15,7 @@ export function ProductFilterDrawer({
   inStock = false,
   sort = "newest",
 }) {
+  const { navigate } = useFilterNavigation();
   const [open, setOpen] = useState(false);
   const activeCount = countActiveFilters({
     categories: selectedCategories,
@@ -25,8 +28,8 @@ export function ProductFilterDrawer({
 
   useEffect(() => {
     if (!open) return;
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") setOpen(false);
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setOpen(false);
     };
     document.addEventListener("keydown", onKeyDown);
     const prevOverflow = document.body.style.overflow;
@@ -35,16 +38,22 @@ export function ProductFilterDrawer({
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open ]);
+  }, [open]);
+
+  const handleClearAll = () => {
+    navigate((params) => {
+      clearFilterParams(params);
+    });
+  };
 
   return (
-    <div className="lg:hidden">
+    <>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-line bg-white px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-ink uppercase transition-colors hover:border-brand hover:text-brand"
+        className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-line bg-white px-3.5 text-xs font-semibold tracking-[0.1em] text-ink uppercase transition-colors hover:border-brand hover:text-brand lg:hidden"
       >
         <SlidersHorizontal size={15} aria-hidden="true" />
         Filters
@@ -63,7 +72,7 @@ export function ProductFilterDrawer({
           role="dialog"
           aria-modal="true"
           aria-label="Product filters"
-          className="fixed inset-0 z-50"
+          className="fixed inset-0 z-50 lg:hidden"
         >
           <button
             type="button"
@@ -72,7 +81,7 @@ export function ProductFilterDrawer({
             onClick={() => setOpen(false)}
             className="absolute inset-0 cursor-default bg-black/40 backdrop-blur-sm"
           />
-          <div className="absolute inset-y-0 left-0 flex w-80 max-w-[85vw] flex-col bg-white shadow-xl">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
               <h2 className="font-serif text-lg text-ink">Filters</h2>
               <button
@@ -81,11 +90,13 @@ export function ProductFilterDrawer({
                 aria-label="Close filters"
                 className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
               >
-                <X size={17} />
+                <X size={17} aria-hidden="true" />
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-5 py-5">
-              <ProductFilters
+
+            <div className="flex-1 overflow-x-hidden overflow-y-auto bg-cream px-4 py-4">
+              <FilterSidebar
+                showHeader={false}
                 facets={facets}
                 selectedCategories={selectedCategories}
                 selectedSubcategories={selectedSubcategories}
@@ -95,18 +106,26 @@ export function ProductFilterDrawer({
                 sort={sort}
               />
             </div>
-            <div className="border-t border-line px-5 py-4">
+
+            <div className="flex items-center gap-3 border-t border-line px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="h-11 flex-1 cursor-pointer rounded-xl border border-line bg-white text-xs font-semibold tracking-[0.12em] text-ink uppercase transition-colors hover:border-brand hover:text-brand"
+              >
+                Clear all
+              </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="w-full cursor-pointer rounded-xl bg-ink px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors hover:bg-brand"
+                className="h-11 flex-1 cursor-pointer rounded-xl bg-ink text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors hover:bg-brand"
               >
-                Show results
+                Apply
               </button>
             </div>
           </div>
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
