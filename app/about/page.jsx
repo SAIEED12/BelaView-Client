@@ -259,7 +259,7 @@ const AboutPage = () => {
 
       {/* CTA */}
       <section className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 md:pb-20 lg:px-8">
-        <div className="rounded-[2rem] bg-ink px-6 py-14 text-center sm:px-12 md:py-16">
+        <div className="rounded-4xl bg-ink mt-10 px-6 py-14 text-center sm:px-2 md:py-8 md:mt-14">
           <p className="font-serif text-3xl leading-tight text-brand-rose sm:text-4xl">
             Style your home. Express yourself. Feel beautiful.
           </p>
