@@ -16,7 +16,7 @@ const slides = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1765135685377-b6175d4c2788?auto=format&fit=crop&w=2400&q=90",
+      "/HeroPortrait.png",
     title: "Explore our collection",
     subtitle:
       "Beautifully crafted swing chairs and furniture, elegant sarees and fashion wear, and carefully selected cosmetics and beauty products.",

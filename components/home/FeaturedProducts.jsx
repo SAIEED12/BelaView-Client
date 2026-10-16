@@ -14,7 +14,7 @@ export default function FeaturedProducts({ products = [] }) {
   if (!products.length) return null;
 
   return (
-    <section aria-label="Featured products" className="w-full bg-sand">
+    <section aria-label="Featured products" className="w-full border-y border-sand-line bg-sand">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
