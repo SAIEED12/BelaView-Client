@@ -53,7 +53,7 @@ export function MobileFilterDrawer({
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-line bg-white px-3.5 text-xs font-semibold tracking-[0.1em] text-ink uppercase transition-colors hover:border-brand hover:text-brand lg:hidden"
+        className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-sand-line bg-sand-soft px-3.5 text-xs font-semibold tracking-[0.1em] text-ink uppercase transition-colors hover:border-brand hover:text-brand lg:hidden"
       >
         <SlidersHorizontal size={15} aria-hidden="true" />
         Filters
@@ -81,20 +81,20 @@ export function MobileFilterDrawer({
             onClick={() => setOpen(false)}
             className="absolute inset-0 cursor-default bg-black/40 backdrop-blur-sm"
           />
-          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-2xl bg-sand-soft shadow-2xl">
+            <div className="flex items-center justify-between border-b border-sand-line px-5 py-4">
               <h2 className="font-serif text-lg text-ink">Filters</h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Close filters"
-                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-mist hover:text-ink"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors hover:bg-sand/50 hover:text-ink"
               >
                 <X size={17} aria-hidden="true" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-x-hidden overflow-y-auto bg-cream px-4 py-4">
+            <div className="flex-1 overflow-x-hidden overflow-y-auto bg-sand-soft px-4 py-4">
               <FilterSidebar
                 showHeader={false}
                 facets={facets}
@@ -107,11 +107,11 @@ export function MobileFilterDrawer({
               />
             </div>
 
-            <div className="flex items-center gap-3 border-t border-line px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="flex items-center gap-3 border-t border-sand-line px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <button
                 type="button"
                 onClick={handleClearAll}
-                className="h-11 flex-1 cursor-pointer rounded-xl border border-line bg-white text-xs font-semibold tracking-[0.12em] text-ink uppercase transition-colors hover:border-brand hover:text-brand"
+                className="h-11 flex-1 cursor-pointer rounded-xl border border-sand-line bg-white text-xs font-semibold tracking-[0.12em] text-ink uppercase transition-colors hover:border-brand hover:text-brand"
               >
                 Clear all
               </button>

@@ -26,7 +26,7 @@ const rangeInputClassName = [
 ].join(" ");
 
 const numberInputClassName =
-  "w-full min-w-0 rounded-xl border border-line bg-white py-2 pl-7 pr-3 text-sm text-ink outline-none placeholder:text-smoke focus:border-brand focus:ring-2 focus:ring-brand/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+  "w-full min-w-0 rounded-xl border border-sand-line bg-white py-2 pl-7 pr-3 text-sm text-ink outline-none placeholder:text-smoke focus:border-brand focus:ring-2 focus:ring-brand/20 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
 const normalizeBounds = (bounds) => {
   const min = Number(bounds?.min);
@@ -235,7 +235,7 @@ export function PriceFilter({ priceBounds, minPrice = "", maxPrice = "" }) {
         <div className="relative mt-4 h-5">
           <div
             aria-hidden="true"
-            className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-line"
+            className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-sand-line"
           />
           <div
             aria-hidden="true"
@@ -281,7 +281,7 @@ export function PriceFilter({ priceBounds, minPrice = "", maxPrice = "" }) {
               className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 isActive
                   ? "border-brand bg-brand-soft text-brand"
-                  : "border-line bg-white text-smoke hover:border-brand hover:text-brand"
+                  : "border-sand-line bg-white text-smoke hover:border-brand hover:text-brand"
               }`}
             >
               {chip.label}

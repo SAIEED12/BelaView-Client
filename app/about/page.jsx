@@ -88,7 +88,7 @@ const faqs = [
 
 const AboutPage = () => {
   return (
-    <div className="bg-cream">
+    <div className="bg-sand-soft">
       {/* Hero */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -139,7 +139,7 @@ const AboutPage = () => {
       </section>
 
       {/* Story */}
-      <section className="border-y border-line bg-mist">
+      <section className="border-y border-sand-line bg-sand">
         <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[1fr_1.4fr] lg:gap-16 lg:px-8">
           <h2 className="font-serif text-3xl leading-tight text-ink sm:text-4xl">
             Why we put these three together
@@ -216,7 +216,7 @@ const AboutPage = () => {
                   {item.examples.map((ex) => (
                     <li
                       key={ex}
-                      className="rounded-full border border-line px-3 py-1 text-sm text-ink font-semibold"
+                      className="rounded-full border border-sand-line px-3 py-1 text-sm text-ink font-semibold"
                     >
                       {ex}
                     </li>
@@ -236,14 +236,14 @@ const AboutPage = () => {
       </section>
 
       {/* Promises */}
-      <section className="bg-mist">
+      <section className="bg-sand">
         <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
           <h2 className="max-w-2xl font-serif text-3xl leading-tight text-ink sm:text-4xl">
             What you can expect from us
           </h2>
           <dl className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
             {promises.map((p) => (
-              <div key={p.title} className="border-t border-line pt-5">
+              <div key={p.title} className="border-t border-sand-line pt-5">
                 <p.icon size={22} className="text-brand" aria-hidden="true" />
                 <dt className="mt-3 text-base font-semibold text-ink">
                   {p.title}

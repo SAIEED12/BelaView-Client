@@ -66,7 +66,6 @@ const supportLinks = [
   { label: "Contact us", href: "/contact" },
   { label: "Shipping & delivery", href: "/shipping" },
   { label: "Return Policy", href: "/return-policy" },
-  { label: "FAQs", href: "/faq" },
 ];
 
 const socialLinkClass =

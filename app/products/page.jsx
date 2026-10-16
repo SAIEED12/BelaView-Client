@@ -112,7 +112,7 @@ const AllProductsPage = async ({ searchParams }) => {
             <div className="min-w-0">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 {total > 0 ? (
-                  <p className="text-sm font-semibold text-brand">
+                  <p className="text-sm font-semibold text-black">
                     Showing {start}–{end} of {total} products
                   </p>
                 ) : (

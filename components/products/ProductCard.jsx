@@ -15,7 +15,7 @@ export default function ProductCard({ product, showCategory = false }) {
   const inStock = Number(product.stock ?? 1) > 0;
 
   return (
-    <article className="group flex min-w-0 flex-col rounded-xl border border-line bg-white p-2.5 transition-shadow hover:shadow-lg sm:p-3 gap-1">
+    <article className="group flex min-w-0 flex-col rounded-xl border border-line bg-sand-soft p-2.5 transition-shadow hover:shadow-lg sm:p-3 gap-1">
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-mist ">
         {product.image && (
           <Image

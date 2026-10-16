@@ -15,9 +15,9 @@ export default function FloatingMessenger() {
       rel="noopener noreferrer"
       aria-label="Chat with us on Messenger"
       title="Chat on Messenger"
-      className="fixed bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg shadow-black/25 transition-transform hover:scale-110 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0084FF] sm:bottom-6 sm:right-6"
+      className="fixed bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-[#0084FF] text-white shadow-lg shadow-black/25 transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0084FF] sm:bottom-6 sm:right-6"
       style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-    >
+    > 
       <svg
         width="20"
         height="20"

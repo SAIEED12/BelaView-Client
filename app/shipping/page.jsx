@@ -31,7 +31,7 @@ const channelLink =
 
 const ShippingAndDelivery = () => {
   return (
-    <div className="bg-cream">
+    <div className="bg-sand-soft">
       {/* Intro */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="max-w-3xl">
@@ -51,7 +51,7 @@ const ShippingAndDelivery = () => {
       {/* Steps */}
       <section
         aria-label="How ordering and delivery work"
-        className="border-y border-line bg-mist"
+        className="border-y border-sand-line bg-sand"
       >
         <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[1fr_1.6fr] lg:gap-16 lg:px-8">
           <div>
@@ -108,11 +108,11 @@ const ShippingAndDelivery = () => {
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-line bg-mist p-6 sm:p-8">
+        <div className="rounded-[2rem] border border-sand-line bg-sand p-6 sm:p-8">
           <h3 className="text-base font-semibold text-ink">
             Example: a product that costs ৳5,000
           </h3>
-          <dl className="mt-4 divide-y divide-line text-base">
+          <dl className="mt-4 divide-y divide-sand-line text-base">
             <div className="flex items-center justify-between py-3">
               <dt className="text-smoke">Pay to confirm your order (20%)</dt>
               <dd className="font-semibold text-ink">৳1,000</dd>
@@ -131,7 +131,7 @@ const ShippingAndDelivery = () => {
 
       {/* Related policy */}
       <section className="mx-auto w-full max-w-7xl px-4 pb-14 sm:px-6 md:pb-20 lg:px-8">
-        <p className="max-w-2xl border-t border-line pt-6 text-sm leading-relaxed text-smoke sm:text-base">
+        <p className="max-w-2xl border-t border-sand-line pt-6 text-sm leading-relaxed text-smoke sm:text-base">
           Found damage when you opened your package? Tell us immediately.{" "}
           <Link
             href="/return-policy"

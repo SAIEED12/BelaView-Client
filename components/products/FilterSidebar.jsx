@@ -8,8 +8,8 @@ import { PriceFilter } from "./PriceFilter";
 import { useFilterNavigation } from "./FilterNavigationProvider";
 
 const FilterCard = ({ icon: Icon, title, children }) => (
-  <section className="overflow-hidden rounded-xl border border-line bg-white">
-    <h3 className="flex items-center gap-2.5 border-b border-line px-5 py-3.5 text-[13px] font-semibold tracking-[0.14em] text-ink uppercase">
+  <section className="overflow-hidden rounded-xl border border-sand-line bg-sand-soft">
+    <h3 className="flex items-center gap-2.5 border-b border-sand-line px-5 py-3.5 text-[13px] font-semibold tracking-[0.14em] text-ink uppercase">
       <Icon size={16} aria-hidden="true" className="shrink-0 text-brand" />
       {title}
     </h3>
@@ -43,7 +43,7 @@ const StockStatusRadioGroup = ({ inStock, onChange }) => {
             <span
               aria-hidden="true"
               className={`flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand/30 peer-focus-visible:ring-offset-1 ${
-                checked ? "border-brand" : "border-line"
+                checked ? "border-brand" : "border-sand-line"
               }`}
             >
               {checked ? (

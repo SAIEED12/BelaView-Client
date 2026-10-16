@@ -40,7 +40,7 @@ const FacetCheckbox = ({
         className={`relative flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-brand/30 peer-focus-visible:ring-offset-1 ${
           checked || indeterminate
             ? "border-brand bg-brand"
-            : "border-line bg-white"
+            : "border-sand-line bg-white"
         }`}
       >
         {indeterminate ? (
@@ -116,8 +116,7 @@ export function CategoryAccordion({
     });
   };
 
-  // Parent selection writes only the parent slug (all children are implied).
-  // Turning it off drops the parent and any explicitly selected children.
+
   const toggleParent = (category) => {
     const slug = facetSlug(category);
     const childSlugs = facetSubcategories(category).map(facetSlug);
@@ -135,16 +134,13 @@ export function CategoryAccordion({
     navigateSelections(parents, subs);
   };
 
-  // Child selection writes only the child slug (filtering by subcategory is
-  // supported by the API, and keeps the parent's tri-state meaningful). When
-  // every child ends up selected the selection collapses to the parent slug.
+
   const toggleChild = (category, sub) => {
     const parentSlug = facetSlug(category);
     const subSlug = facetSlug(sub);
     const childSlugs = facetSubcategories(category).map(facetSlug);
     const parentSelected = selectedCategories.includes(parentSlug);
 
-    // Materialize the current child state (a selected parent implies all children).
     const currentSubs = new Set(
       parentSelected ? childSlugs : selectedSubcategories,
     );
@@ -189,7 +185,7 @@ export function CategoryAccordion({
 
           return (
             <li key={slug} className="min-w-0">
-              <div className="flex min-w-0 items-center gap-0.5 rounded-lg pr-1 transition-colors hover:bg-mist">
+              <div className="flex min-w-0 items-center gap-0.5 rounded-lg pr-1 transition-colors hover:bg-sand/50">
                 {children.length > 0 ? (
                   <button
                     type="button"
@@ -220,7 +216,7 @@ export function CategoryAccordion({
               {children.length > 0 && isOpen ? (
                 <ul
                   id={panelId}
-                  className="mt-0.5 mb-0.5 ml-6 space-y-0.5 border-l border-line pl-2"
+                  className="mt-0.5 mb-0.5 ml-6 space-y-0.5 border-l border-sand-line pl-2"
                 >
                   {children.map((sub) => {
                     const subSlug = facetSlug(sub);
@@ -229,7 +225,7 @@ export function CategoryAccordion({
                       parentSelected || selectedSubcategories.includes(subSlug);
                     return (
                       <li key={subSlug} className="min-w-0">
-                        <div className="rounded-lg transition-colors hover:bg-mist">
+                        <div className="rounded-lg transition-colors hover:bg-sand/50">
                           <FacetCheckbox
                             checked={subChecked}
                             onChange={() => toggleChild(category, sub)}

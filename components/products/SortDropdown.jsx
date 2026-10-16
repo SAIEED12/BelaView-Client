@@ -30,7 +30,7 @@ export function SortDropdown({ sort = DEFAULT_SORT }) {
         id="products-sort"
         value={value}
         onChange={handleChange}
-        className="h-10 cursor-pointer rounded-xl border border-line bg-white px-3 text-sm font-medium text-ink outline-none transition-colors hover:border-brand focus:border-brand focus:ring-2 focus:ring-brand/20"
+        className="h-10 cursor-pointer rounded-xl border border-sand-line bg-sand-soft px-3 text-sm font-medium text-ink outline-none transition-colors hover:border-brand focus:border-brand focus:ring-2 focus:ring-brand/20"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.id} value={option.id}>

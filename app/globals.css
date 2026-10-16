@@ -23,6 +23,11 @@
   --color-ink: #1a1a1a;
   --color-smoke: #525252;
   --color-fog: #8a8a8a;
+
+  /* Warm sand — content pages (About, Shipping, Contact, Return Policy) */
+  --color-sand: #d9c6b0;
+  --color-sand-soft: #ece3d8;
+  --color-sand-line: #c9b49b;
 }
 
 ::selection {

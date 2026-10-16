@@ -19,7 +19,7 @@ const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 )}`;
 
 const channelLink =
-  "text-base font-semibold text-ink underline decoration-line underline-offset-4 transition-colors hover:text-brand hover:decoration-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand";
+  "text-base font-semibold text-ink underline decoration-sand-line underline-offset-4 transition-colors hover:text-brand hover:decoration-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand";
 
 const tips = [
   "The product name or a link to it",
@@ -29,7 +29,7 @@ const tips = [
 
 const ContactPage = () => {
   return (
-    <div className="bg-cream">
+    <div className="bg-sand-soft">
       {/* Intro */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="max-w-3xl">
@@ -47,11 +47,11 @@ const ContactPage = () => {
       {/* Channels */}
       <section
         aria-label="Ways to contact us"
-        className="border-y border-line bg-mist"
+        className="border-y border-sand-line bg-sand"
       >
         <div className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
           <dl className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="border-t border-line pt-5">
+            <div className="border-t border-sand-line pt-5">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <MessageCircle size={20} aria-hidden="true" />
               </span>
@@ -66,7 +66,7 @@ const ContactPage = () => {
               </dd>
             </div>
 
-            <div className="border-t border-line pt-5">
+            <div className="border-t border-sand-line pt-5">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <Phone size={20} aria-hidden="true" />
               </span>
@@ -81,7 +81,7 @@ const ContactPage = () => {
               </dd>
             </div>
 
-            <div className="border-t border-line pt-5">
+            <div className="border-t border-sand-line pt-5">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <Mail size={20} aria-hidden="true" />
               </span>
@@ -96,7 +96,7 @@ const ContactPage = () => {
               </dd>
             </div>
 
-            <div className="border-t border-line pt-5">
+            <div className="border-t border-sand-line pt-5">
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
                 <MapPin size={20} aria-hidden="true" />
               </span>
@@ -139,7 +139,7 @@ const ContactPage = () => {
         </div>
 
         <div>
-          <ul className="divide-y divide-line border-y border-line">
+          <ul className="divide-y divide-sand-line border-y border-sand-line">
             {tips.map((tip) => (
               <li
                 key={tip}

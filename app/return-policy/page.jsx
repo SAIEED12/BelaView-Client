@@ -28,7 +28,7 @@ const steps = [
 
 const ReturnPolicyPage = () => {
   return (
-    <div className="bg-cream">
+    <div className="bg-sand-soft">
       {/* Intro */}
       <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8">
         <div className="max-w-3xl">
@@ -48,7 +48,7 @@ const ReturnPolicyPage = () => {
       {/* Steps */}
       <section
         aria-label="How returns work"
-        className="border-y border-line bg-mist"
+        className="border-y border-sand-line bg-sand"
       >
         <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:py-20 lg:grid-cols-[1fr_1.6fr] lg:gap-16 lg:px-8">
           <div>
@@ -90,7 +90,7 @@ const ReturnPolicyPage = () => {
         className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 md:py-20 lg:px-8"
       >
         <div className="grid gap-10 md:grid-cols-2 md:gap-14">
-          <div className="border-t border-line pt-6">
+          <div className="border-t border-sand-line pt-6">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-soft text-brand">
               <ShieldAlert size={20} aria-hidden="true" />
             </span>
@@ -123,8 +123,8 @@ const ReturnPolicyPage = () => {
             </ul>
           </div>
 
-          <div className="border-t border-line pt-6">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-mist text-ink">
+          <div className="border-t border-sand-line pt-6">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-sand text-ink">
               <XCircle size={20} aria-hidden="true" />
             </span>
             <h2 className="mt-4 font-serif text-2xl text-ink sm:text-3xl">
