@@ -43,6 +43,7 @@ const AdminProductsPage = async ({ searchParams }) => {
         <ProductSearchInput
           initialValue={searchText}
           placeholder="Search products by name, category, or price..."
+          searchPath="/dashboard/admin/products"
         />
       </Suspense>
       {list.length === 0 && searchText ? (

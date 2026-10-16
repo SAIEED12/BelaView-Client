@@ -12,6 +12,7 @@ export default function ProductCard({ product, showCategory = false }) {
     ? formatLabel(product.subcategory)
     : "";
   const cardLabel = subcategoryLabel || categoryLabel;
+  const inStock = Number(product.stock ?? 1) > 0;
 
   return (
     <article className="group flex min-w-0 flex-col rounded-xl border border-line bg-white p-2.5 transition-shadow hover:shadow-lg sm:p-3 gap-1">
@@ -25,6 +26,11 @@ export default function ProductCard({ product, showCategory = false }) {
             sizes="(max-width: 639px) 50vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
+        )}
+        {!inStock && (
+          <span className="absolute top-2 left-2 z-10 rounded-md bg-red-400/80 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
+            Out of Stock
+          </span>
         )}
         <div className="absolute bottom-2 right-2 z-10 rounded-full bg-white/85 shadow-md backdrop-blur-sm ">
           <WishlistHeartButton productId={id} name={product.name} />

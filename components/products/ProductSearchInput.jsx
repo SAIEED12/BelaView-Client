@@ -11,6 +11,7 @@ export function ProductSearchInput({
   placeholder = "Search products by name or category...",
   className = "",
   compact = false,
+  searchPath = "/products",
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -43,12 +44,13 @@ export function ProductSearchInput({
   const commitSearch = (raw) => {
     const trimmed = String(raw ?? "").trim();
     lastCommittedRef.current = trimmed;
-    // Used globally in the navbar: searches always run on /products.
-    if (pathname !== "/products") {
+    // Global navbar usage searches on /products; pages that own the input
+    // (e.g. the admin dashboard) pass their own searchPath to filter in place.
+    if (pathname !== searchPath) {
       const params = new URLSearchParams();
       if (trimmed) params.set("search", trimmed);
       const query = params.toString();
-      router.push(query ? `/products?${query}` : "/products");
+      router.push(query ? `${searchPath}?${query}` : searchPath);
       return;
     }
     const params = new URLSearchParams(searchParamsRef.current);

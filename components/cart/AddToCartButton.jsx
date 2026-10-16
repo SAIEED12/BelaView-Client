@@ -40,7 +40,7 @@ export function AddToCartButton({
         aria-live="polite"
         aria-label={label}
         title={label}
-        className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-black text-white transition-colors hover:bg-black/50 disabled:cursor-not-allowed disabled:opacity-50"
+        className="inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-black text-white transition-colors hover:bg-black/80 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {justAdded ? (
           <Check size={16} aria-hidden="true" />
