@@ -75,7 +75,7 @@ const PurchasePanel = ({ productId, name, price, image = "", stock }) => {
       {/* Quantity + live subtotal */}
       <div className="flex items-center justify-between gap-4">
         <div
-          className="inline-flex items-center rounded-full border border-[#E5E5E5] bg-white"
+          className="inline-flex items-center rounded-full border border-sand-line bg-sand-soft"
           role="group"
           aria-label="Quantity"
         >

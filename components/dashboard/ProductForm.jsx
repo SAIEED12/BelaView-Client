@@ -12,9 +12,6 @@ const labelClassName = "text-sm font-medium text-[#1A1A1A]";
 
 const fileKey = (f) => `${f.name}-${f.size}-${f.lastModified}`;
 
-const toMaterialsString = (materials) =>
-  Array.isArray(materials) ? materials.filter(Boolean).join(", ") : (materials ?? "");
-
 // Products saved before categories existed store free text. Resolve it against
 // the current list so legacy products keep their value until the admin picks
 // a real category.
@@ -329,19 +326,6 @@ export function ProductForm({
           </div>
         )}
       </div>
-
-      <TextField
-        className="flex w-full flex-col gap-1.5"
-        name="materials"
-        defaultValue={toMaterialsString(initialValues.materials)}
-        isRequired
-      >
-        <Label className={labelClassName}>Materials</Label>
-        <Input
-          placeholder="e.g. Jute, Cotton, Bamboo (comma separated)"
-          className={inputClassName}
-        />
-      </TextField>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
