@@ -40,16 +40,14 @@ export function PaginationControls({ page = 1, totalPages = 1, label = "paginati
       params.set("page", String(nextPage));
     }
     const next = params.toString();
+    window.scrollTo({ top: 0 });
     router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
   };
 
   if (safeTotalPages <= 1) return null;
 
   return (
-    <Pagination
-      aria-label={label}
-      className="mt-8 [&_.pagination__content]:flex-wrap [&_.pagination__content]:justify-center [&_.pagination__content]:self-center"
-    >
+    <Pagination aria-label={label} className="products-pagination mt-8">
       <Pagination.Content>
         <Pagination.Item>
           <Pagination.Previous

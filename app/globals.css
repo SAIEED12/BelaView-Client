@@ -36,3 +36,31 @@
   width: 100%;
   height: 100%;
 }
+
+/* Products listing pagination — centered, brand colors */
+.products-pagination .pagination__content {
+  margin-inline: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.products-pagination .pagination__link {
+  border-color: var(--color-line);
+  color: var(--color-smoke);
+  background-color: #fff;
+}
+
+.products-pagination .pagination__link:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.products-pagination .pagination__link[data-active="true"] {
+  background-color: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #fff;
+}
+
+.products-pagination .pagination__link:disabled {
+  opacity: 0.45;
+}
