@@ -33,7 +33,7 @@ export default function WhyBelaView() {
           <div className="grid grid-cols-2 gap-4">
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-mist">
               <Image
-                src="/Hero1.jpg"
+                src="/HeroPortrait.png"
                 alt="Handcrafted BelaView swing"
                 fill
                 unoptimized
@@ -43,7 +43,7 @@ export default function WhyBelaView() {
             </div>
             <div className="relative mt-8 aspect-[3/4] overflow-hidden rounded-2xl bg-mist">
               <Image
-                src="/Hero2.jpg"
+                src="/55.png"
                 alt="Cozy swing corner"
                 fill
                 unoptimized

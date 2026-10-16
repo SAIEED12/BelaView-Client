@@ -1,255 +1,263 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { A11y, Autoplay } from "swiper/modules";
+
 
 const slides = [
   {
-    image: "/11.png",
-    title: "Welcome to our store",
-    subtitle:
-      "Where comfort, style, beauty, and everyday essentials come together in one place. ",
-    cta: "Shop Swings",
+    image: "/HeroPortrait.png",
+    alt: "BelaView black swing chair with a red cushion in a sunlit bedroom",
+    // position: "center",
+    // title: "Made for Moments That Matter",
+    // subtitle: "Create a cozy space to relax, read, talk, and simply slow down.",
+    // cta: "Shop Now",
     href: "/products",
   },
   {
-    image:
-      "/HeroPortrait.png",
-    title: "Explore our collection",
-    subtitle:
-      "Beautifully crafted swing chairs and furniture, elegant sarees and fashion wear, and carefully selected cosmetics and beauty products.",
-    cta: "Explore Collection",
+    image: "/22.png",
+    alt: "Wooden porch swing with soft cushions overlooking a valley at sunset",
+    position: "center 40%",
+    // title: "Style Your Home",
+    // subtitle:
+    //   "We focus on bringing you products that combine quality, style, comfort, and value for everyday living.",
+    // cta: "Discover More",
     href: "/products",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1647996091785-c1ec68da320c?q=80&w=2400&auto=format&fit=crop",
-    title: "Style your home",
-    subtitle:
-      "We focus on bringing you products that combine quality, style, comfort, and value for everyday living.",
-    cta: "Discover More",
+    image: "/33.png",
+    alt: "Black metal swing chair with a red BelaView cushion",
+    // Portrait shot — keep the crop on the seat and cushion.
+    position: "center 58%",
+    // title: "Welcome to Our Store",
+    // subtitle:
+    //   "Where comfort, style, beauty, and everyday essentials come together in one place.",
+    // cta: "Shop Swings",
     href: "/products",
   },
   {
-    image:
-      "https://images.unsplash.com/photo-1664524168285-f9df501efa0c?auto=format&fit=crop&w=2400&q=90",
-    title: "Made for Moments That Matter",
-    subtitle: "Create a cozy space to relax, read, talk, and simply slow down.",
-    cta: "Shop Now",
+    image: "/44.png",
+    alt: "Hanging wicker egg chair with plush cushions next to a bright window",
+    position: "center",
+    // title: "Explore Our Collection",
+    // subtitle:
+    //   "Beautifully crafted swing chairs and furniture, elegant sarees and fashion wear, and carefully selected cosmetics and beauty products.",
+    // cta: "Explore Collection",
+    href: "/products",
+  },
+  {
+    image: "/55.png",
+    alt: "Hanging wicker egg chair with plush cushions next to a bright window",
+    position: "center",
+    // title: "Explore Our Collection",
+    // subtitle:
+    //   "Beautifully crafted swing chairs and furniture, elegant sarees and fashion wear, and carefully selected cosmetics and beauty products.",
+    // cta: "Explore Collection",
     href: "/products",
   },
 ];
 
+// The banner spans the max-w-7xl container minus its horizontal padding.
+const BANNER_SIZES =
+  "(max-width: 639px) calc(100vw - 24px), (max-width: 1023px) calc(100vw - 48px), (min-width: 1280px) 1216px, calc(100vw - 64px)";
+
+const titleClassName =
+  "font-serif text-2xl leading-snug text-white sm:text-4xl sm:leading-[1.15] md:text-5xl";
+const titleStyle = {
+  textShadow: "0 2px 20px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.35)",
+};
+
 /**
- * Full-screen hero carousel for the swing collection.
+ * Compact rounded banner slider under the navbar.
  *
- * @param {number} autoplayMs   Time each slide holds before advancing. Default 5500.
- * @param {number} transitionMs Crossfade duration between slides. Default 1200.
+ * @param {number} autoplayMs   Time each banner holds before advancing. Default 5200.
+ * @param {number} transitionMs Slide transition duration. Default 700.
  */
-export default function Hero({ autoplayMs = 5500, transitionMs = 1200 }) {
+export default function Hero({ autoplayMs = 5200, transitionMs = 700 }) {
+  const swiperRef = useRef(null);
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const touchStartX = useRef(null);
-  const count = slides.length;
 
-  const goTo = useCallback((i) => setActive((i + count) % count), [count]);
-  const next = useCallback(() => goTo(active + 1), [active, goTo]);
-  const prev = useCallback(() => goTo(active - 1), [active, goTo]);
-
+  // Respect prefers-reduced-motion: no autoplay, instant slide changes.
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setReduceMotion(mq.matches);
-    const onChange = (e) => setReduceMotion(e.matches);
+    const onChange = (event) => setReduceMotion(event.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // Autoplay
   useEffect(() => {
-    if (paused) return;
-    const t = setTimeout(() => {
-      setActive((a) => (a + 1) % count);
-    }, autoplayMs);
-    return () => clearTimeout(t);
-  }, [active, paused, autoplayMs, count]);
+    const swiper = swiperRef.current;
+    if (!swiper?.autoplay) return;
+    swiper.params.speed = reduceMotion ? 0 : transitionMs;
+    if (reduceMotion) {
+      swiper.autoplay.stop();
+    } else {
+      swiper.autoplay.start();
+    }
+  }, [reduceMotion, transitionMs]);
 
+  const goTo = useCallback((index) => {
+    swiperRef.current?.slideToLoop(index);
+  }, []);
+
+  // Left/right arrow keys, unless the user is typing in a form field.
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "ArrowRight") next();
-      if (e.key === "ArrowLeft") prev();
+    const onKey = (event) => {
+      const target = event.target;
+      const tag = target?.tagName;
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target?.isContentEditable
+      ) {
+        return;
+      }
+      if (event.key === "ArrowRight") swiperRef.current?.slideNext();
+      if (event.key === "ArrowLeft") swiperRef.current?.slidePrev();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [next, prev]);
+  }, []);
 
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
+  // Pause the timer while a control has keyboard focus; resume when focus leaves.
+  const handleFocusCapture = (event) => {
+    if (!event.target.matches?.(":focus-visible")) return;
+    swiperRef.current?.autoplay?.stop();
   };
-  const onTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
-    if (Math.abs(dx) > 40) goTo(active + (dx < 0 ? 1 : -1));
+  const handleBlurCapture = (event) => {
+    if (event.currentTarget.contains(event.relatedTarget)) return;
+    if (reduceMotion) return;
+    swiperRef.current?.autoplay?.start();
   };
-
-  const kenBurnsMs = Math.max(autoplayMs + transitionMs, 6000);
-  const effectiveTransitionMs = reduceMotion ? 0 : transitionMs;
 
   return (
     <section
       role="region"
       aria-roledescription="carousel"
-      aria-label="Featured swings"
-      className="relative h-dvh min-h-140 w-full overflow-hidden bg-brand-dark"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
-      onTouchStart={onTouchStart}
-      onTouchEnd={onTouchEnd}
+      aria-label="Featured banners"
+      className="mx-auto w-full max-w-7xl px-3 pt-3 sm:px-6 sm:pt-5 lg:px-8"
+      onFocusCapture={handleFocusCapture}
+      onBlurCapture={handleBlurCapture}
     >
-      {/* Slides */}
-      {slides.map((s, i) => {
-        const isActive = i === active;
-        return (
-          <div
-            key={i}
-            aria-hidden={!isActive}
-            className="absolute inset-0 overflow-hidden transition-opacity ease-in-out"
-            style={{
-              transitionDuration: `${effectiveTransitionMs}ms`,
-              opacity: isActive ? 1 : 0,
-            }}
-          >
-            <div
-              key={isActive ? `kb-${i}-${active}` : `still-${i}`}
-              className={`absolute inset-0 ${isActive && !reduceMotion ? "hero-kenburns" : ""}`}
-              style={
-                isActive && !reduceMotion
-                  ? { animationDuration: `${kenBurnsMs}ms` }
-                  : undefined
-              }
-            >
-              <Image
-                src={s.image}
-                alt=""
-                fill
-                priority={i === 0}
-                sizes="100vw"
-                className="object-cover"
-              />
-            </div>
+      <div className="relative overflow-hidden rounded-2xl border border-line/80 bg-mist shadow-[0_18px_44px_-26px_rgba(26,26,26,0.45)] sm:rounded-3xl">
+        <Swiper
+          modules={[A11y, Autoplay]}
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
+          onSlideChange={(swiper) => setActive(swiper.realIndex)}
+          slidesPerView={1}
+          speed={transitionMs}
+          loop
+          grabCursor
+          autoplay={{
+            delay: autoplayMs,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+          }}
+        >
+          {slides.map((slide, index) => (
+            <SwiperSlide key={slide.image} className="h-auto!">
+              <div className="relative aspect-[9/5] w-full sm:aspect-[2/1]">
+                <Image
+                  src={slide.image}
+                  alt={slide.alt}
+                  fill
+                  preload={index === 0}
+                  sizes={BANNER_SIZES}
+                  draggable={false}
+                  className="object-cover"
+                  style={
+                    slide.position
+                      ? { objectPosition: slide.position }
+                      : undefined
+                  }
+                />
 
-            <div className="absolute inset-0 bg-linear-to-b from-black/45 via-black/10 to-black/65" />
-            <div className="absolute inset-0 bg-[radial-gradient(50%_40%_at_50%_50%,rgba(0,0,0,0.55),transparent_75%)]" />
-          </div>
-        );
-      })}
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/55 via-black/20 to-black/60" />
 
-      {/* Centered content */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
-        {slides.map((s, i) => {
-          if (i !== active) return null;
-          const riseClass = reduceMotion
-            ? "opacity-100"
-            : "opacity-0 hero-rise";
-          return (
-            <div key={active} className="flex flex-col items-center">
-              <h1
-                className={`max-w-3xl font-serif text-[2.5rem] leading-[1.08] text-white sm:text-6xl md:text-7xl ${riseClass}`}
-                style={{
-                  ...(reduceMotion ? {} : { animationDelay: "60ms" }),
-                  textShadow:
-                    "0 2px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.35)",
-                }}
-              >
-                {s.title}
-              </h1>
-              <p
-                className={`mt-5 max-w-md text-base leading-relaxed text-white/80 sm:max-w-xl md:text-lg ${riseClass}`}
-                style={reduceMotion ? undefined : { animationDelay: "220ms" }}
-              >
-                {s.subtitle}
-              </p>
-              <Link
-                href={s.href}
-                className="group mt-9 inline-flex items-center gap-2 rounded-full bg-[#f3f4f6b2] py-3.5 pl-7 pr-3 text-sm font-medium text-black shadow-lg"
-              >
-                {s.cta}
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white transition-transform group-hover:translate-x-0.5">
-                  <ArrowRight size={14} />
-                </span>
-              </Link>
-            </div>
-          );
-        })}
+                <Link
+                  href={slide.href}
+                  draggable={false}
+                  aria-label={slide.title || undefined}
+                  className="group absolute inset-0 z-10 flex select-none flex-col items-center justify-center px-6 text-center sm:px-14"
+                >
+                  <div className="flex w-full max-w-2xl flex-col items-center">
+                    {index === 0 ? (
+                      <h1 className={titleClassName} style={titleStyle}>
+                        {slide.title}
+                      </h1>
+                    ) : (
+                      <p className={titleClassName} style={titleStyle}>
+                        {slide.title}
+                      </p>
+                    )}
+
+                    {slide.subtitle ? (
+                      <p className="mt-2 hidden max-w-md text-xs leading-relaxed text-white/85 sm:mt-3 sm:block sm:text-sm md:max-w-xl md:text-base">
+                        {slide.subtitle}
+                      </p>
+                    ) : null}
+
+                    {slide.cta ? (
+                      <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/90 py-2.5 pl-6 pr-2 text-xs font-medium text-ink shadow-lg transition-colors group-hover:bg-white sm:mt-6 sm:text-sm">
+                        {slide.cta}
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand text-white transition-transform duration-300 group-hover:translate-x-0.5 sm:h-7 sm:w-7">
+                          <ArrowRight size={14} />
+                        </span>
+                      </span>
+                    ) : null}
+                  </div>
+                </Link>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {/* Arrows — desktop only; mobile relies on swipe + dots */}
+        <button
+          type="button"
+          onClick={() => swiperRef.current?.slidePrev()}
+          aria-label="Previous slide"
+          className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/25 sm:flex md:left-5 md:h-12 md:w-12"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={() => swiperRef.current?.slideNext()}
+          aria-label="Next slide"
+          className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/25 sm:flex md:right-5 md:h-12 md:w-12"
+        >
+          <ChevronRight size={20} />
+        </button>
+
+        {/* Pagination dots */}
+        <div className="absolute inset-x-0 bottom-3 z-20 flex items-center justify-center gap-1.5 sm:bottom-5 sm:gap-2">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.image}
+              type="button"
+              onClick={() => goTo(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === active}
+              className="h-1.5 cursor-pointer rounded-full bg-white/45 shadow-[0_1px_6px_rgba(0,0,0,0.45)] transition-all duration-300 hover:bg-white/80"
+              style={{
+                width: index === active ? 26 : 7,
+                backgroundColor: index === active ? "#ffffff" : undefined,
+              }}
+            />
+          ))}
+        </div>
       </div>
-
-      {/* Arrows */}
-      <button
-        onClick={prev}
-        aria-label="Previous slide"
-        className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:left-6 md:h-12 md:w-12"
-      >
-        <ChevronLeft size={20} />
-      </button>
-      <button
-        onClick={next}
-        aria-label="Next slide"
-        className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20 sm:right-6 md:h-12 md:w-12"
-      >
-        <ChevronRight size={20} />
-      </button>
-
-      {/* Pagination */}
-      <div className="absolute inset-x-0 bottom-7 z-10 flex items-center justify-center gap-2 md:bottom-10">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            aria-current={i === active}
-            className="h-1.5 cursor-pointer rounded-full bg-white/40 transition-all duration-300 hover:bg-white/70"
-            style={{
-              width: i === active ? "28px" : "7px",
-              backgroundColor: i === active ? "#ffffff" : undefined,
-            }}
-          />
-        ))}
-      </div>
-
-      <style jsx>{`
-        @keyframes heroKenBurns {
-          0% {
-            transform: scale(1) translate3d(0, 0, 0);
-          }
-          100% {
-            transform: scale(1.09) translate3d(-1.5%, -1%, 0);
-          }
-        }
-        .hero-kenburns {
-          animation-name: heroKenBurns;
-          animation-timing-function: ease-out;
-          animation-fill-mode: forwards;
-        }
-        @keyframes heroRise {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .hero-rise {
-          animation: heroRise 750ms ease-out forwards;
-        }
-      `}</style>
     </section>
   );
 }
