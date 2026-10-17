@@ -119,7 +119,7 @@ const PurchasePanel = ({ productId, name, price, image = "", stock }) => {
           type="button"
           onClick={handleAddToCart}
           disabled={!inStock}
-          className="block w-full cursor-pointer flex-1 rounded-full border border-[#1A1A1A] px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-[#1A1A1A] transition-colors hover:bg-[#1A1A1A] hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-[#1A1A1A]"
+          className="block w-full cursor-pointer flex-1 rounded-full border border-ink px-6 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-ink transition-colors hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink"
         >
           Add to Cart{justAdded ? " ✓" : ""}
         </button>

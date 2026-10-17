@@ -4,19 +4,337 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import {
+  CheckCircle2,
+  Minus,
+  Phone,
+  Plus,
+  RotateCcw,
+  ShoppingBag,
+  Trash2,
+  Truck,
+} from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { readBuyNow, clearBuyNow } from "@/lib/buy-now";
 import { createOrder, getCheckoutProduct } from "@/lib/actions/orders";
 import { sendMetaEvent } from "@/lib/meta-pixel";
 import { useCart } from "@/components/cart/CartProvider";
+import { SkeletonBlock } from "@/components/loading/skeletons";
 
-const DELIVERY_CHARGE = 60;
+const DELIVERY_AREAS = [
+  { id: "inside-dhaka", label: "Inside Dhaka", charge: 70 },
+  { id: "outside-dhaka", label: "Outside Dhaka", charge: 120 },
+];
 const BD_PHONE_RE = /^(?:\+?88)?01[3-9]\d{8}$/;
 const normalizePhone = (value) =>
   String(value ?? "").trim().replace(/[\s-]+/g, "");
 
+const cardClass =
+  "rounded-3xl border border-sand-line bg-white shadow-[0_18px_44px_-32px_rgba(26,26,26,0.35)]";
+
 const inputClass =
-  "w-full max-w-full rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[#1A1A1A] placeholder:text-[#8A8A8A] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-sm";
+  "w-full max-w-full rounded-xl border border-sand-line bg-cream px-4 py-3 text-base text-ink placeholder:text-fog outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-sm";
+
+const pillLinkClass =
+  "inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-6 py-2.5 text-xs font-semibold tracking-[0.12em] text-white no-underline transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+
+const submitButtonClass =
+  "block min-h-12 w-full cursor-pointer rounded-full bg-brand px-6 py-3 text-center text-xs font-semibold break-words whitespace-normal uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm";
+
+const stepperButtonClass =
+  "inline-flex touch-manipulation items-center justify-center text-ink transition-colors hover:text-brand disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+
+const summaryRowClass =
+  "flex gap-3 rounded-2xl border border-sand-line/70 bg-sand-soft/60 p-3 sm:gap-4 sm:p-4";
+
+const thumbClass =
+  "relative shrink-0 overflow-hidden rounded-xl bg-sand-soft ring-1 ring-sand-line";
+
+function CheckoutHeader() {
+  return (
+    <header className="border-b border-sand-line bg-sand">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+          Secure checkout
+        </p>
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-ink sm:text-3xl lg:text-4xl">
+          Checkout
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-smoke">
+          Cash on delivery · Delivery charge ৳70 inside Dhaka · ৳120 outside
+          Dhaka · We call to confirm every order before it ships.
+        </p>
+      </div>
+    </header>
+  );
+}
+
+function StepHeading({ step, children }) {
+  return (
+    <h2 className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-ink">
+      <span
+        aria-hidden="true"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-soft text-sm font-semibold text-brand"
+      >
+        {step}
+      </span>
+      {children}
+    </h2>
+  );
+}
+
+function PaymentMethodFieldset() {
+  return (
+    <fieldset className="rounded-2xl border border-sand-line bg-cream p-4 sm:p-5">
+      <legend className="sr-only">Payment method</legend>
+      <p aria-hidden="true" className="text-sm font-medium text-ink">
+        Payment method
+      </p>
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-brand/30 bg-white p-3.5">
+        <input
+          type="radio"
+          checked
+          readOnly
+          className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
+        />
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-ink">
+            Cash on Delivery
+          </span>
+          <span className="mt-0.5 block text-xs leading-relaxed text-smoke">
+            Pay in cash when your order arrives. We call to confirm before
+            dispatch.
+          </span>
+        </span>
+      </label>
+    </fieldset>
+  );
+}
+
+function DeliveryAreaRadios({ value, onChange, showError }) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Delivery area"
+      className="flex flex-col gap-2"
+    >
+      {DELIVERY_AREAS.map((area) => {
+        const selected = value === area.id;
+        return (
+          <label
+            key={area.id}
+            className={`flex cursor-pointer items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 transition-colors ${
+              selected
+                ? "border-brand/30"
+                : "border-sand-line hover:border-brand/40"
+            }`}
+          >
+            <input
+              type="radio"
+              name="co-delivery-area"
+              value={area.id}
+              checked={selected}
+              onChange={() => onChange(area.id)}
+              className="h-4 w-4 shrink-0 accent-brand"
+            />
+            <span className="min-w-0 flex-1 text-sm font-semibold text-ink">
+              {area.label}
+            </span>
+            <span className="text-sm font-semibold tabular-nums text-ink">
+              ৳{area.charge}
+            </span>
+          </label>
+        );
+      })}
+      {showError ? (
+        <p className="text-xs font-medium text-red-700">
+          Please select a delivery area.
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function CheckoutHelp() {
+  return (
+    <ul className="mt-1 flex flex-col gap-2.5 border-t border-sand-line pt-4 text-xs text-smoke sm:text-sm">
+      <li className="flex items-start gap-2.5">
+        <Truck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+        <span>Cash on delivery — pay in cash when your order arrives.</span>
+      </li>
+      <li className="flex items-start gap-2.5">
+        <RotateCcw
+          aria-hidden="true"
+          className="mt-0.5 h-4 w-4 shrink-0 text-brand"
+        />
+        <span>
+          Something not right? Read our{" "}
+          <Link
+            href="/return-policy"
+            className="font-semibold text-brand underline underline-offset-4 hover:text-brand-dark"
+          >
+            return policy
+          </Link>
+          .
+        </span>
+      </li>
+      <li className="flex items-start gap-2.5">
+        <Phone aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
+        <span>
+          Questions? Call{" "}
+          <a
+            href="tel:+8801965599181"
+            className="font-semibold text-brand underline underline-offset-4 hover:text-brand-dark"
+          >
+            +8801965599181
+          </a>
+          .
+        </span>
+      </li>
+    </ul>
+  );
+}
+
+function DeliveryDetailsForm({
+  onSubmit,
+  name,
+  setName,
+  phone,
+  setPhone,
+  address,
+  setAddress,
+  deliveryArea,
+  setDeliveryArea,
+  notes,
+  setNotes,
+  errors,
+  touched,
+  submitError,
+  submitting,
+  submitDisabled,
+  submitLabel,
+}) {
+  return (
+    <section className={`${cardClass} p-4 sm:p-5 lg:p-6`}>
+      <StepHeading step={2}>Delivery details</StepHeading>
+      <form onSubmit={onSubmit} className="mt-4 flex flex-col gap-4" noValidate>
+        <div>
+          <label htmlFor="co-name" className="mb-1.5 block text-sm font-medium text-ink">
+            Full name
+          </label>
+          <input
+            id="co-name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your full name"
+            autoComplete="name"
+            className={inputClass}
+            aria-invalid={touched && errors.name ? true : undefined}
+            aria-describedby={touched && errors.name ? "co-name-error" : undefined}
+          />
+          {touched && errors.name ? (
+            <p id="co-name-error" className="mt-1.5 text-xs font-medium text-red-700">
+              {errors.name}
+            </p>
+          ) : null}
+        </div>
+
+        <div>
+          <label htmlFor="co-phone" className="mb-1.5 block text-sm font-medium text-ink">
+            Phone Number (BD)
+          </label>
+          <input
+            id="co-phone"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="e.g. 01XXXXXXXXX or +8801XXXXXXXXX"
+            inputMode="tel"
+            autoComplete="tel"
+            className={inputClass}
+            aria-invalid={touched && errors.phone ? true : undefined}
+            aria-describedby={touched && errors.phone ? "co-phone-error" : undefined}
+          />
+          {touched && errors.phone ? (
+            <p id="co-phone-error" className="mt-1.5 text-xs font-medium text-red-700">
+              {errors.phone}
+            </p>
+          ) : null}
+        </div>
+
+        <div>
+          <label htmlFor="co-address" className="mb-1.5 block text-sm font-medium text-ink">
+            Address
+          </label>
+          <textarea
+            id="co-address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="House, road, area"
+            rows={3}
+            autoComplete="street-address"
+            className={`${inputClass} resize-y`}
+            aria-invalid={touched && errors.address ? true : undefined}
+            aria-describedby={touched && errors.address ? "co-address-error" : undefined}
+          />
+          {touched && errors.address ? (
+            <p id="co-address-error" className="mt-1.5 text-xs font-medium text-red-700">
+              {errors.address}
+            </p>
+          ) : null}
+        </div>
+
+        <DeliveryAreaRadios
+          value={deliveryArea}
+          onChange={setDeliveryArea}
+          showError={touched && !deliveryArea}
+        />
+
+        <div>
+          <label htmlFor="co-notes" className="mb-1.5 block text-sm font-medium text-ink">
+            Note <span className="font-normal text-fog">(optional)</span>
+          </label>
+          <textarea
+            id="co-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Delivery instructions"
+            rows={2}
+            maxLength={500}
+            className={`${inputClass} resize-y`}
+            aria-invalid={touched && errors.notes ? true : undefined}
+            aria-describedby={touched && errors.notes ? "co-notes-error" : undefined}
+          />
+          {touched && errors.notes ? (
+            <p id="co-notes-error" className="mt-1.5 text-xs font-medium text-red-700">
+              {errors.notes}
+            </p>
+          ) : null}
+        </div>
+
+        <PaymentMethodFieldset />
+
+        {submitError ? (
+          <p
+            role="alert"
+            className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {submitError}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          disabled={submitDisabled}
+          className={submitButtonClass}
+        >
+          {submitting ? "Placing order…" : submitLabel}
+        </button>
+
+        <CheckoutHelp />
+      </form>
+    </section>
+  );
+}
 
 export default function CheckoutClient() {
   const searchParams = useSearchParams();
@@ -47,7 +365,7 @@ export default function CheckoutClient() {
   const [name, setName] = useState(() => session?.user?.name ?? "");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
+  const [deliveryArea, setDeliveryArea] = useState("");
   const [notes, setNotes] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -93,8 +411,10 @@ export default function CheckoutClient() {
   const outOfStock = product ? stock <= 0 : false;
   const clampedQty = stock > 0 ? Math.min(Math.max(1, qty), stock) : qty;
 
+  const deliveryCharge =
+    DELIVERY_AREAS.find((area) => area.id === deliveryArea)?.charge ?? 0;
   const subtotal = unitPrice * clampedQty;
-  const total = subtotal + DELIVERY_CHARGE;
+  const total = subtotal + deliveryCharge;
 
   // ---- Multi-item cart mode ----
   const cartIdsKey = cartItems.map((it) => it.productId).join(",");
@@ -159,7 +479,7 @@ export default function CheckoutClient() {
   );
 
   const cartSubtotal = cartLines.reduce((sum, l) => sum + l.lineTotal, 0);
-  const cartTotal = cartSubtotal + DELIVERY_CHARGE;
+  const cartTotal = cartSubtotal + deliveryCharge;
   const cartBlocked = cartLines.some((l) => l.missing || l.outOfStock);
 
   // ---- Meta Pixel: InitiateCheckout ----
@@ -216,19 +536,20 @@ export default function CheckoutClient() {
       submitting ||
       cartItems.length === 0 ||
       loadingCart ||
-      cartBlocked
+      cartBlocked ||
+      !deliveryArea
     )
       return;
     setSubmitting(true);
     try {
-      const fullAddress = `${address.trim()}, ${city.trim()}`;
+      const fullAddress = address.trim();
       const placed = await createOrder({
         customer: { name: name.trim(), phone: normalizePhone(phone), address: fullAddress },
         items: cartLines.map((l) => ({
           productId: l.productId,
           quantity: l.effectiveQty,
         })),
-        deliveryCharge: DELIVERY_CHARGE,
+        deliveryCharge,
         note: notes,
         userId: session?.user?.id ?? null,
       });
@@ -262,12 +583,12 @@ export default function CheckoutClient() {
     errors.phone =
       "Enter a valid BD mobile (e.g. 01XXXXXXXXX or +8801XXXXXXXXX). Dashes/spaces allowed.";
   if (!address.trim()) errors.address = "Address is required.";
-  if (!city.trim()) errors.city = "City / district is required.";
   if (notes.trim().length > 500)
     errors.notes = "Note must be at most 500 characters.";
 
-  const isValid =
+  const baseValid =
     Object.keys(errors).length === 0 && !outOfStock && clampedQty > 0 && !loadingProduct;
+  const isValid = baseValid && Boolean(deliveryArea);
 
   const handleSubmit = async (ev) => {
     ev.preventDefault();
@@ -280,11 +601,11 @@ export default function CheckoutClient() {
     }
     setSubmitting(true);
     try {
-      const fullAddress = `${address.trim()}, ${city.trim()}`;
+      const fullAddress = address.trim();
       const placed = await createOrder({
         customer: { name: name.trim(), phone: normalizePhone(phone), address: fullAddress },
         items: [{ productId: paramProductId, quantity: clampedQty }],
-        deliveryCharge: DELIVERY_CHARGE,
+        deliveryCharge,
         note: notes,
         userId: session?.user?.id ?? null,
       });
@@ -311,510 +632,428 @@ export default function CheckoutClient() {
 
   if (order) {
     const orderId = String(order._id || order.id || "");
+    const orderTotal = Number(order.totalAmount || total);
+    const confirmPhone = order?.customer?.phone || normalizePhone(phone);
     return (
-      <main className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 sm:py-16">
-        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700">
-          ✓
-        </span>
-        <h1 className="text-2xl font-semibold text-ink sm:text-3xl">Order placed!</h1>
-        <p className="w-full max-w-full font-semibold text-sm break-words text-[#525252]">
-          Cash on Delivery · Total ৳{Number(order.totalAmount || total).toLocaleString()}
-          {orderId ? <span className="block break-all sm:inline"> · Order ID: {orderId}</span> : ""}
-        </p>
-        <p className="w-full max-w-full font-semibold text-sm break-words text-[#525252]">
-          We will call {order?.customer?.phone || normalizePhone(phone)} to confirm delivery.
-        </p>
-        <div className="mt-2 mb-50 flex w-full flex-col justify-center gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
-          <Link
-            href="/products"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-white no-underline transition-colors hover:bg-brand-dark sm:w-auto"
-          >
-            Continue Shopping
-          </Link>
-          {/* <Link
-            href={`/dashboard/customer/orders?phone=${encodeURIComponent(
-              order?.customer?.phone || phone.trim()
-            )}`}
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#1A1A1A] px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-[#1A1A1A] no-underline transition-colors hover:bg-[#1A1A1A] hover:text-white sm:w-auto"
-          >
-            Track Order
-          </Link> */}
+      <main className="flex flex-1 items-center bg-sand-soft">
+        <div className="mx-auto w-full max-w-xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+          <div className={`${cardClass} p-6 text-center sm:p-8`}>
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
+              <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
+            </span>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+              Order confirmed
+            </p>
+            <h1 className="mt-2 font-serif text-2xl font-semibold text-ink sm:text-3xl">
+              Order placed!
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-smoke">
+              Thank you for shopping with BelaView. We will call{" "}
+              <span className="font-semibold break-words text-ink">
+                {confirmPhone}
+              </span>{" "}
+              to confirm delivery.
+            </p>
+
+            <dl className="mt-6 divide-y divide-sand-line overflow-hidden rounded-2xl border border-sand-line bg-cream text-left text-sm">
+              {orderId ? (
+                <div className="flex items-baseline justify-between gap-4 px-4 py-3">
+                  <dt className="text-smoke">Order ID</dt>
+                  <dd className="text-right font-semibold break-all text-ink">
+                    {orderId}
+                  </dd>
+                </div>
+              ) : null}
+              <div className="flex items-baseline justify-between gap-4 px-4 py-3">
+                <dt className="text-smoke">Payment</dt>
+                <dd className="font-semibold text-ink">Cash on Delivery</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 px-4 py-3">
+                <dt className="text-smoke">Total</dt>
+                <dd className="font-semibold tabular-nums text-brand">
+                  ৳{orderTotal.toLocaleString()}
+                </dd>
+              </div>
+            </dl>
+
+            <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+              <Link href="/products" className={pillLinkClass}>
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
     );
   }
 
   if (isCartMode) {
-    const cartValid =
+    const cartReady =
       Object.keys(errors).length === 0 &&
       cartItems.length > 0 &&
       !loadingCart &&
-      !cartBlocked &&
-      !submitting;
+      !cartBlocked;
 
     if (!loadingCart && cartItems.length === 0) {
       return (
-        <main className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 sm:py-16">
-          <h1 className="text-2xl font-semibold text-ink sm:text-3xl">Checkout</h1>
-          <p className="text-sm text-smoke">
-            Your cart is empty. Add some products first.
-          </p>
-          <Link
-            href="/products"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-white no-underline transition-colors hover:bg-brand-dark sm:w-auto"
-          >
-            Continue Shopping
-          </Link>
+        <main className="flex flex-1 flex-col bg-sand-soft">
+          <CheckoutHeader />
+          <div className="mx-auto w-full max-w-xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+            <div className={`${cardClass} p-6 text-center sm:p-8`}>
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
+                <ShoppingBag className="h-6 w-6" aria-hidden="true" />
+              </span>
+              <h2 className="mt-5 font-serif text-xl font-semibold text-ink sm:text-2xl">
+                Your cart is empty
+              </h2>
+              <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-smoke">
+                Add a product to your cart and come back here to complete your
+                order.
+              </p>
+              <Link href="/products" className={`${pillLinkClass} mt-6`}>
+                Continue Shopping
+              </Link>
+            </div>
+          </div>
         </main>
       );
     }
 
     return (
-      <main className="mx-auto max-w-5xl overflow-x-clip px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-        <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl lg:text-4xl">Checkout</h1>
+      <main className="flex flex-1 flex-col bg-sand-soft">
+        <CheckoutHeader />
 
-        <div className="mt-6 grid grid-cols-1 gap-6 sm:mt-8 lg:grid-cols-2 lg:gap-8">
-          {/* Order summary */}
-          <section className="h-fit rounded-2xl border border-line bg-white p-4 self-start sm:p-5 lg:sticky lg:top-24 lg:p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">
-              Order summary ({cartItems.length} {cartItems.length === 1 ? "item" : "items"})
-            </h2>
-            {loadingCart ? (
-              <p className="mt-4 text-sm text-smoke">Loading cart…</p>
-            ) : (
-              <ul className="mt-4 flex flex-col gap-4">
-                {cartLines.map((line) => (
-                  <li key={line.productId} className="flex gap-3">
-                    {line.image ? (
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#F5F5F5] sm:h-20 sm:w-20">
-                        <Image
-                          src={line.image}
-                          alt={line.name}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : null}
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-sm font-semibold wrap-break-word text-[#1A1A1A] sm:text-base">
-                        {line.name}
-                      </p>
-                      {line.missing ? (
-                        <p className="mt-1 text-xs text-red-700">
-                          No longer available please remove it.
-                        </p>
-                      ) : line.outOfStock ? (
-                        <p className="mt-1 text-xs text-red-700">Out of stock.</p>
-                      ) : line.stock !== null && line.effectiveQty >= line.stock ? (
-                        <p className="mt-1 text-xs text-amber-700">
-                          Only {line.stock} available
-                        </p>
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+            {/* Order summary */}
+            <section
+              className={`${cardClass} h-fit self-start p-4 sm:p-5 lg:sticky lg:top-34 lg:p-6`}
+            >
+              <StepHeading step={1}>
+                Order summary ({cartItems.length}{" "}
+                {cartItems.length === 1 ? "item" : "items"})
+              </StepHeading>
+              {loadingCart ? (
+                <p className="mt-4 text-sm text-smoke">Loading cart…</p>
+              ) : (
+                <ul className="mt-4 flex flex-col gap-3">
+                  {cartLines.map((line) => (
+                    <li key={line.productId} className={summaryRowClass}>
+                      {line.image ? (
+                        <div className={`${thumbClass} h-16 w-16 sm:h-20 sm:w-20`}>
+                          <Image
+                            src={line.image}
+                            alt={line.name}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        </div>
                       ) : null}
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setCartQty(line.productId, line.effectiveQty - 1)}
-                          disabled={line.effectiveQty <= 1}
-                          aria-label={`Decrease quantity of ${line.name}`}
-                          className="flex h-9 w-9 touch-manipulation items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] disabled:opacity-40"
-                        >
-                          −
-                        </button>
-                        <span className="w-8 text-center text-sm font-semibold tabular-nums">
-                          {line.effectiveQty}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setCartQty(line.productId, line.effectiveQty + 1)}
-                          disabled={line.stock !== null && line.effectiveQty >= line.stock}
-                          aria-label={`Increase quantity of ${line.name}`}
-                          className="flex h-9 w-9 touch-manipulation items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] disabled:opacity-40"
-                        >
-                          +
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeCartItem(line.productId)}
-                          className="ml-auto cursor-pointer text-xs font-semibold text-[#8A8A8A] underline-offset-2 hover:text-brand hover:underline"
-                        >
-                          Remove
-                        </button>
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-2 text-sm font-semibold wrap-break-word text-ink sm:text-base">
+                          {line.name}
+                        </p>
+                        {line.missing ? (
+                          <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+                            No longer available — please remove it.
+                          </span>
+                        ) : line.outOfStock ? (
+                          <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+                            Out of stock.
+                          </span>
+                        ) : line.stock !== null && line.effectiveQty >= line.stock ? (
+                          <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                            Only {line.stock} available
+                          </span>
+                        ) : null}
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <div
+                            role="group"
+                            aria-label={`Quantity for ${line.name}`}
+                            className="inline-flex items-center rounded-full border border-sand-line bg-white"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setCartQty(line.productId, line.effectiveQty - 1)}
+                              disabled={line.effectiveQty <= 1}
+                              aria-label={`Decrease quantity of ${line.name}`}
+                              className={`${stepperButtonClass} h-9 w-9 rounded-l-full`}
+                            >
+                              <Minus aria-hidden="true" className="h-3.5 w-3.5" />
+                            </button>
+                            <span
+                              aria-live="polite"
+                              className="w-8 text-center text-sm font-semibold tabular-nums text-ink"
+                            >
+                              {line.effectiveQty}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setCartQty(line.productId, line.effectiveQty + 1)}
+                              disabled={line.stock !== null && line.effectiveQty >= line.stock}
+                              aria-label={`Increase quantity of ${line.name}`}
+                              className={`${stepperButtonClass} h-9 w-9 rounded-r-full`}
+                            >
+                              <Plus aria-hidden="true" className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeCartItem(line.productId)}
+                            aria-label={`Remove ${line.name} from cart`}
+                            className="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold text-fog transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                          >
+                            <Trash2 aria-hidden="true" className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Remove</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                    <span className="shrink-0 text-sm font-semibold tabular-nums">
-                      ৳{line.lineTotal.toLocaleString()}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-ink">
+                        ৳{line.lineTotal.toLocaleString()}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm">
-              <div className="flex items-baseline justify-between gap-4">
-                <dt className="text-smoke">Subtotal</dt>
-                <dd className="text-right font-semibold wrap-break-word tabular-nums">৳{cartSubtotal.toLocaleString()}</dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4">
-                <dt className="text-smoke">Delivery</dt>
-                <dd className="text-right font-semibold wrap-break-word tabular-nums">৳{DELIVERY_CHARGE.toLocaleString()}</dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 border-t border-line pt-2 text-base sm:text-lg">
-                <dt className="font-semibold">Total (COD)</dt>
-                <dd className="text-right font-semibold wrap-break-word tabular-nums text-brand">
-                  ৳{cartTotal.toLocaleString()}
-                </dd>
-              </div>
-            </dl>
-          </section>
+              <dl className="mt-5 space-y-2.5 border-t border-sand-line pt-4 text-sm">
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-smoke">Subtotal</dt>
+                  <dd className="text-right font-semibold wrap-break-word text-ink tabular-nums">
+                    ৳{cartSubtotal.toLocaleString()}
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-4">
+                  <dt className="text-smoke">Delivery charge</dt>
+                  <dd className="text-right font-semibold wrap-break-word text-ink tabular-nums">
+                    {deliveryArea ? (
+                      `৳${deliveryCharge.toLocaleString()}`
+                    ) : (
+                      <span className="font-medium text-fog">Select area</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-baseline justify-between gap-4 border-t border-sand-line pt-3">
+                  <dt className="text-base font-semibold text-ink sm:text-lg">
+                    Total (COD)
+                    {!deliveryArea ? (
+                      <span className="ml-1.5 text-xs font-normal text-fog">
+                        (excl. delivery)
+                      </span>
+                    ) : null}
+                  </dt>
+                  <dd
+                    className={`text-right font-semibold wrap-break-word text-lg tabular-nums sm:text-xl ${
+                      deliveryArea ? "text-brand" : "text-smoke"
+                    }`}
+                  >
+                    ৳{cartTotal.toLocaleString()}
+                  </dd>
+                </div>
+              </dl>
+            </section>
 
-          {/* Shipping + payment form */}
-          <section className="rounded-2xl border border-line bg-white p-4 sm:p-5 lg:p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">
-              Delivery details
-            </h2>
-            <form onSubmit={handleCartSubmit} className="mt-4 flex flex-col gap-4" noValidate>
-              <div>
-                <label htmlFor="co-name" className="mb-1.5 block text-sm font-medium text-ink">
-                  Full name
-                </label>
-                <input
-                  id="co-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your full name"
-                  autoComplete="name"
-                  className={inputClass}
-                />
-                {touched && errors.name ? (
-                  <p className="mt-1 text-xs text-red-700">{errors.name}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="co-phone" className="mb-1.5 block text-sm font-medium text-[#1A1A1A]">
-                  Phone Number (BD)
-                </label>
-                <input
-                  id="co-phone"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="e.g. 01XXXXXXXXX or +8801XXXXXXXXX"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  className={inputClass}
-                />
-                {touched && errors.phone ? (
-                  <p className="mt-1 text-xs text-red-700">{errors.phone}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="co-address" className="mb-1.5 block text-sm font-medium text-ink">
-                  Address
-                </label>
-                <textarea
-                  id="co-address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="House, road, area"
-                  rows={3}
-                  autoComplete="street-address"
-                  className={`${inputClass} resize-y`}
-                />
-                {touched && errors.address ? (
-                  <p className="mt-1 text-xs text-red-700">{errors.address}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="co-city" className="mb-1.5 block text-sm font-medium text-ink">
-                  City / district
-                </label>
-                <input
-                  id="co-city"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="e.g. Dhaka"
-                  autoComplete="address-level2"
-                  className={inputClass}
-                />
-                {touched && errors.city ? (
-                  <p className="mt-1 text-xs text-red-700">{errors.city}</p>
-                ) : null}
-              </div>
-
-              <div>
-                <label htmlFor="co-notes" className="mb-1.5 block text-sm font-medium text-ink">
-                  Note <span className="font-normal text-fog">(optional)</span>
-                </label>
-                <textarea
-                  id="co-notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Delivery instructions"
-                  rows={2}
-                  maxLength={500}
-                  className={`${inputClass} resize-y`}
-                />
-                {touched && errors.notes ? (
-                  <p className="mt-1 text-xs text-red-700">{errors.notes}</p>
-                ) : null}
-              </div>
-
-              <fieldset className="rounded-xl border border-[#E5E5E5] p-4 sm:p-5">
-                <legend className="px-1 text-sm font-medium text-[#1A1A1A]">
-                  Payment method
-                </legend>
-                <label className="flex cursor-pointer items-center gap-2 text-sm">
-                  <input type="radio" checked readOnly className="accent-black" />
-                  Cash on Delivery
-                </label>
-              </fieldset>
-
-              {submitError ? (
-                <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {submitError}
-                </p>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={!cartValid}
-                className="block min-h-12 w-full cursor-pointer rounded-full bg-brand px-6 py-3 text-center text-xs font-semibold break-words whitespace-normal uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
-              >
-                {submitting ? "Placing order…" : `Place order · ৳${cartTotal.toLocaleString()}`}
-              </button>
-            </form>
-          </section>
+            {/* Shipping + payment form */}
+            <DeliveryDetailsForm
+              onSubmit={handleCartSubmit}
+              name={name}
+              setName={setName}
+              phone={phone}
+              setPhone={setPhone}
+              address={address}
+              setAddress={setAddress}
+              deliveryArea={deliveryArea}
+              setDeliveryArea={setDeliveryArea}
+              notes={notes}
+              setNotes={setNotes}
+              errors={errors}
+              touched={touched}
+              submitError={submitError}
+              submitting={submitting}
+              submitDisabled={!cartReady || submitting}
+              submitLabel={`Place order · ৳${cartTotal.toLocaleString()}`}
+            />
+          </div>
         </div>
       </main>
     );
   }
   if (!paramProductId) {
     return (
-      <main className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 sm:py-16">
-        <h1 className="text-2xl font-semibold text-ink sm:text-3xl">Checkout</h1>
-        <p className="text-sm text-smoke">
-          No product selected. Start with Buy Now from a product page.
-        </p>
-        <Link
-          href="/products"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand px-4 py-2.5 text-xs font-semibold tracking-[0.12em] text-white no-underline transition-colors hover:bg-brand-dark sm:w-auto"
-        >
-          Continue Shopping
-        </Link>
+      <main className="flex flex-1 flex-col bg-sand-soft">
+        <CheckoutHeader />
+        <div className="mx-auto w-full max-w-xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+          <div className={`${cardClass} p-6 text-center sm:p-8`}>
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-soft text-brand">
+              <ShoppingBag className="h-6 w-6" aria-hidden="true" />
+            </span>
+            <h2 className="mt-5 font-serif text-xl font-semibold text-ink sm:text-2xl">
+              No product selected
+            </h2>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-smoke">
+              Start with Buy Now from a product page to check out.
+            </p>
+            <Link href="/products" className={`${pillLinkClass} mt-6`}>
+              Continue Shopping
+            </Link>
+          </div>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto max-w-5xl overflow-x-clip px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-      <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl lg:text-4xl">Checkout</h1>
+    <main className="flex flex-1 flex-col bg-sand-soft">
+      <CheckoutHeader />
 
-      <div className="mt-6 grid grid-cols-1 gap-6 sm:mt-8 lg:grid-cols-2 lg:gap-8">
-        {/* Order summary */}
-        <section className="h-fit rounded-2xl border border-line bg-white p-4 self-start sm:p-5 lg:sticky lg:top-24 lg:p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">
-            Order summary
-          </h2>
-          {loadingProduct ? (
-            <p className="mt-4 text-sm text-smoke">Loading product…</p>
-          ) : productError && !product ? (
-            <p className="mt-4 text-sm text-red-700">{productError}</p>
-          ) : (
-            <div className="mt-4 flex gap-3 sm:gap-4">
-              {displayImage ? (
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-[#F5F5F5] sm:h-20 sm:w-20">
-                  <Image
-                    src={displayImage}
-                    alt={displayName}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                </div>
-              ) : null}
-              <div className="min-w-0 flex-1">
-                <p className="line-clamp-2 text-sm font-semibold break-words text-[#1A1A1A] sm:text-base">{displayName}</p>
-                <p className="mt-1 text-sm font-semibold break-words text-[#525252]">
-                  ৳{unitPrice.toLocaleString()}
-                </p>
-                <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    disabled={clampedQty <= 1}
-                    aria-label="Decrease quantity"
-                    className="flex h-10 w-10 touch-manipulation items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] disabled:opacity-40"
-                  >
-                    −
-                  </button>
-                  <span className="w-8 text-center text-sm font-semibold tabular-nums">
-                    {clampedQty}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setQty((q) => (stock > 0 ? Math.min(stock, q + 1) : q + 1))
-                    }
-                    disabled={stock > 0 && clampedQty >= stock}
-                    aria-label="Increase quantity"
-                    className="flex h-10 w-10 touch-manipulation items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] disabled:opacity-40"
-                  >
-                    +
-                  </button>
-                  {stock > 0 && clampedQty >= stock ? (
-                    <span className="w-full text-xs text-amber-700 sm:w-auto">
-                      Only {stock} available
-                    </span>
-                  ) : null}
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+          {/* Order summary */}
+          <section
+            className={`${cardClass} h-fit self-start p-4 sm:p-5 lg:sticky lg:top-34 lg:p-6`}
+          >
+            <StepHeading step={1}>Order summary</StepHeading>
+            {loadingProduct ? (
+              <div className="mt-4 flex gap-3 sm:gap-4">
+                <SkeletonBlock className="h-16 w-16 shrink-0 rounded-xl sm:h-20 sm:w-20" />
+                <div className="min-w-0 flex-1">
+                  <SkeletonBlock className="h-4 w-3/4" />
+                  <SkeletonBlock className="mt-2 h-4 w-1/3" />
+                  <SkeletonBlock className="mt-3 h-10 w-32 rounded-full" />
                 </div>
               </div>
-            </div>
-          )}
+            ) : productError && !product ? (
+              <p className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {productError}
+              </p>
+            ) : (
+              <div className={`${summaryRowClass} mt-4`}>
+                {displayImage ? (
+                  <div className={`${thumbClass} h-16 w-16 sm:h-20 sm:w-20`}>
+                    <Image
+                      src={displayImage}
+                      alt={displayName}
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
+                  </div>
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <p className="line-clamp-2 text-sm font-semibold break-words text-ink sm:text-base">
+                    {displayName}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold tabular-nums text-smoke">
+                    ৳{unitPrice.toLocaleString()}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div
+                      role="group"
+                      aria-label="Quantity"
+                      className="inline-flex items-center rounded-full border border-sand-line bg-white"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setQty((q) => Math.max(1, q - 1))}
+                        disabled={clampedQty <= 1}
+                        aria-label="Decrease quantity"
+                        className={`${stepperButtonClass} h-10 w-10 rounded-l-full`}
+                      >
+                        <Minus aria-hidden="true" className="h-4 w-4" />
+                      </button>
+                      <span
+                        aria-live="polite"
+                        className="w-10 text-center text-sm font-semibold tabular-nums text-ink"
+                      >
+                        {clampedQty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setQty((q) => (stock > 0 ? Math.min(stock, q + 1) : q + 1))
+                        }
+                        disabled={stock > 0 && clampedQty >= stock}
+                        aria-label="Increase quantity"
+                        className={`${stepperButtonClass} h-10 w-10 rounded-r-full`}
+                      >
+                        <Plus aria-hidden="true" className="h-4 w-4" />
+                      </button>
+                    </div>
+                    {stock > 0 && clampedQty >= stock ? (
+                      <span className="inline-flex w-fit items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                        Only {stock} available
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+            )}
 
-          {productError && product ? (
-            <p className="mt-3 text-sm text-red-700">{productError}</p>
-          ) : null}
-
-          <dl className="mt-5 space-y-2 border-t border-line pt-4 text-sm">
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-smoke">Subtotal</dt>
-              <dd className="text-right font-semibold wrap-break-word tabular-nums">৳{subtotal.toLocaleString()}</dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-smoke">Delivery</dt>
-              <dd className="text-right font-semibold wrap-break-word tabular-nums">৳{DELIVERY_CHARGE.toLocaleString()}</dd>
-            </div>
-            <div className="flex items-baseline justify-between gap-4 border-t border-line pt-2 text-base sm:text-lg">
-              <dt className="font-semibold">Total (COD)</dt>
-              <dd className="text-right font-semibold wrap-break-word tabular-nums text-brand">
-                ৳{total.toLocaleString()}
-              </dd>
-            </div>
-          </dl>
-        </section>
-
-        {/* Shipping + payment form */}
-        <section className="rounded-2xl border border-line bg-white p-4 sm:p-5 lg:p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-ink">
-            Delivery details
-          </h2>
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4" noValidate>
-            <div>
-              <label htmlFor="co-name" className="mb-1.5 block text-sm font-medium text-ink">
-                Full name
-              </label>
-              <input
-                id="co-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
-                autoComplete="name"
-                className={inputClass}
-              />
-              {touched && errors.name ? (
-                <p className="mt-1 text-xs text-red-700">{errors.name}</p>
-              ) : null}
-            </div>
-
-            <div>
-              <label htmlFor="co-phone" className="mb-1.5 block text-sm font-medium text-[#1A1A1A]">
-                Phone Number (BD)
-              </label>
-              <input
-                id="co-phone"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone number"
-                inputMode="numeric"
-                autoComplete="tel"
-                className={inputClass}
-              />
-              {touched && errors.phone ? (
-                <p className="mt-1 text-xs text-red-700">{errors.phone}</p>
-              ) : null}
-            </div>
-
-            <div>
-              <label htmlFor="co-address" className="mb-1.5 block text-sm font-medium text-ink">
-                Address
-              </label>
-              <textarea
-                id="co-address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="House, road, area"
-                rows={3}
-                autoComplete="street-address"
-                className={`${inputClass} resize-y`}
-              />
-              {touched && errors.address ? (
-                <p className="mt-1 text-xs text-red-700">{errors.address}</p>
-              ) : null}
-            </div>
-
-            <div>
-              <label htmlFor="co-city" className="mb-1.5 block text-sm font-medium text-ink">
-                City / district
-              </label>
-              <input
-                id="co-city"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="e.g. Dhaka"
-                autoComplete="address-level2"
-                className={inputClass}
-              />
-              {touched && errors.city ? (
-                <p className="mt-1 text-xs text-red-700">{errors.city}</p>
-              ) : null}
-            </div>
-
-            <div>
-              <label htmlFor="co-notes" className="mb-1.5 block text-sm font-medium text-ink">
-                Note <span className="font-normal text-fog">(optional)</span>
-              </label>
-              <textarea
-                id="co-notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Delivery instructions"
-                rows={2}
-                maxLength={500}
-                className={`${inputClass} resize-y`}
-              />
-              {touched && errors.notes ? (
-                <p className="mt-1 text-xs text-red-700">{errors.notes}</p>
-              ) : null}
-            </div>
-
-            <fieldset className="rounded-xl border border-[#E5E5E5] p-4 sm:p-5">
-              <legend className="px-1 text-sm font-medium text-[#1A1A1A]">
-                Payment method
-              </legend>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
-                <input type="radio" checked readOnly className="accent-black" />
-                Cash on Delivery
-              </label>
-            </fieldset>
-
-            {submitError ? (
-              <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-                {submitError}
+            {productError && product ? (
+              <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {productError}
               </p>
             ) : null}
 
-            <button
-              type="submit"
-              disabled={!isValid || submitting}
-              className="block min-h-12 w-full cursor-pointer rounded-full bg-brand px-6 py-3 text-center text-xs font-semibold break-words whitespace-normal uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
-            >
-              {submitting ? "Placing order…" : `Place order · ৳${total.toLocaleString()}`}
-            </button>
-          </form>
-        </section>
+            <dl className="mt-5 space-y-2.5 border-t border-sand-line pt-4 text-sm">
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-smoke">Subtotal</dt>
+                <dd className="text-right font-semibold wrap-break-word text-ink tabular-nums">
+                  ৳{subtotal.toLocaleString()}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4">
+                <dt className="text-smoke">Delivery charge</dt>
+                <dd className="text-right font-semibold wrap-break-word text-ink tabular-nums">
+                  {deliveryArea ? (
+                    `৳${deliveryCharge.toLocaleString()}`
+                  ) : (
+                    <span className="font-medium text-fog">Select area</span>
+                  )}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-4 border-t border-sand-line pt-3">
+                <dt className="text-base font-semibold text-ink sm:text-lg">
+                  Total (COD)
+                  {!deliveryArea ? (
+                    <span className="ml-1.5 text-xs font-normal text-fog">
+                      (excl. delivery)
+                    </span>
+                  ) : null}
+                </dt>
+                <dd
+                  className={`text-right font-semibold wrap-break-word text-lg tabular-nums sm:text-xl ${
+                    deliveryArea ? "text-brand" : "text-smoke"
+                  }`}
+                >
+                  ৳{total.toLocaleString()}
+                </dd>
+              </div>
+            </dl>
+          </section>
+
+          {/* Shipping + payment form */}
+          <DeliveryDetailsForm
+            onSubmit={handleSubmit}
+            name={name}
+            setName={setName}
+            phone={phone}
+            setPhone={setPhone}
+            address={address}
+            setAddress={setAddress}
+            deliveryArea={deliveryArea}
+            setDeliveryArea={setDeliveryArea}
+            notes={notes}
+            setNotes={setNotes}
+            errors={errors}
+            touched={touched}
+            submitError={submitError}
+            submitting={submitting}
+            submitDisabled={!baseValid || submitting}
+            submitLabel={`Place order · ৳${total.toLocaleString()}`}
+          />
+        </div>
       </div>
     </main>
   );

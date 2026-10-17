@@ -10,9 +10,20 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-10 text-center sm:px-6 sm:py-16">
-          <h1 className="text-2xl font-semibold text-[#1A1A1A] sm:text-3xl">Checkout</h1>
-          <p className="text-sm text-[#525252]">Loading checkout…</p>
+        <main className="flex flex-1 flex-col bg-sand-soft">
+          <header className="border-b border-sand-line bg-sand">
+            <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+                Secure checkout
+              </p>
+              <h1 className="mt-2 font-serif text-2xl font-semibold text-ink sm:text-3xl lg:text-4xl">
+                Checkout
+              </h1>
+              <p className="mt-2 text-sm leading-relaxed text-smoke">
+                Preparing checkout…
+              </p>
+            </div>
+          </header>
         </main>
       }
     >
