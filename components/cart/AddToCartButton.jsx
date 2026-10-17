@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Check, ShoppingCart } from "lucide-react";
 import { useCart } from "./CartProvider";
 
@@ -11,14 +12,23 @@ export function AddToCartButton({
   image = "",
   stock = 1,
   iconOnly = false,
+  sizes = [],
 }) {
+  const router = useRouter();
   const { addItem } = useCart();
   const [justAdded, setJustAdded] = useState(false);
 
   const inStock = Number(stock) > 0;
+  // A size must be picked on the product page before a sized product can be
+  // added, so quick-add navigates there instead of adding a size-less line.
+  const needsSize = Array.isArray(sizes) && sizes.length > 0;
 
   const handleClick = () => {
     if (!inStock) return;
+    if (needsSize) {
+      router.push(`/products/${productId}`);
+      return;
+    }
     addItem({
       productId,
       name,
@@ -31,7 +41,13 @@ export function AddToCartButton({
   };
 
   if (iconOnly) {
-    const label = !inStock ? "Out of stock" : justAdded ? "Added to cart" : "Add to cart";
+    const label = !inStock
+      ? "Out of stock"
+      : needsSize
+        ? "Choose size on product page"
+        : justAdded
+          ? "Added to cart"
+          : "Add to cart";
     return (
       <button
         type="button"
@@ -60,7 +76,13 @@ export function AddToCartButton({
       aria-live="polite"
       className="block w-full cursor-pointer rounded-md border bg-ink  px-4 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-ink/80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink sm:py-1"
     >
-      {!inStock ? "Out of Stock" : justAdded ? "Added ✓" : "Add to Cart"}
+      {!inStock
+        ? "Out of Stock"
+        : needsSize
+          ? "Select Size"
+          : justAdded
+            ? "Added ✓"
+            : "Add to Cart"}
     </button>
   );
 }

@@ -342,6 +342,7 @@ export default function CheckoutClient() {
 
   const paramProductId = searchParams.get("productId") || "";
   const paramQty = Number(searchParams.get("qty") || "1");
+  const paramSize = (searchParams.get("size") || "").trim();
   const mode = searchParams.get("mode") || "";
   const isCartMode = mode === "cart" || !paramProductId;
 
@@ -411,6 +412,13 @@ export default function CheckoutClient() {
   const outOfStock = product ? stock <= 0 : false;
   const clampedQty = stock > 0 ? Math.min(Math.max(1, qty), stock) : qty;
 
+  // Buy Now carries the picked size via the URL (fallback: the session snapshot).
+  const chosenSize = (paramSize || String(snapshot?.size ?? "")).trim().slice(0, 16);
+  const productSizes =
+    product && Array.isArray(product.sizes) ? product.sizes.filter(Boolean) : [];
+  const sizeMissing = productSizes.length > 0 && !productSizes.includes(chosenSize);
+  const orderSize = sizeMissing ? "" : chosenSize;
+
   const deliveryCharge =
     DELIVERY_AREAS.find((area) => area.id === deliveryArea)?.charge ?? 0;
   const subtotal = unitPrice * clampedQty;
@@ -463,8 +471,12 @@ export default function CheckoutClient() {
           liveStock !== null && liveStock > 0
             ? Math.min(Math.max(1, it.qty), liveStock)
             : it.qty;
+        const lineSizes = live && Array.isArray(live.sizes) ? live.sizes.filter(Boolean) : [];
+        const lineSizeMissing =
+          lineSizes.length > 0 && !(it.size && lineSizes.includes(it.size));
         return {
           ...it,
+          key: it.key ?? it.productId,
           name: live?.name || live?.title || it.name || it.productId,
           image: live?.image || live?.images?.[0] || it.image || "",
           price,
@@ -473,6 +485,7 @@ export default function CheckoutClient() {
           lineTotal: price * effectiveQty,
           missing: live === null,
           outOfStock: liveStock !== null && liveStock <= 0,
+          sizeMissing: lineSizeMissing,
         };
       }),
     [cartItems, liveMap]
@@ -480,7 +493,9 @@ export default function CheckoutClient() {
 
   const cartSubtotal = cartLines.reduce((sum, l) => sum + l.lineTotal, 0);
   const cartTotal = cartSubtotal + deliveryCharge;
-  const cartBlocked = cartLines.some((l) => l.missing || l.outOfStock);
+  const cartBlocked = cartLines.some(
+    (l) => l.missing || l.outOfStock || l.sizeMissing
+  );
 
   // ---- Meta Pixel: InitiateCheckout ----
   // Fires once per checkout context (single product, or a given cart item set).
@@ -548,6 +563,7 @@ export default function CheckoutClient() {
         items: cartLines.map((l) => ({
           productId: l.productId,
           quantity: l.effectiveQty,
+          size: l.sizeMissing ? "" : l.size || "",
         })),
         deliveryCharge,
         note: notes,
@@ -587,7 +603,11 @@ export default function CheckoutClient() {
     errors.notes = "Note must be at most 500 characters.";
 
   const baseValid =
-    Object.keys(errors).length === 0 && !outOfStock && clampedQty > 0 && !loadingProduct;
+    Object.keys(errors).length === 0 &&
+    !outOfStock &&
+    !sizeMissing &&
+    clampedQty > 0 &&
+    !loadingProduct;
   const isValid = baseValid && Boolean(deliveryArea);
 
   const handleSubmit = async (ev) => {
@@ -604,7 +624,7 @@ export default function CheckoutClient() {
       const fullAddress = address.trim();
       const placed = await createOrder({
         customer: { name: name.trim(), phone: normalizePhone(phone), address: fullAddress },
-        items: [{ productId: paramProductId, quantity: clampedQty }],
+        items: [{ productId: paramProductId, quantity: clampedQty, size: orderSize }],
         deliveryCharge,
         note: notes,
         userId: session?.user?.id ?? null,
@@ -738,7 +758,7 @@ export default function CheckoutClient() {
               ) : (
                 <ul className="mt-4 flex flex-col gap-3">
                   {cartLines.map((line) => (
-                    <li key={line.productId} className={summaryRowClass}>
+                    <li key={line.key} className={summaryRowClass}>
                       {line.image ? (
                         <div className={`${thumbClass} h-16 w-16 sm:h-20 sm:w-20`}>
                           <Image
@@ -754,6 +774,9 @@ export default function CheckoutClient() {
                         <p className="line-clamp-2 text-sm font-semibold wrap-break-word text-ink sm:text-base">
                           {line.name}
                         </p>
+                        {line.size ? (
+                          <p className="text-xs text-smoke">Size: {line.size}</p>
+                        ) : null}
                         {line.missing ? (
                           <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
                             No longer available — please remove it.
@@ -761,6 +784,16 @@ export default function CheckoutClient() {
                         ) : line.outOfStock ? (
                           <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
                             Out of stock.
+                          </span>
+                        ) : line.sizeMissing ? (
+                          <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                            Choose a size —{" "}
+                            <Link
+                              href={`/products/${line.productId}`}
+                              className="font-semibold underline underline-offset-2"
+                            >
+                              select size
+                            </Link>
                           </span>
                         ) : line.stock !== null && line.effectiveQty >= line.stock ? (
                           <span className="mt-1.5 inline-flex w-fit items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
@@ -775,7 +808,7 @@ export default function CheckoutClient() {
                           >
                             <button
                               type="button"
-                              onClick={() => setCartQty(line.productId, line.effectiveQty - 1)}
+                              onClick={() => setCartQty(line.key, line.effectiveQty - 1)}
                               disabled={line.effectiveQty <= 1}
                               aria-label={`Decrease quantity of ${line.name}`}
                               className={`${stepperButtonClass} h-9 w-9 rounded-l-full`}
@@ -790,7 +823,7 @@ export default function CheckoutClient() {
                             </span>
                             <button
                               type="button"
-                              onClick={() => setCartQty(line.productId, line.effectiveQty + 1)}
+                              onClick={() => setCartQty(line.key, line.effectiveQty + 1)}
                               disabled={line.stock !== null && line.effectiveQty >= line.stock}
                               aria-label={`Increase quantity of ${line.name}`}
                               className={`${stepperButtonClass} h-9 w-9 rounded-r-full`}
@@ -800,7 +833,7 @@ export default function CheckoutClient() {
                           </div>
                           <button
                             type="button"
-                            onClick={() => removeCartItem(line.productId)}
+                            onClick={() => removeCartItem(line.key)}
                             aria-label={`Remove ${line.name} from cart`}
                             className="ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-1 text-xs font-semibold text-fog transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                           >
@@ -947,6 +980,11 @@ export default function CheckoutClient() {
                   <p className="mt-1 text-sm font-semibold tabular-nums text-smoke">
                     ৳{unitPrice.toLocaleString()}
                   </p>
+                  {!sizeMissing && chosenSize ? (
+                    <p className="mt-1 text-xs font-medium text-smoke">
+                      Size: {chosenSize}
+                    </p>
+                  ) : null}
                   <div className="mt-3 flex flex-wrap items-center gap-2 sm:gap-3">
                     <div
                       role="group"
@@ -993,6 +1031,19 @@ export default function CheckoutClient() {
             {productError && product ? (
               <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {productError}
+              </p>
+            ) : null}
+
+            {sizeMissing ? (
+              <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                This product needs a size.{" "}
+                <Link
+                  href={`/products/${paramProductId}`}
+                  className="font-semibold underline underline-offset-2"
+                >
+                  Go back and select one
+                </Link>
+                .
               </p>
             ) : null}
 

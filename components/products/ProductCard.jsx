@@ -61,6 +61,7 @@ export default function ProductCard({ product, showCategory = false }) {
             price={product.price}
             image={product.image || ""}
             stock={Number(product.stock ?? 1)}
+            sizes={product.sizes}
           />
         </div>
       </div>

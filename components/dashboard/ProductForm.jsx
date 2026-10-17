@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Input, Label, TextArea, TextField } from "@heroui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { slugifyCategory } from "@/lib/categories";
+import { formatSizesInput } from "@/lib/product-sizes";
 
 export const MAX_IMAGES = 4;
 
@@ -245,7 +246,7 @@ export function ProductForm({
             Images
           </Label>
           <span className="text-xs text-fog">
-            Up to {MAX_IMAGES} · {totalImages}/{MAX_IMAGES} selected
+          {totalImages}/{MAX_IMAGES} selected
           </span>
         </div>
 
@@ -431,6 +432,21 @@ export function ProductForm({
           />
         </TextField>
       </div>
+
+      <TextField
+        className="flex w-full flex-col gap-1.5"
+        name="sizes"
+        defaultValue={formatSizesInput(initialValues.sizes)}
+      >
+        <Label className={labelClassName}>
+          Sizes <span className="font-normal text-fog">(optional)</span>
+        </Label>
+        <Input placeholder="Enter size" className={inputClassName} />
+      </TextField>
+      <p className="-mt-3 text-xs text-fog">
+        Comma-separated, e.g. 30, 32, 34, 36. Leave empty if the product
+        has no size choice.
+      </p>
 
       {error && (
         <p className="text-sm text-brand" role="alert">

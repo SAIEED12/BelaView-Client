@@ -13,9 +13,12 @@ import { useSession } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { getCart, saveCart, clearCart as clearServerCart } from "@/lib/actions/cart";
 import { sendMetaEvent } from "@/lib/meta-pixel";
+import { cartLineKey } from "@/lib/cart-line";
 
 const LOCAL_KEY = "belaview:cart-v1";
 const MAX_QTY = 99;
+
+const normalizeSize = (value) => (typeof value === "string" ? value.trim() : "");
 
 const readLocal = () => {
   if (typeof window === "undefined") return [];
@@ -24,7 +27,7 @@ const readLocal = () => {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    const byId = new Map();
+    const byKey = new Map();
     for (const entry of parsed) {
       if (!entry || typeof entry !== "object") continue;
       const productId = String(entry.productId ?? "").trim();
@@ -33,12 +36,16 @@ const readLocal = () => {
         MAX_QTY,
         Math.max(1, Number(entry.qty) || 1)
       );
-      const prev = byId.get(productId);
+      const size = normalizeSize(entry.size);
+      const key = cartLineKey(productId, size);
+      const prev = byKey.get(key);
       if (prev) {
         prev.qty = Math.min(MAX_QTY, prev.qty + qty);
       } else {
-        byId.set(productId, {
+        byKey.set(key, {
+          key,
           productId,
+          size,
           qty,
           name: typeof entry.name === "string" ? entry.name : "",
           price: Number(entry.price) || 0,
@@ -46,7 +53,7 @@ const readLocal = () => {
         });
       }
     }
-    return [...byId.values()];
+    return [...byKey.values()];
   } catch {
     return [];
   }
@@ -93,10 +100,12 @@ export function CartProvider({ children }) {
       try {
         const serverItems = await getCart();
         if (cancelled) return;
-        const byId = new Map();
-        for (const it of itemsRef.current) byId.set(it.productId, { ...it });
+        const byKey = new Map();
+        for (const it of itemsRef.current) byKey.set(it.key, { ...it });
         for (const s of serverItems) {
-          const existing = byId.get(s.productId);
+          const size = normalizeSize(s.size);
+          const key = cartLineKey(s.productId, size);
+          const existing = byKey.get(key);
           if (existing) {
             // Idempotent: local and server usually hold the SAME cart after
             // a save, so take the max instead of summing (summing doubles
@@ -106,8 +115,10 @@ export function CartProvider({ children }) {
               Math.max(existing.qty, s.quantity)
             );
           } else {
-            byId.set(s.productId, {
+            byKey.set(key, {
+              key,
               productId: s.productId,
+              size,
               qty: Math.min(MAX_QTY, s.quantity),
               name: "",
               price: 0,
@@ -115,11 +126,15 @@ export function CartProvider({ children }) {
             });
           }
         }
-        const merged = [...byId.values()];
+        const merged = [...byKey.values()];
         writeLocal(merged);
         // Persist merged union to server (fire-and-forget)
         saveCart(
-          merged.map((m) => ({ productId: m.productId, quantity: m.qty }))
+          merged.map((m) => ({
+            productId: m.productId,
+            size: m.size,
+            quantity: m.qty,
+          }))
         ).catch(() => {});
         if (!cancelled) setItems(merged);
       } catch {
@@ -146,7 +161,11 @@ export function CartProvider({ children }) {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       saveCart(
-        items.map((m) => ({ productId: m.productId, quantity: m.qty }))
+        items.map((m) => ({
+          productId: m.productId,
+          size: m.size,
+          quantity: m.qty,
+        }))
       ).catch(() => {});
     }, 600);
     return () => {
@@ -154,9 +173,11 @@ export function CartProvider({ children }) {
     };
   }, [items, hydrated, userId, syncedFor]);
 
-  const addItem = useCallback(({ productId, name = "", price = 0, image = "", qty = 1 }) => {
+  const addItem = useCallback(({ productId, name = "", price = 0, image = "", qty = 1, size = "" }) => {
     const id = String(productId ?? "").trim();
     if (!id) return;
+    const safeSize = normalizeSize(size);
+    const key = cartLineKey(id, safeSize);
     toast.success("Added to cart!", { duration: 5000 });
     const safeQty = Math.min(MAX_QTY, Math.max(1, Number(qty) || 1));
     sendMetaEvent("AddToCart", {
@@ -168,8 +189,12 @@ export function CartProvider({ children }) {
       num_items: safeQty,
     });
     setItems((prev) => {
-      const next = prev.map((it) => ({ ...it }));
-      const existing = next.find((it) => it.productId === id);
+      // A size-less line for a sized product can never check out; drop it
+      // when the customer adds the same product with a size (stale carts).
+      const next = prev
+        .filter((it) => !(safeSize && it.productId === id && !it.size))
+        .map((it) => ({ ...it }));
+      const existing = next.find((it) => it.key === key);
       if (existing) {
         existing.qty = Math.min(MAX_QTY, existing.qty + safeQty);
         if (name) existing.name = name;
@@ -177,7 +202,9 @@ export function CartProvider({ children }) {
         if (image) existing.image = image;
       } else {
         next.push({
+          key,
           productId: id,
+          size: safeSize,
           qty: safeQty,
           name,
           price: Number(price) || 0,
@@ -188,24 +215,24 @@ export function CartProvider({ children }) {
     });
   }, []);
 
-  const setQty = useCallback((productId, qty) => {
-    const id = String(productId ?? "").trim();
+  const setQty = useCallback((lineKey, qty) => {
+    const key = String(lineKey ?? "").trim();
     const n = Number(qty);
     setItems((prev) => {
       if (!Number.isFinite(n) || n <= 0) {
-        return prev.filter((it) => it.productId !== id);
+        return prev.filter((it) => it.key !== key);
       }
       return prev.map((it) =>
-        it.productId === id
+        it.key === key
           ? { ...it, qty: Math.min(MAX_QTY, Math.max(1, Math.floor(n))) }
           : it
       );
     });
   }, []);
 
-  const removeItem = useCallback((productId) => {
-    const id = String(productId ?? "").trim();
-    setItems((prev) => prev.filter((it) => it.productId !== id));
+  const removeItem = useCallback((lineKey) => {
+    const key = String(lineKey ?? "").trim();
+    setItems((prev) => prev.filter((it) => it.key !== key));
   }, []);
 
   const clear = useCallback(async () => {

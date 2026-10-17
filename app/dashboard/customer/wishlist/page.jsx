@@ -108,6 +108,7 @@ const CustomerWishlistPage = async () => {
                       price={product.price}
                       image={product.image || ""}
                       stock={Number(product.stock ?? 1)}
+                      sizes={product.sizes}
                     />
                     <Link
                       href={`/products/${id}`}

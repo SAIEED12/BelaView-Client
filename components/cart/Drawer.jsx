@@ -64,9 +64,10 @@ export function CartDrawer({ compact = false }) {
                   {items.map((item) => {
                     const lineTotal =
                       (Number(item.price) || 0) * (Number(item.qty) || 0);
+                    const lineKey = item.key ?? item.productId;
                     return (
                       <li
-                        key={item.productId}
+                        key={lineKey}
                         className="flex gap-3 border-b border-[#F0F0F0] pb-4 last:border-0"
                       >
                         {item.image ? (
@@ -84,13 +85,18 @@ export function CartDrawer({ compact = false }) {
                           <p className="truncate text-sm font-semibold text-[#1A1A1A]">
                             {item.name || item.productId}
                           </p>
+                          {item.size ? (
+                            <p className="text-xs text-[#8A8A8A]">
+                              Size: {item.size}
+                            </p>
+                          ) : null}
                           <p className="text-xs text-[#8A8A8A]">
                             ৳{(Number(item.price) || 0).toLocaleString()} each
                           </p>
                           <div className="mt-2 flex items-center gap-2">
                             <button
                               type="button"
-                              onClick={() => setQty(item.productId, item.qty - 1)}
+                              onClick={() => setQty(lineKey, item.qty - 1)}
                               aria-label={`Decrease quantity of ${item.name || item.productId}`}
                               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] hover:border-brand hover:text-brand"
                             >
@@ -104,7 +110,7 @@ export function CartDrawer({ compact = false }) {
                             </span>
                             <button
                               type="button"
-                              onClick={() => setQty(item.productId, item.qty + 1)}
+                              onClick={() => setQty(lineKey, item.qty + 1)}
                               aria-label={`Increase quantity of ${item.name || item.productId}`}
                               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border border-[#E5E5E5] text-[#1A1A1A] hover:border-brand hover:text-brand"
                             >
@@ -112,7 +118,7 @@ export function CartDrawer({ compact = false }) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => removeItem(item.productId)}
+                              onClick={() => removeItem(lineKey)}
                               aria-label={`Remove ${item.name || item.productId} from cart`}
                               className="ml-auto flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-[#8A8A8A] hover:bg-red-50 hover:text-brand"
                             >

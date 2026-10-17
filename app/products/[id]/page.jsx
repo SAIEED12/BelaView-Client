@@ -13,6 +13,7 @@ import PurchasePanel from "@/components/PurchasePanel";
 import RelatedProducts from "@/components/RelatedProducts";
 import ViewContentTracker from "@/components/ViewContentTracker";
 import { getVisiblePolicies } from "@/lib/productPolicies";
+import { getProductSizes } from "@/lib/product-sizes";
 
 const SERVER_URL = process.env.SERVER_URL;
 
@@ -65,18 +66,34 @@ const ProductsDetailsPage = async ({ params }) => {
   const stock = Number(product.stock) || 0;
   const stockBadge =
     stock === 0
-      ? { label: "Out of stock", className: "bg-red-100 text-red-700" }
+      ? {
+          label: "Out of stock",
+          dot: "bg-red-500",
+          className: "bg-red-50 text-red-700 ring-1 ring-red-600/20",
+        }
       : stock <= 1
         ? {
             label: `Only ${stock} left`,
-            className: "bg-amber-100 text-amber-800",
+            dot: "bg-amber-500",
+            className: "bg-amber-50 text-amber-800 ring-1 ring-amber-600/20",
           }
-        : { label: "In stock", className: "bg-green-100 text-green-800" };
+        : {
+            label: "In stock",
+            dot: "bg-emerald-500",
+            className: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20",
+          };
+
+  // Context line above the title — most specific term the product has.
+  const eyebrowLabel = String(product.subcategory || product.category || "")
+    .trim()
+    .replace(/-/g, " ");
 
   const description =
     typeof product.description === "string" ? product.description.trim() : "";
 
   const policies = getVisiblePolicies(product);
+
+  const sizes = getProductSizes(product);
 
   return (
     <main className="flex flex-col">
@@ -128,45 +145,63 @@ const ProductsDetailsPage = async ({ params }) => {
           </div>
 
           {/*  Info (right)  */}
-          <div className="flex flex-col gap-6 lg:sticky lg:top-24">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-medium ${stockBadge.className}`}
-              >
-                {stockBadge.label}
-              </span>
+          <div className="flex flex-col gap-5 rounded-[28px] border border-sand-line bg-sand-soft p-5 sm:p-6 lg:sticky lg:top-24">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {eyebrowLabel ? (
+                  <p className="text-[11px] font-semibold tracking-[0.18em] text-fog uppercase">
+                    {eyebrowLabel}
+                  </p>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${stockBadge.className}`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${stockBadge.dot}`}
+                    aria-hidden="true"
+                  />
+                  {stockBadge.label}
+                </span>
+              </div>
+
+              <h1 className="text-2xl leading-[1.2] font-semibold text-ink sm:text-[28px]">
+                {product.name}
+              </h1>
+
+              <p className="text-xl font-semibold text-brand sm:text-2xl">
+                <span className="text-lg sm:text-xl">৳</span>
+                {price.toLocaleString()}
+              </p>
             </div>
 
-            <h1 className="font-serif text-2xl leading-tight text-ink sm:text-2xl font-semibold">
-              {product.name}
-            </h1>
-
-            <p className="text-xl font-semibold text-brand sm:text-xl">
-              ৳{price.toLocaleString()}
-            </p>
-
             <PurchasePanel
+              key={String(product._id)}
               productId={String(product._id)}
               name={product.name}
               price={price}
               image={images[0] ?? ""}
               stock={stock}
+              sizes={sizes}
             />
 
             {/* Trust row */}
-            <ul className="grid grid-cols-3 gap-3 border-t border-line pt-6">
+            <ul className="grid grid-cols-1 divide-y divide-sand-line border-t border-sand-line pt-4 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:pt-6">
               {TRUST_ITEMS.map(({ icon: Icon, title, note }) => (
                 <li
                   key={title}
-                  className="flex flex-col items-center gap-1.5 text-center"
+                  className="flex items-center gap-3 py-3 text-left first:pt-0 last:pb-0 sm:flex-col sm:items-center sm:gap-1.5 sm:px-3 sm:py-0 sm:text-center"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sand-soft text-[#79693e]">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-sand-line bg-white text-[#6b5b33]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span className="text-xs font-semibold text-ink">
-                    {title}
+                  <span className="flex flex-col sm:items-center">
+                    <span className="text-xs font-semibold text-ink">
+                      {title}
+                    </span>
+                    <span className="text-xs text-smoke">{note}</span>
                   </span>
-                  <span className="text-xs text-smoke">{note}</span>
                 </li>
               ))}
             </ul>
@@ -183,10 +218,10 @@ const ProductsDetailsPage = async ({ params }) => {
           <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
             {description ? (
               <div className="rounded-3xl border border-sand-line bg-white p-6 sm:p-8">
-                <h2 className="font-serif text-2xl text-ink sm:text-2xl font-semibold">
+                <h2 className="font-serif text-xl text-ink sm:text-xl font-semibold">
                   Description
                 </h2>
-                <p className="mt-4 max-w-3xl text-base leading-relaxed whitespace-pre-line text-smoke">
+                <p className="mt-4 max-w-3xl text-base whitespace-pre-line text-smoke">
                   {description}
                 </p>
               </div>

@@ -104,6 +104,7 @@ export function CustomerOrderDetailsModal({ order, isOpen, onOpenChange }) {
                         </p>
                         <p className="text-xs text-smoke">
                           {item.quantity} × ৳{Number(item.unitPrice ?? 0).toLocaleString()}
+                          {item.size ? ` · Size: ${item.size}` : ""}
                         </p>
                       </div>
                       <p className="shrink-0 text-sm font-semibold text-ink">
