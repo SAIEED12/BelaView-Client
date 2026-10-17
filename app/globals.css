@@ -6,6 +6,10 @@
 @import "swiper/css/navigation";
 
 @theme {
+  /* Site-wide font — Montserrat, variable injected by next/font in app/layout.js */
+  --font-sans: var(--font-montserrat);
+  --font-serif: var(--font-montserrat);
+
   /* BelaView logo red family — deeper premium red for UI */
   --color-brand: #d90429;
   --color-brand-mid: #b00622;

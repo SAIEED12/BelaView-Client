@@ -12,6 +12,7 @@ import {
 import { useSession } from "@/lib/auth-client";
 import toast from "react-hot-toast";
 import { getCart, saveCart, clearCart as clearServerCart } from "@/lib/actions/cart";
+import { sendMetaEvent } from "@/lib/meta-pixel";
 
 const LOCAL_KEY = "belaview:cart-v1";
 const MAX_QTY = 99;
@@ -158,6 +159,14 @@ export function CartProvider({ children }) {
     if (!id) return;
     toast.success("Added to cart!", { duration: 5000 });
     const safeQty = Math.min(MAX_QTY, Math.max(1, Number(qty) || 1));
+    sendMetaEvent("AddToCart", {
+      content_ids: [id],
+      content_type: "product",
+      ...(name ? { content_name: name } : {}),
+      value: (Number(price) || 0) * safeQty,
+      currency: "BDT",
+      num_items: safeQty,
+    });
     setItems((prev) => {
       const next = prev.map((it) => ({ ...it }));
       const existing = next.find((it) => it.productId === id);

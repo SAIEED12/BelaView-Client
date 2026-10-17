@@ -1,12 +1,13 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { readBuyNow, clearBuyNow } from "@/lib/buy-now";
 import { createOrder, getCheckoutProduct } from "@/lib/actions/orders";
+import { sendMetaEvent } from "@/lib/meta-pixel";
 import { useCart } from "@/components/cart/CartProvider";
 
 const DELIVERY_CHARGE = 60;
@@ -161,6 +162,51 @@ export default function CheckoutClient() {
   const cartTotal = cartSubtotal + DELIVERY_CHARGE;
   const cartBlocked = cartLines.some((l) => l.missing || l.outOfStock);
 
+  // ---- Meta Pixel: InitiateCheckout ----
+  // Fires once per checkout context (single product, or a given cart item set).
+  // The key changes only when the context changes, so quantity tweaks or
+  // re-renders don't re-fire it.
+  const initiateCheckoutKey = isCartMode
+    ? !loadingCart && !cartBlocked && cartLines.length > 0
+      ? `cart:${cartLines.map((l) => l.productId).join(",")}`
+      : ""
+    : product && !outOfStock && !loadingProduct
+      ? `product:${paramProductId}`
+      : "";
+  const initiateCheckoutTracked = useRef("");
+
+  useEffect(() => {
+    if (!initiateCheckoutKey) return;
+    if (initiateCheckoutTracked.current === initiateCheckoutKey) return;
+    initiateCheckoutTracked.current = initiateCheckoutKey;
+
+    if (isCartMode) {
+      sendMetaEvent("InitiateCheckout", {
+        value: cartTotal,
+        currency: "BDT",
+        content_ids: cartLines.map((l) => String(l.productId)),
+        content_type: "product",
+        num_items: cartLines.reduce((n, l) => n + l.effectiveQty, 0),
+      });
+    } else {
+      sendMetaEvent("InitiateCheckout", {
+        value: total,
+        currency: "BDT",
+        content_ids: [String(paramProductId)],
+        content_type: "product",
+        num_items: clampedQty,
+      });
+    }
+  }, [
+    initiateCheckoutKey,
+    isCartMode,
+    cartTotal,
+    cartLines,
+    total,
+    clampedQty,
+    paramProductId,
+  ]);
+
   const handleCartSubmit = async (ev) => {
     ev.preventDefault();
     setTouched(true);
@@ -188,6 +234,18 @@ export default function CheckoutClient() {
       });
       clearBuyNow();
       await clearCartStore();
+      sendMetaEvent(
+        "Purchase",
+        {
+          value: Number(placed.totalAmount) || cartTotal,
+          currency: "BDT",
+          content_ids: cartLines.map((l) => String(l.productId)),
+          content_type: "product",
+          num_items: cartLines.reduce((n, l) => n + l.effectiveQty, 0),
+          order_id: String(placed._id || placed.id || ""),
+        },
+        { phone: normalizePhone(phone) }
+      );
       setOrder(placed);
     } catch (err) {
       setSubmitError(err?.message || "Failed to place order. Please try again.");
@@ -231,6 +289,18 @@ export default function CheckoutClient() {
         userId: session?.user?.id ?? null,
       });
       clearBuyNow();
+      sendMetaEvent(
+        "Purchase",
+        {
+          value: Number(placed.totalAmount) || total,
+          currency: "BDT",
+          content_ids: [String(paramProductId)],
+          content_type: "product",
+          num_items: clampedQty,
+          order_id: String(placed._id || placed.id || ""),
+        },
+        { phone: normalizePhone(phone) }
+      );
       setOrder(placed);
     } catch (err) {
       setSubmitError(err?.message || "Failed to place order. Please try again.");

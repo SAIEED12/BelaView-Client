@@ -11,6 +11,7 @@ import {
 import ProductGallery from "@/components/ProductGallery";
 import PurchasePanel from "@/components/PurchasePanel";
 import RelatedProducts from "@/components/RelatedProducts";
+import ViewContentTracker from "@/components/ViewContentTracker";
 import { getVisiblePolicies } from "@/lib/productPolicies";
 
 const SERVER_URL = process.env.SERVER_URL;
@@ -79,6 +80,11 @@ const ProductsDetailsPage = async ({ params }) => {
 
   return (
     <main className="flex flex-col">
+      <ViewContentTracker
+        productId={String(product._id)}
+        name={product.name}
+        price={price}
+      />
       {/* Breadcrumb */}
       <div className="mx-auto w-full max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
         <nav aria-label="Breadcrumb">
