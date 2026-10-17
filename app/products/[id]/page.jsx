@@ -137,11 +137,11 @@ const ProductsDetailsPage = async ({ params }) => {
               </span>
             </div>
 
-            <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
+            <h1 className="font-serif text-2xl leading-tight text-ink sm:text-2xl font-semibold">
               {product.name}
             </h1>
 
-            <p className="text-3xl font-semibold text-brand sm:text-4xl">
+            <p className="text-xl font-semibold text-brand sm:text-xl">
               ৳{price.toLocaleString()}
             </p>
 
@@ -160,7 +160,7 @@ const ProductsDetailsPage = async ({ params }) => {
                   key={title}
                   className="flex flex-col items-center gap-1.5 text-center"
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-soft text-brand">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sand-soft text-[#79693e]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span className="text-xs font-semibold text-ink">
@@ -183,7 +183,7 @@ const ProductsDetailsPage = async ({ params }) => {
           <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
             {description ? (
               <div className="rounded-3xl border border-sand-line bg-white p-6 sm:p-8">
-                <h2 className="font-serif text-2xl text-ink sm:text-3xl">
+                <h2 className="font-serif text-2xl text-ink sm:text-2xl font-semibold">
                   Description
                 </h2>
                 <p className="mt-4 max-w-3xl text-base leading-relaxed whitespace-pre-line text-smoke">
@@ -205,7 +205,7 @@ const ProductsDetailsPage = async ({ params }) => {
                       key={policy.field}
                       className="rounded-2xl border border-sand-line bg-white p-5 sm:p-6"
                     >
-                      <h3 className="flex items-center gap-2.5 text-xs font-semibold tracking-[0.14em] text-ink uppercase">
+                      <h3 className="flex items-center gap-2.5 text-xs font-bold text-ink uppercase">
                         {Icon ? (
                           <span
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand"
