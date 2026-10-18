@@ -4,6 +4,7 @@ import { OrdersTable } from "@/components/dashboard/OrdersTable";
 import { auth } from "@/lib/auth";
 import { getOrders } from "@/lib/actions/orders";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
+import { toUserMessage } from "@/lib/error-message";
 
 export const metadata = {
   title: "Orders | Admin Dashboard",
@@ -56,7 +57,7 @@ const AdminOrdersPage = async ({ searchParams }) => {
       result.total = result.orders.length;
     }
   } catch (err) {
-    loadError = err?.message || "Failed to fetch orders";
+    loadError = toUserMessage(err, "Failed to fetch orders");
   }
 
   const list = Array.isArray(result.orders) ? result.orders : [];

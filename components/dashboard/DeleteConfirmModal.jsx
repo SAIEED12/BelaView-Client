@@ -24,7 +24,11 @@ export function DeleteConfirmModal({ product, isOpen, onOpenChange }) {
     setError(null);
     setIsPending(true);
     try {
-      await deleteProduct(String(product._id));
+      const res = await deleteProduct(String(product._id));
+      if (res?.ok === false) {
+        setError(res.error);
+        return;
+      }
       toast.success("Product deleted successfully!", { duration: 5000 });
       onOpenChange(false);
       router.refresh();

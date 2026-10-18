@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Modal } from "@heroui/react";
 import { Ban } from "lucide-react";
 import { cancelOrder } from "@/lib/actions/orders";
+import { toUserMessage } from "@/lib/error-message";
 
 export function OrderCancelModal({ order, isOpen, onOpenChange }) {
   const router = useRouter();
@@ -26,11 +27,15 @@ export function OrderCancelModal({ order, isOpen, onOpenChange }) {
     setError(null);
     setIsPending(true);
     try {
-      await cancelOrder(orderId);
+      const res = await cancelOrder(orderId);
+      if (res?.ok === false) {
+        setError(res.error);
+        return;
+      }
       onOpenChange(false);
       router.refresh();
     } catch (err) {
-      setError(err?.message || "Couldn't cancel the order. Please try again.");
+      setError(toUserMessage(err, "Couldn't cancel the order. Please try again."));
     } finally {
       setIsPending(false);
     }

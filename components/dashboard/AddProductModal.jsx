@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { imageUpload } from "@/lib/imageUpload";
 import { MAX_IMAGES, ProductForm } from "./ProductForm";
 import { DEFAULT_POLICIES } from "@/lib/productPolicies";
+import { toUserMessage } from "@/lib/error-message";
 import toast from "react-hot-toast";
 
 export function AddProductModal({ categories = [] }) {
@@ -62,10 +63,14 @@ export function AddProductModal({ categories = [] }) {
       }
 
       try {
-        await addProduct({ ...data, image: urls[0], images: urls });
+        const res = await addProduct({ ...data, image: urls[0], images: urls });
+        if (res?.ok === false) {
+          setError(res.error);
+          return;
+        }
       } catch (err) {
         console.error("Add product failed:", err);
-        setError(err?.message || "Couldn't save the product. Please try again.");
+        setError(toUserMessage(err, "Couldn't save the product. Please try again."));
         return;
       }
 

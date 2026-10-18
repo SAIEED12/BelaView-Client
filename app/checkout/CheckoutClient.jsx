@@ -17,6 +17,7 @@ import {
 import { useSession } from "@/lib/auth-client";
 import { readBuyNow, clearBuyNow } from "@/lib/buy-now";
 import { createOrder, getCheckoutProduct } from "@/lib/actions/orders";
+import { toUserMessage } from "@/lib/error-message";
 import { sendMetaEvent } from "@/lib/meta-pixel";
 import { useCart } from "@/components/cart/CartProvider";
 import { SkeletonBlock } from "@/components/loading/skeletons";
@@ -569,6 +570,10 @@ export default function CheckoutClient() {
         note: notes,
         userId: session?.user?.id ?? null,
       });
+      if (placed?.ok === false) {
+        setSubmitError(placed.error);
+        return;
+      }
       clearBuyNow();
       await clearCartStore();
       sendMetaEvent(
@@ -585,7 +590,7 @@ export default function CheckoutClient() {
       );
       setOrder(placed);
     } catch (err) {
-      setSubmitError(err?.message || "Failed to place order. Please try again.");
+      setSubmitError(toUserMessage(err, "Failed to place order. Please try again."));
     } finally {
       setSubmitting(false);
     }
@@ -629,6 +634,10 @@ export default function CheckoutClient() {
         note: notes,
         userId: session?.user?.id ?? null,
       });
+      if (placed?.ok === false) {
+        setSubmitError(placed.error);
+        return;
+      }
       clearBuyNow();
       sendMetaEvent(
         "Purchase",
@@ -644,7 +653,7 @@ export default function CheckoutClient() {
       );
       setOrder(placed);
     } catch (err) {
-      setSubmitError(err?.message || "Failed to place order. Please try again.");
+      setSubmitError(toUserMessage(err, "Failed to place order. Please try again."));
     } finally {
       setSubmitting(false);
     }

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CustomersTable } from "@/components/dashboard/CustomersTable";
 import { auth } from "@/lib/auth";
 import { getCustomers } from "@/lib/actions/users";
+import { toUserMessage } from "@/lib/error-message";
 
 export const metadata = {
   title: "Customers | Admin Dashboard",
@@ -28,7 +29,7 @@ const AdminCustomersPage = async () => {
   try {
     customers = await getCustomers();
   } catch (err) {
-    loadError = err?.message || "Failed to fetch customers";
+    loadError = toUserMessage(err, "Failed to fetch customers");
   }
 
   const list = Array.isArray(customers) ? customers : [];

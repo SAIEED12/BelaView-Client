@@ -9,11 +9,11 @@ import {
   createSubcategory,
   deleteCategory,
   deleteSubcategory,
-  migrateProductCategories,
   seedStarterCategories,
   updateCategory,
   updateSubcategory,
 } from "@/lib/actions/categories";
+import { toUserMessage } from "@/lib/error-message";
 
 const inputClassName =
   "w-full rounded-xl border border-[#E5E5E5] bg-white px-3 py-2 text-sm text-[#1A1A1A] placeholder:text-[#8A8A8A] outline-none focus:border-brand focus:ring-2 focus:ring-brand/20";
@@ -24,7 +24,7 @@ const saveButtonClassName =
 const cancelButtonClassName =
   "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#8A8A8A] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A]";
 
-export function CategoryManager({ categories = [], unassignedCount = 0 }) {
+export function CategoryManager({ categories = [] }) {
   const router = useRouter();
   const [expanded, setExpanded] = useState(() => new Set());
   const [pending, setPending] = useState(null);
@@ -75,12 +75,16 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
   const run = async (key, task, successMessage) => {
     setPending(key);
     try {
-      await task();
+      const result = await task();
+      if (result?.ok === false) {
+        toast.error(result.error, { duration: 6000 });
+        return false;
+      }
       toast.success(successMessage, { duration: 4000 });
       refresh();
       return true;
     } catch (error) {
-      toast.error(error?.message || "Something went wrong. Please try again.", {
+      toast.error(toUserMessage(error, "Something went wrong. Please try again."), {
         duration: 6000,
       });
       return false;
@@ -203,25 +207,7 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
   };
 
   const handleSeed = async () => {
-    const ok = await run("seed", () => seedStarterCategories(), "Starter categories added");
-    if (!ok) return;
-    const result = await migrateProductCategories().catch(() => null);
-    if (result) {
-      toast.success(
-        `Moved ${result.updatedProducts ?? 0} existing product(s) onto the new categories`,
-        { duration: 6000 },
-      );
-      refresh();
-    }
-  };
-
-  const handleMigrate = async () => {
-    const ok = await run(
-      "migrate",
-      () => migrateProductCategories(),
-      "Existing products re-linked to categories",
-    );
-    if (ok) return;
+    await run("seed", () => seedStarterCategories(), "Starter categories added");
   };
 
   return (
@@ -242,24 +228,7 @@ export function CategoryManager({ categories = [], unassignedCount = 0 }) {
             {pending === "seed" ? "Adding…" : "Add starter categories"}
           </button>
         </div>
-      ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={handleMigrate}
-            disabled={pending === "migrate"}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold tracking-[0.12em] text-ink uppercase transition-colors hover:border-brand hover:text-brand disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <Wand2 size={14} />
-            {pending === "migrate" ? "Re-linking…" : "Re-link existing products"}
-          </button>
-          {unassignedCount > 0 ? (
-            <span className="text-xs text-smoke">
-              {unassignedCount} product(s) not in any category
-            </span>
-          ) : null}
-        </div>
-      )}
+      ) : null}
 
       <div className="flex flex-col gap-3">
         {categories.map((category) => {

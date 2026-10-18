@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 const AdminCategoriesPage = async () => {
-  const { categories, unassignedCount } = await getCategories();
+  const { categories } = await getCategories();
 
   return (
     <div>
@@ -22,7 +22,7 @@ const AdminCategoriesPage = async () => {
       </div>
 
       <div className="flex flex-col gap-6">
-        <CategoryManager categories={categories} unassignedCount={unassignedCount} />
+        <CategoryManager categories={categories} />
         <BulkCategoryAssign categories={categories} />
       </div>
     </div>

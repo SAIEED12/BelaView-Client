@@ -132,7 +132,7 @@ export function ProductTable({ products, total = 0, page = 1, limit = 20, totalP
       {safeTotalPages > 1 ? (
         <Pagination
           aria-label="Products pagination"
-          className="mt-4 [&_.pagination__content]:flex-wrap [&_.pagination__content]:justify-center [&_.pagination__content]:self-center"
+          className="brand-pagination mt-4"
         >
           <Pagination.Content>
             <Pagination.Item>

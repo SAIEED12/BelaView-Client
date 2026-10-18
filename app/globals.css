@@ -46,18 +46,18 @@
   height: 100%;
 }
 
-/* Products listing pagination — brand-aligned outlined buttons.
-   HeroUI v3 resolves every state through the --pagination-link-* custom
-   properties, so overriding those (instead of raw background-color) is what
-   keeps hover/pressed/active feedback working. */
-.products-pagination .pagination__content {
+/* Shared brand pagination — storefront product listings + admin dashboard
+   tables. HeroUI v3 resolves every state through the --pagination-link-*
+   custom properties, so overriding those (instead of raw background-color) is
+   what keeps hover/pressed/active feedback working. */
+.brand-pagination .pagination__content {
   margin-inline: auto;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.375rem;
 }
 
-.products-pagination .pagination__link {
+.brand-pagination .pagination__link {
   --pagination-link-bg: var(--color-paper);
   --pagination-link-fg: var(--color-smoke);
   --pagination-link-bg-hover: var(--color-brand-soft);
@@ -71,12 +71,12 @@
     box-shadow 100ms var(--ease-out);
 }
 
-.products-pagination .pagination__link:not([data-active="true"]):hover:not(:disabled) {
+.brand-pagination .pagination__link:not([data-active="true"]):hover:not(:disabled) {
   --pagination-link-fg: var(--color-brand);
   border-color: var(--color-brand);
 }
 
-.products-pagination .pagination__link[data-active="true"] {
+.brand-pagination .pagination__link[data-active="true"] {
   --pagination-link-bg: var(--color-brand);
   --pagination-link-fg: #fff;
   --pagination-link-bg-hover: var(--color-brand-mid);
@@ -84,11 +84,11 @@
   border-color: var(--color-brand);
 }
 
-.products-pagination .pagination__link:focus-visible {
+.brand-pagination .pagination__link:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
 }
 
-.products-pagination .pagination__link:disabled {
+.brand-pagination .pagination__link:disabled {
   opacity: 0.4;
 }

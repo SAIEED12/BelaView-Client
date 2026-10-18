@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { toUserMessage } from "@/lib/error-message";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -45,7 +46,7 @@ function LoginForm() {
         return;
       }
     } catch (err) {
-      setError(err?.message || "Something went wrong. Please try again.");
+      setError(toUserMessage(err, "Something went wrong. Please try again."));
     } finally {
       setLoading(false);
     }

@@ -47,7 +47,7 @@ export function PaginationControls({ page = 1, totalPages = 1, label = "paginati
   if (safeTotalPages <= 1) return null;
 
   return (
-    <Pagination aria-label={label} className="products-pagination mt-8">
+    <Pagination aria-label={label} className="brand-pagination mt-8">
       <Pagination.Content>
         <Pagination.Item>
           <Pagination.Previous

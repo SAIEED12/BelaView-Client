@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOrders } from "@/lib/actions/orders";
+import { toUserMessage } from "@/lib/error-message";
 import { CustomerOrdersTable } from "@/components/dashboard/CustomerOrdersTable";
 
 export const metadata = {
@@ -25,7 +26,7 @@ const CustomerOrdersPage = async () => {
   try {
     orders = await getOrders({ userId: session.user.id });
   } catch (err) {
-    loadError = err?.message || "Failed to fetch orders";
+    loadError = toUserMessage(err, "Failed to fetch orders");
   }
 
   const list = Array.isArray(orders) ? orders : [];

@@ -133,7 +133,7 @@ export function CustomersTable({ customers }) {
       {totalPages > 1 ? (
         <Pagination
           aria-label="Customers pagination"
-          className="mt-4 [&_.pagination__content]:flex-wrap [&_.pagination__content]:justify-center [&_.pagination__content]:self-center"
+          className="brand-pagination mt-4"
         >
           <Pagination.Content>
             <Pagination.Item>

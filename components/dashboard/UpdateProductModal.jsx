@@ -2,6 +2,7 @@
 import { Package } from "lucide-react";
 import { Button, Modal } from "@heroui/react";
 import { updateProduct } from "@/lib/actions/products";
+import { toUserMessage } from "@/lib/error-message";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -78,14 +79,18 @@ export function UpdateProductModal({ product, categories = [], isOpen, onOpenCha
 
       const finalImages = [...kept, ...urls];
       try {
-        await updateProduct(String(product._id), {
+        const res = await updateProduct(String(product._id), {
           ...data,
           image: finalImages[0],
           images: finalImages,
         });
+        if (res?.ok === false) {
+          setError(res.error);
+          return;
+        }
       } catch (err) {
         console.error("Update product failed:", err);
-        setError(err?.message || "Couldn't update the product. Please try again.");
+        setError(toUserMessage(err, "Couldn't update the product. Please try again."));
         return;
       }
 

@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
 import { getAllOrdersForExport } from "@/lib/actions/orders";
 import { buildOrdersFilename, downloadCsv, ordersToCsv } from "@/lib/export-orders-csv";
+import { toUserMessage } from "@/lib/error-message";
 import { OrderCancelModal } from "./OrderCancelModal";
 import { OrderDetailsModal } from "./OrderDetailsModal";
 import { OrderEditModal } from "./OrderEditModal";
@@ -185,7 +186,7 @@ export function OrdersTable({
       );
       toast.success(`Exported ${all.length} order${all.length === 1 ? "" : "s"} to CSV`);
     } catch (err) {
-      const message = err?.message || "Export failed. Please try again.";
+      const message = toUserMessage(err, "Export failed. Please try again.");
       setExportError(message);
       toast.error(message);
     } finally {
@@ -409,7 +410,7 @@ export function OrdersTable({
       {safeTotalPages > 1 ? (
         <Pagination
           aria-label="Orders pagination"
-          className="mt-4 [&_.pagination__content]:flex-wrap [&_.pagination__content]:justify-center [&_.pagination__content]:self-center"
+          className="brand-pagination mt-4"
         >
           <Pagination.Content>
             <Pagination.Item>

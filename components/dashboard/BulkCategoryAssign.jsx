@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Loader2, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { bulkAssignProductCategory, getProductsPage } from "@/lib/actions/products";
+import { toUserMessage } from "@/lib/error-message";
 
 const PAGE_SIZE = 50;
 
@@ -80,6 +81,10 @@ export function BulkCategoryAssign({ categories = [] }) {
         targetCategory,
         targetSubcategory,
       );
+      if (result?.ok === false) {
+        toast.error(result.error, { duration: 6000 });
+        return;
+      }
       toast.success(
         `Moved ${result?.modifiedCount ?? selected.length} product(s) to ${targetCategory}`,
         { duration: 5000 },
@@ -87,7 +92,7 @@ export function BulkCategoryAssign({ categories = [] }) {
       await load(page);
       router.refresh();
     } catch (error) {
-      toast.error(error?.message || "Couldn't update the products.", { duration: 6000 });
+      toast.error(toUserMessage(error, "Couldn't update the products."), { duration: 6000 });
     } finally {
       setIsPending(false);
     }

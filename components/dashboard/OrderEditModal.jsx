@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
 import { updateOrder } from "@/lib/actions/orders";
 import { getAdminProducts, getProductsByIds } from "@/lib/actions/products";
+import { toUserMessage } from "@/lib/error-message";
 
 const MAX_NOTE_LENGTH = 500;
 const MAX_SIZE_LENGTH = 16;
@@ -126,7 +127,7 @@ export function OrderEditModal({ order, isOpen, onOpenChange }) {
       } catch (err) {
         if (searchRequestRef.current !== requestId) return;
         setSearchResults([]);
-        setSearchError(err?.message || "Product search failed.");
+        setSearchError(toUserMessage(err, "Product search failed."));
       } finally {
         if (searchRequestRef.current === requestId) setIsSearching(false);
       }
@@ -286,7 +287,7 @@ export function OrderEditModal({ order, isOpen, onOpenChange }) {
 
     setIsPending(true);
     try {
-      await updateOrder(orderId, {
+      const res = await updateOrder(orderId, {
         customer: { name, phone, address },
         items: items.map((item) => ({
           productId: item.productId,
@@ -298,11 +299,15 @@ export function OrderEditModal({ order, isOpen, onOpenChange }) {
         note: note.trim(),
         orderStatus: status,
       });
+      if (res?.ok === false) {
+        setError(res.error);
+        return;
+      }
       toast.success("Order updated successfully!");
       onOpenChange(false);
       router.refresh();
     } catch (err) {
-      setError(err?.message || "Couldn't update the order. Please try again.");
+      setError(toUserMessage(err, "Couldn't update the order. Please try again."));
     } finally {
       setIsPending(false);
     }

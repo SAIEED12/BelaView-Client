@@ -5,6 +5,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getWishlist } from "@/lib/actions/wishlist";
 import { getCheckoutProduct } from "@/lib/actions/orders";
+import { toUserMessage } from "@/lib/error-message";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { WishlistRemoveButton } from "@/components/wishlist/WishlistRemoveButton";
 
@@ -28,7 +29,7 @@ const CustomerWishlistPage = async () => {
   try {
     ids = await getWishlist();
   } catch (err) {
-    loadError = err?.message || "Failed to fetch wishlist";
+    loadError = toUserMessage(err, "Failed to fetch wishlist");
   }
 
   const list = Array.isArray(ids) ? ids : [];

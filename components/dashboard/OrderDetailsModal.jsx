@@ -7,6 +7,7 @@ import { Button, Modal } from "@heroui/react";
 import { Package } from "lucide-react";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
 import { updateOrderStatus } from "@/lib/actions/orders";
+import { toUserMessage } from "@/lib/error-message";
 
 const statusStyles = {
   pending: "bg-stone-200 text-stone-700",
@@ -50,11 +51,15 @@ export function OrderDetailsModal({ order, isOpen, onOpenChange }) {
     setError(null);
     setIsPending(true);
     try {
-      await updateOrderStatus(orderId, status);
+      const res = await updateOrderStatus(orderId, status);
+      if (res?.ok === false) {
+        setError(res.error);
+        return;
+      }
       onOpenChange(false);
       router.refresh();
     } catch (err) {
-      setError(err?.message || "Couldn't update the order status. Please try again.");
+      setError(toUserMessage(err, "Couldn't update the order status. Please try again."));
     } finally {
       setIsPending(false);
     }
