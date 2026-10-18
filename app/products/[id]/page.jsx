@@ -272,7 +272,7 @@ const ProductsDetailsPage = async ({ params }) => {
                 <h2 className="font-serif text-md text-ink font-semibold">
                   Description
                 </h2>
-                <p className="mt-4 max-w-3xl text-base whitespace-pre-line text-smoke">
+                <p className="mt-4 max-w-3xl text-sm whitespace-pre-line text-smoke">
                   {description}
                 </p>
               </div>
