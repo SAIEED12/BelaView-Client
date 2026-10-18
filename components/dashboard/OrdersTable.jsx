@@ -3,13 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Pagination, Table } from "@heroui/react";
-import { Ban, Download, Eye } from "lucide-react";
+import { Ban, Download, Eye, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { ORDER_STATUSES } from "@/lib/order-statuses";
 import { getAllOrdersForExport } from "@/lib/actions/orders";
 import { buildOrdersFilename, downloadCsv, ordersToCsv } from "@/lib/export-orders-csv";
 import { OrderCancelModal } from "./OrderCancelModal";
 import { OrderDetailsModal } from "./OrderDetailsModal";
+import { OrderEditModal } from "./OrderEditModal";
 
 const iconButtonClassName =
   "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-smoke transition-colors outline-none hover:bg-brand-soft hover:text-brand focus-visible:ring-2 focus-visible:ring-brand/40 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-[#525252]";
@@ -204,6 +205,7 @@ export function OrdersTable({
   };
 
   const [viewingOrder, setViewingOrder] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
   const [cancellingOrder, setCancellingOrder] = useState(null);
 
   const rows = useMemo(() => (Array.isArray(orders) ? orders : []), [orders]);
@@ -367,6 +369,15 @@ export function OrdersTable({
                         </button>
                         <button
                           type="button"
+                          onClick={() => setEditingOrder(order)}
+                          aria-label={`Edit order ${id}`}
+                          title="Edit order"
+                          className={iconButtonClassName}
+                        >
+                          <Pencil size={16} strokeWidth={1.75} />
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => setCancellingOrder(order)}
                           disabled={!cancellable}
                           aria-label={`Cancel order ${id}`}
@@ -446,6 +457,14 @@ export function OrdersTable({
         isOpen={viewingOrder !== null}
         onOpenChange={(open) => {
           if (!open) setViewingOrder(null);
+        }}
+      />
+      <OrderEditModal
+        key={editingOrder ? `edit-${String(editingOrder._id)}` : "edit-none"}
+        order={editingOrder}
+        isOpen={editingOrder !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingOrder(null);
         }}
       />
       <OrderCancelModal

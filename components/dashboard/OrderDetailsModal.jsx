@@ -158,11 +158,25 @@ export function OrderDetailsModal({ order, isOpen, onOpenChange }) {
                 </div>
                 <div className="flex items-baseline justify-between gap-4 border-t border-line pt-2 text-base">
                   <dt className="font-semibold">Total</dt>
-                  <dd className="font-semibold text-brand">
+                  <dd className="flex flex-wrap items-center justify-end gap-2 font-semibold text-brand">
                     ৳{Number(order.totalAmount ?? 0).toLocaleString()}
+                    {order.totalOverridden ? (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold tracking-[0.08em] text-amber-800 uppercase">
+                        Adjusted
+                      </span>
+                    ) : null}
                   </dd>
                 </div>
               </dl>
+
+              {order.totalOverridden ? (
+                <p className="text-right text-xs text-fog">
+                  Calculated: ৳
+                  {(
+                    Number(order.subtotal ?? 0) + Number(order.deliveryCharge ?? 0)
+                  ).toLocaleString()}
+                </p>
+              ) : null}
 
               {order.note ? (
                 <p className="rounded-xl border border-line px-4 py-3 text-sm wrap-break-word text-smoke">
