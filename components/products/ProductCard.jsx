@@ -87,12 +87,12 @@ export const ProductGrid = ({ products = [], showCategory = false, emptyMessage 
   const count = products.length;
   const gridClassName =
     count === 1
-      ? "grid grid-cols-1 gap-7 sm:max-w-sm"
+      ? "grid grid-cols-1 gap-3 sm:gap-7 sm:max-w-sm"
       : count === 2
-        ? "grid grid-cols-2 gap-7 lg:max-w-3xl"
+        ? "grid grid-cols-2 gap-3 sm:gap-7 lg:max-w-3xl"
         : count === 3
-          ? "grid grid-cols-2 gap-7 sm:grid-cols-3"
-          : "grid grid-cols-2 gap-7 sm:grid-cols-3 lg:grid-cols-4";
+          ? "grid grid-cols-2 gap-3 sm:gap-7 sm:grid-cols-3"
+          : "grid grid-cols-2 gap-3 sm:gap-7 sm:grid-cols-3 lg:grid-cols-4";
 
   return (
     <div className={gridClassName}>
