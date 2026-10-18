@@ -5,13 +5,11 @@ import Image from "next/image";
 
 const MAX_IMAGES = 4;
 
-const ProductGallery = ({ images = [], name, category }) => {
+const ProductGallery = ({ images = [], name }) => {
   const shown = images.slice(0, MAX_IMAGES);
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState({ on: false, x: 50, y: 50 });
   const sliderRef = useRef(null);
-
-  const categoryLabel = category ? category.replace("-", " ") : null;
 
   // Mobile: keep the dots in sync with the swipe position
   const handleScroll = () => {
@@ -35,17 +33,9 @@ const ProductGallery = ({ images = [], name, category }) => {
     });
   };
 
-  const categoryBadge = categoryLabel && (
-    <span className="pointer-events-none absolute left-4 top-4 z-10 rounded-full bg-[#1A1A1A] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white">
-      {categoryLabel}
-    </span>
-  );
-
   if (shown.length === 0) {
     return (
-      <div className="relative aspect-[4/5] w-full rounded-[24px] border border-[#E5E5E5] bg-[#F5F5F5]">
-        {categoryBadge}
-      </div>
+      <div className="relative aspect-[4/5] w-full rounded-[24px] border border-[#E5E5E5] bg-[#F5F5F5]" />
     );
   }
 
@@ -75,8 +65,6 @@ const ProductGallery = ({ images = [], name, category }) => {
             </div>
           ))}
         </div>
-
-        {categoryBadge}
 
         {shown.length > 1 && (
           <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1.5 backdrop-blur-sm">
@@ -122,7 +110,6 @@ const ProductGallery = ({ images = [], name, category }) => {
               transformOrigin: `${zoom.x}% ${zoom.y}%`,
             }}
           />
-          {categoryBadge}
         </div>
 
         {shown.length > 1 && (

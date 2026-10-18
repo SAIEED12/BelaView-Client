@@ -96,28 +96,26 @@ const PurchasePanel = ({
   };
 
   const stepButton =
-    "inline-flex h-9 w-9 items-center justify-center text-ink transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-ink";
+    "inline-flex h-8 w-8 items-center justify-center text-ink transition-colors hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-ink";
 
-  const chipButton =
-    "inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border bg-transparent text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-wait disabled:opacity-60";
+  const textAction =
+    "inline-flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-wait disabled:opacity-60";
 
   return (
     <div className="flex flex-col gap-5">
       {/* Size picker (only for products with sizes) */}
       {requiresSize ? (
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[10px] font-semibold tracking-[0.14em] text-fog uppercase">
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-fog uppercase">
               Select size
             </p>
-            {!size ? (
+            {sizeError && !size ? (
               <span
-                className={`text-[11px] ${
-                  sizeError ? "font-medium text-brand" : "text-fog"
-                }`}
+                className="text-[11px] font-medium text-brand"
                 aria-live="polite"
               >
-                {sizeError ? "Choose a size to continue" : "Required"}
+                Choose a size to continue
               </span>
             ) : null}
           </div>
@@ -125,7 +123,7 @@ const PurchasePanel = ({
             role="radiogroup"
             aria-label="Select size"
             aria-invalid={sizeError}
-            className="grid grid-cols-[repeat(auto-fit,minmax(3.5rem,1fr))] gap-2"
+            className="flex flex-wrap gap-2"
           >
             {sizeOptions.map((option) => {
               const selected = size === option;
@@ -140,7 +138,7 @@ const PurchasePanel = ({
                     setSizeError(false);
                   }}
                   disabled={!inStock}
-                  className={`h-10 cursor-pointer rounded-lg border text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 ${
+                  className={`inline-flex h-9 min-w-[2.75rem] cursor-pointer items-center justify-center rounded-lg border px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 sm:h-10 ${
                     selected
                       ? "border-brand bg-brand-soft font-semibold text-brand ring-1 ring-brand"
                       : sizeError
@@ -157,13 +155,13 @@ const PurchasePanel = ({
       ) : null}
 
       {/* Quantity + live subtotal — receipt strip */}
-      <div className="flex items-end justify-between gap-4 border-y border-sand-line py-4">
+      <div className="flex items-end justify-between gap-4 border-y border-sand-line py-3.5">
         <div className="flex flex-col gap-2">
           <p className="text-[10px] font-semibold tracking-[0.14em] text-fog uppercase">
             Quantity
           </p>
           <div
-            className="inline-flex w-fit items-center rounded-full border border-sand-line bg-white"
+            className="inline-flex w-fit items-center rounded-lg border border-sand-line bg-white"
             role="group"
             aria-label="Quantity"
           >
@@ -172,12 +170,12 @@ const PurchasePanel = ({
               onClick={decrease}
               disabled={!inStock || qty <= 1}
               aria-label="Decrease quantity"
-              className={`${stepButton} rounded-l-full`}
+              className={`${stepButton} rounded-l-lg`}
             >
-              <Minus className="h-4 w-4" aria-hidden="true" />
+              <Minus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
             <span
-              className="w-10 text-center text-sm font-semibold tabular-nums text-ink"
+              className="w-8 text-center text-sm font-semibold tabular-nums text-ink"
               aria-live="polite"
             >
               {qty}
@@ -187,9 +185,9 @@ const PurchasePanel = ({
               onClick={increase}
               disabled={!inStock || qty >= maxQty}
               aria-label="Increase quantity"
-              className={`${stepButton} rounded-r-full`}
+              className={`${stepButton} rounded-r-lg`}
             >
-              <Plus className="h-4 w-4" aria-hidden="true" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -205,12 +203,12 @@ const PurchasePanel = ({
       </div>
 
       {/* Primary actions */}
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex gap-2.5">
         <button
           type="button"
           onClick={handleAddToCart}
           disabled={!inStock}
-          className="flex h-12 w-full shrink-0 cursor-pointer items-center justify-center rounded-full border border-ink px-6 text-xs font-semibold tracking-[0.14em] text-ink uppercase transition-[color,background-color,transform] duration-150 hover:bg-ink hover:text-white active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink sm:h-14 sm:flex-1"
+          className="flex h-11 min-w-0 flex-1 cursor-pointer items-center justify-center rounded-lg border border-ink px-4 text-xs font-bold tracking-[0.12em] text-ink uppercase transition-[color,background-color,transform] duration-150 hover:bg-ink hover:text-white active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-ink sm:h-12 sm:text-[13px]"
         >
           Add to Cart
         </button>
@@ -218,7 +216,7 @@ const PurchasePanel = ({
           type="button"
           onClick={handleBuyNow}
           disabled={!inStock || isBuying}
-         className="inline-flex h-12 w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border border-brand bg-brand px-6 text-center text-xs font-semibold tracking-[0.14em] text-white uppercase shadow-sm shadow-brand/20 transition-[background-color,transform] duration-150 hover:border-brand-dark hover:bg-brand-dark active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-brand sm:h-14 sm:flex-1"
+          className="inline-flex h-11 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border border-brand bg-brand px-4 text-center text-xs font-bold tracking-[0.12em] text-white uppercase shadow-sm shadow-brand/20 transition-[background-color,transform] duration-150 hover:border-brand-dark hover:bg-brand-dark active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-brand sm:h-12 sm:text-[13px]"
         >
           {isBuying ? (
             <>
@@ -232,32 +230,30 @@ const PurchasePanel = ({
       </div>
 
       {/* Secondary actions */}
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+        <button
+          type="button"
+          onClick={handleShare}
+          className={`${textAction} text-smoke hover:text-brand`}
+        >
+          <Share2 className="h-4 w-4" aria-hidden="true" />
+          Share
+        </button>
+
         <button
           type="button"
           onClick={() => toggle(productId)}
           disabled={wishlistBusy}
           aria-pressed={wished}
-          className={`${chipButton} ${
-            wished
-              ? "border-brand/40 text-brand"
-              : "border-sand-line text-smoke hover:border-brand hover:text-brand"
+          className={`${textAction} ${
+            wished ? "text-brand" : "text-smoke hover:text-brand"
           }`}
         >
           <Heart
             className={`h-4 w-4 ${wished ? "fill-brand text-brand" : ""}`}
             aria-hidden="true"
           />
-          <span className="truncate">{wished ? "Saved" : "Save to wishlist"}</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleShare}
-          className={`${chipButton} border-sand-line text-smoke hover:border-brand hover:text-brand`}
-        >
-          <Share2 className="h-4 w-4" aria-hidden="true" />
-          Share
+          <span>{wished ? "Saved" : "Save to wishlist"}</span>
         </button>
       </div>
     </div>

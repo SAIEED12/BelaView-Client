@@ -22,11 +22,20 @@ export default function Loading() {
             </div>
           </div>
           <div className="flex flex-col gap-4">
-            <SkeletonBlock className="h-6 w-28 rounded-full" />
-            <SkeletonBlock className="h-11 w-3/4" />
-            <SkeletonBlock className="h-10 w-44" />
-            <SkeletonBlock className="h-12 w-full rounded-full" />
-            <SkeletonBlock className="h-12 w-full rounded-full" />
+            <SkeletonBlock className="h-10 w-3/4" />
+            <SkeletonBlock className="h-9 w-40" />
+            <div className="flex flex-wrap gap-2">
+              {[0, 1, 2].map((key) => (
+                <SkeletonBlock key={key} className="h-10 w-16 rounded-lg" />
+              ))}
+            </div>
+            <SkeletonBlock className="h-16 w-full" />
+            <div className="flex gap-2.5">
+              <SkeletonBlock className="h-12 flex-1 rounded-lg" />
+              <SkeletonBlock className="h-12 flex-1 rounded-lg" />
+            </div>
+            <SkeletonBlock className="h-5 w-44" />
+            <SkeletonBlock className="h-5 w-52" />
             <div className="grid grid-cols-3 gap-3 border-t border-line pt-6">
               {[0, 1, 2].map((key) => (
                 <div key={key} className="flex flex-col items-center gap-2">

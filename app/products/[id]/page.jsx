@@ -12,6 +12,15 @@ import ProductGallery from "@/components/ProductGallery";
 import PurchasePanel from "@/components/PurchasePanel";
 import RelatedProducts from "@/components/RelatedProducts";
 import ViewContentTracker from "@/components/ViewContentTracker";
+import {
+  categoryHref,
+  findParentBySlug,
+  findSubcategoryBySlug,
+  formatCategoryName,
+  getCategoryTree,
+  slugifyCategory,
+  subcategoryHref,
+} from "@/lib/categories";
 import { getVisiblePolicies } from "@/lib/productPolicies";
 import { getProductSizes } from "@/lib/product-sizes";
 
@@ -31,12 +40,23 @@ const POLICY_ICONS = {
   returnPolicy: RotateCcw,
 };
 
+// The products listing reads the same params, so it can absorb links for legacy
+// category values that are no longer linked to a category record.
+const productFilterHref = (category, subcategory) => {
+  const params = new URLSearchParams();
+  if (category) params.set("category", category);
+  if (subcategory) params.set("subcategory", subcategory);
+  const query = params.toString();
+  return query ? `/products?${query}` : "/products";
+};
+
 const ProductsDetailsPage = async ({ params }) => {
   const { id } = await params;
 
-  const [productRes, listRes] = await Promise.all([
+  const [productRes, listRes, categoryTree] = await Promise.all([
     fetch(`${SERVER_URL}/products/${id}`, { cache: "no-store" }),
     fetch(`${SERVER_URL}/products`, { cache: "no-store" }).catch(() => null),
+    getCategoryTree().catch(() => []),
   ]);
 
   if (!productRes.ok) notFound();
@@ -83,10 +103,36 @@ const ProductsDetailsPage = async ({ params }) => {
             className: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20",
           };
 
-  // Context line above the title — most specific term the product has.
-  const eyebrowLabel = String(product.subcategory || product.category || "")
-    .trim()
-    .replace(/-/g, " ");
+  // Category trail shown under the actions — products store category slugs, so
+  // resolve the display names and links against the category tree.
+  const categorySlug = String(product.category ?? "").trim();
+  const subcategorySlug = String(product.subcategory ?? "").trim();
+  const parentCategory = findParentBySlug(categoryTree, categorySlug);
+  const childCategory = parentCategory
+    ? findSubcategoryBySlug(parentCategory, subcategorySlug)
+    : null;
+
+  const categoryLinks = [];
+  if (categorySlug) {
+    categoryLinks.push({
+      label: parentCategory?.name || formatCategoryName(categorySlug),
+      href: parentCategory
+        ? categoryHref(parentCategory)
+        : productFilterHref(slugifyCategory(categorySlug), ""),
+    });
+  }
+  if (subcategorySlug) {
+    categoryLinks.push({
+      label: childCategory?.name || formatCategoryName(subcategorySlug),
+      href:
+        parentCategory && childCategory
+          ? subcategoryHref(parentCategory, childCategory)
+          : productFilterHref(
+              slugifyCategory(categorySlug),
+              slugifyCategory(subcategorySlug),
+            ),
+    });
+  }
 
   const description =
     typeof product.description === "string" ? product.description.trim() : "";
@@ -137,24 +183,21 @@ const ProductsDetailsPage = async ({ params }) => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:items-start lg:gap-14">
           {/*  Gallery (left)  */}
           <div className="lg:sticky lg:top-24">
-            <ProductGallery
-              images={images}
-              name={product.name}
-              category={product.category}
-            />
+            <ProductGallery images={images} name={product.name} />
           </div>
 
           {/*  Info (right)  */}
           <div className="flex flex-col gap-5 rounded-[28px] border border-sand-line bg-sand-soft p-5 sm:p-6 lg:sticky lg:top-24">
             <div className="flex flex-col gap-3">
+              <h1 className="text-3xl leading-[1.15] font-semibold text-ink sm:text-4xl">
+                {product.name}
+              </h1>
+
               <div className="flex flex-wrap items-center justify-between gap-3">
-                {eyebrowLabel ? (
-                  <p className="text-[11px] font-semibold tracking-[0.18em] text-fog uppercase">
-                    {eyebrowLabel}
-                  </p>
-                ) : (
-                  <span aria-hidden="true" />
-                )}
+                <p className="text-2xl font-semibold text-brand sm:text-3xl">
+                  <span className="text-lg sm:text-xl">৳</span>
+                  {price.toLocaleString()}
+                </p>
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${stockBadge.className}`}
                 >
@@ -165,15 +208,6 @@ const ProductsDetailsPage = async ({ params }) => {
                   {stockBadge.label}
                 </span>
               </div>
-
-              <h1 className="text-2xl leading-[1.2] font-semibold text-ink sm:text-[28px]">
-                {product.name}
-              </h1>
-
-              <p className="text-xl font-semibold text-brand sm:text-2xl">
-                <span className="text-lg sm:text-xl">৳</span>
-                {price.toLocaleString()}
-              </p>
             </div>
 
             <PurchasePanel
@@ -185,6 +219,23 @@ const ProductsDetailsPage = async ({ params }) => {
               stock={stock}
               sizes={sizes}
             />
+
+            {/* Categories — same spot as the reference, right under the actions */}
+            {categoryLinks.length > 0 ? (
+              <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 border-t border-sand-line pt-4 text-sm">
+                <span className="font-semibold text-ink">Categories:</span>
+                {categoryLinks.map((entry, index) => (
+                  <Link
+                    key={entry.href}
+                    href={entry.href}
+                    className="text-smoke transition-colors hover:text-brand"
+                  >
+                    {entry.label}
+                    {index < categoryLinks.length - 1 ? "," : ""}
+                  </Link>
+                ))}
+              </div>
+            ) : null}
 
             {/* Trust row */}
             <ul className="grid grid-cols-1 divide-y divide-sand-line border-t border-sand-line pt-4 sm:grid-cols-3 sm:divide-x sm:divide-y-0 sm:pt-6">

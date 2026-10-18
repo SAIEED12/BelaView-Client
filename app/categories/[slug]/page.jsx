@@ -67,7 +67,7 @@ const CategoryPage = async ({ params, searchParams }) => {
     await fetchCategoryProducts(parent.slug, page);
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-smoke">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

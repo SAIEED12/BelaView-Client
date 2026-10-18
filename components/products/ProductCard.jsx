@@ -82,8 +82,20 @@ export const ProductGrid = ({ products = [], showCategory = false, emptyMessage 
       </div>
     );
   }
+  // Few results shouldn't sit in a sparse 4-up row — cap the tracks at the
+  // number of products so the cards grow instead of leaving dead space.
+  const count = products.length;
+  const gridClassName =
+    count === 1
+      ? "grid grid-cols-1 gap-7 sm:max-w-sm"
+      : count === 2
+        ? "grid grid-cols-2 gap-7 lg:max-w-3xl"
+        : count === 3
+          ? "grid grid-cols-2 gap-7 sm:grid-cols-3"
+          : "grid grid-cols-2 gap-7 sm:grid-cols-3 lg:grid-cols-4";
+
   return (
-    <div className="grid grid-cols-2 gap-7 sm:grid-cols-3 lg:grid-cols-4">
+    <div className={gridClassName}>
       {products.map((product) => (
         <ProductCard
           key={String(product?._id ?? product?.id ?? "")}

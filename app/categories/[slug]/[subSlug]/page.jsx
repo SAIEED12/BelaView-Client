@@ -72,10 +72,12 @@ const SubcategoryPage = async ({ params, searchParams }) => {
   const { products, total, totalPages, page: currentPage } =
     await fetchSubcategoryProducts(parent.slug, sub.slug, page);
 
-  const siblings = parent.subcategories.filter((entry) => entry.slug !== sub.slug);
+  const subcategories = Array.isArray(parent.subcategories)
+    ? parent.subcategories
+    : [];
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <nav aria-label="Breadcrumb" className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-smoke">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -105,30 +107,67 @@ const SubcategoryPage = async ({ params, searchParams }) => {
         </ol>
       </nav>
 
-      <h1 className="font-serif text-3xl text-ink sm:text-4xl">{sub.name}</h1>
+      <h1 className="font-serif text-3xl font-semibold text-ink sm:text-4xl">
+        {sub.name}
+      </h1>
       <p className="mt-2 text-sm text-smoke">
-        {total} {total === 1 ? "product" : "products"} in {parent.name}
+        {total} {total === 1 ? "product" : "products"} in {parent.name} ·{" "}
+        {sub.name}
       </p>
 
-      {siblings.length > 0 ? (
+      {subcategories.length > 0 ? (
         <div className="mt-8">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink">
-            More in {parent.name}
+            Browse in {parent.name}
           </h2>
           <ul className="mt-3 flex flex-wrap gap-2">
-            {siblings.map((entry) => (
-              <li key={entry.slug}>
-                <Link
-                  href={subcategoryHref(parent, entry)}
-                  className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-ink no-underline transition-colors hover:border-brand hover:bg-brand-soft hover:text-brand"
-                >
-                  {entry.name}
-                  <span className="text-[10px] font-semibold text-fog">
-                    {entry.productCount ?? 0}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            <li>
+              <Link
+                href={categoryHref(parent)}
+                className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-ink no-underline transition-colors hover:border-brand hover:bg-brand-soft hover:text-brand"
+              >
+                All {parent.name}
+              </Link>
+            </li>
+            {subcategories.map((entry) => {
+              const count = Number(entry.productCount) || 0;
+              const chipClass =
+                "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold no-underline transition-colors";
+
+              if (entry.slug === sub.slug) {
+                return (
+                  <li key={entry.slug}>
+                    <span
+                      aria-current="page"
+                      className={`${chipClass} border-brand bg-brand text-white`}
+                    >
+                      {entry.name}
+                      {count > 0 ? (
+                        <span className="text-[10px] font-semibold text-white/80">
+                          {count}
+                        </span>
+                      ) : null}
+                    </span>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={entry.slug}>
+                  <Link
+                    href={subcategoryHref(parent, entry)}
+                    className={`${chipClass} border-line text-ink hover:border-brand hover:bg-brand-soft hover:text-brand`}
+                  >
+                    {entry.name}
+                    {count > 0 ? (
+                      <span className="text-[10px] font-semibold text-fog">
+                        {count}
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       ) : null}
