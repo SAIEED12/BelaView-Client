@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import SubcategoryChips from "@/components/categories/SubcategoryChips";
 import { ProductGrid } from "@/components/products/ProductCard";
 import { PaginationControls } from "@/components/PaginationControls";
-import {
-  findParentBySlug,
-  getCategoryTree,
-  subcategoryHref,
-} from "@/lib/categories";
+import { findParentBySlug, getCategoryTree } from "@/lib/categories";
 
 const SERVER_URL = process.env.SERVER_URL;
 const PAGE_SIZE = 20;
@@ -98,21 +95,7 @@ const CategoryPage = async ({ params, searchParams }) => {
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink">
             Sub-categories
           </h2>
-          <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {parent.subcategories.map((sub) => (
-              <li key={sub.slug}>
-                <Link
-                  href={subcategoryHref(parent, sub)}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3.5 text-sm font-semibold text-ink no-underline transition-colors hover:border-brand hover:bg-brand-soft hover:text-brand"
-                >
-                  <span className="truncate">{sub.name}</span>
-                  <span className="shrink-0 text-xs font-semibold text-fog">
-                    {sub.productCount ?? 0}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SubcategoryChips parent={parent} className="mt-3" />
         </div>
       ) : null}
 

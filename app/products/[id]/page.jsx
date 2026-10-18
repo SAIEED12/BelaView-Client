@@ -189,12 +189,12 @@ const ProductsDetailsPage = async ({ params }) => {
           {/*  Info (right)  */}
           <div className="flex flex-col gap-5 rounded-[28px] border border-sand-line bg-sand-soft p-5 sm:p-6 lg:sticky lg:top-24">
             <div className="flex flex-col gap-3">
-              <h1 className="text-3xl leading-[1.15] font-semibold text-ink sm:text-4xl">
+              <h1 className="text-2xl leading-[1.15] font-semibold text-ink">
                 {product.name}
               </h1>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-2xl font-semibold text-brand sm:text-3xl">
+                <p className="text-xl font-semibold text-brand">
                   <span className="text-lg sm:text-xl">৳</span>
                   {price.toLocaleString()}
                 </p>
@@ -269,7 +269,7 @@ const ProductsDetailsPage = async ({ params }) => {
           <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
             {description ? (
               <div className="rounded-3xl border border-sand-line bg-white p-6 sm:p-8">
-                <h2 className="font-serif text-xl text-ink sm:text-xl font-semibold">
+                <h2 className="font-serif text-md text-ink font-semibold">
                   Description
                 </h2>
                 <p className="mt-4 max-w-3xl text-base whitespace-pre-line text-smoke">

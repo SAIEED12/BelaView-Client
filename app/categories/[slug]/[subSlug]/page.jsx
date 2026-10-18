@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import SubcategoryChips from "@/components/categories/SubcategoryChips";
 import { ProductGrid } from "@/components/products/ProductCard";
 import { PaginationControls } from "@/components/PaginationControls";
 import {
@@ -8,7 +9,6 @@ import {
   findParentBySlug,
   findSubcategoryBySlug,
   getCategoryTree,
-  subcategoryHref,
 } from "@/lib/categories";
 
 const SERVER_URL = process.env.SERVER_URL;
@@ -120,55 +120,12 @@ const SubcategoryPage = async ({ params, searchParams }) => {
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-ink">
             Browse in {parent.name}
           </h2>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            <li>
-              <Link
-                href={categoryHref(parent)}
-                className="inline-flex items-center gap-2 rounded-full border border-line px-3.5 py-1.5 text-xs font-semibold text-ink no-underline transition-colors hover:border-brand hover:bg-brand-soft hover:text-brand"
-              >
-                All {parent.name}
-              </Link>
-            </li>
-            {subcategories.map((entry) => {
-              const count = Number(entry.productCount) || 0;
-              const chipClass =
-                "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold no-underline transition-colors";
-
-              if (entry.slug === sub.slug) {
-                return (
-                  <li key={entry.slug}>
-                    <span
-                      aria-current="page"
-                      className={`${chipClass} border-brand bg-brand text-white`}
-                    >
-                      {entry.name}
-                      {count > 0 ? (
-                        <span className="text-[10px] font-semibold text-white/80">
-                          {count}
-                        </span>
-                      ) : null}
-                    </span>
-                  </li>
-                );
-              }
-
-              return (
-                <li key={entry.slug}>
-                  <Link
-                    href={subcategoryHref(parent, entry)}
-                    className={`${chipClass} border-line text-ink hover:border-brand hover:bg-brand-soft hover:text-brand`}
-                  >
-                    {entry.name}
-                    {count > 0 ? (
-                      <span className="text-[10px] font-semibold text-fog">
-                        {count}
-                      </span>
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <SubcategoryChips
+            parent={parent}
+            activeSlug={sub.slug}
+            showAll
+            className="mt-3"
+          />
         </div>
       ) : null}
 
