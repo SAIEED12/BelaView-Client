@@ -23,7 +23,7 @@ const collections = [
     title: "Swing & Furniture",
     text: "Swing chairs and furniture built to last, for balconies, bedrooms and living rooms. We choose pieces that look good and stay comfortable through daily use.",
     examples: ["Swing chairs", "Living room pieces", "Home accents"],
-    image: "/Hero1.jpg",
+    image: "/22.png",
     alt: "Handcrafted swing chair",
   },
   {
@@ -31,7 +31,7 @@ const collections = [
     title: "Saree & Fashion",
     text: "Sarees and fashion wear for ordinary days, family gatherings and big celebrations. Pick something simple for the week or something special for the occasion.",
     examples: ["Everyday sarees", "Festive and occasion wear", "Fashion pieces"],
-    image: "/Hero2.jpg",
+    image: "/sharee-7.jpg",
     alt: "Cozy home corner with swing",
   },
   {
@@ -39,7 +39,7 @@ const collections = [
     title: "Cosmetics & Beauty",
     text: "Cosmetics and beauty products chosen to fit into a real daily routine, from quick everyday essentials to a little something for dressing up.",
     examples: ["Skincare and care", "Makeup", "Beauty essentials"],
-    image: "/Hero1.jpg",
+    image: "/others.png",
     alt: "Beauty products arranged on a table",
   },
 ];
@@ -116,7 +116,7 @@ const AboutPage = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="relative aspect-3/4 overflow-hidden rounded-[2rem] bg-mist">
               <Image
-                src="/Hero1.jpg"
+                src="/44.png"
                 alt="Handcrafted swing chair"
                 fill
                 priority
@@ -126,7 +126,7 @@ const AboutPage = () => {
             </div>
             <div className="relative mt-10 aspect-3/4 overflow-hidden rounded-[2rem] bg-mist">
               <Image
-                src="/Hero2.jpg"
+                src="/kurti-1.jpg"
                 alt="Cozy home corner with swing"
                 fill
                 priority
