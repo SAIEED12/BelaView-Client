@@ -49,7 +49,7 @@ export default async function ShopByCategory({ products = [], limit = 6 }) {
         </div>
         <Link
           href="/categories"
-          className="group inline-flex items-center gap-2 rounded-full border border-line px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:border-brand hover:text-brand"
+          className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-brand"
         >
           View all
           <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
