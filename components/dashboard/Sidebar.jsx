@@ -1,47 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
-import { useState } from "react";
-import { authClient, useSession } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
+import UserMenu from "./UserMenu";
 
 function isActive(pathname, href, exact) {
   if (exact) return pathname === href;
   return pathname === href || pathname?.startsWith(`${href}/`);
 }
 
-export default function Sidebar({
-  onNavigate,
-  navSections = [],
-  badge = "",
-}) 
-
-{
+export default function Sidebar({ onNavigate, navSections = [], badge = "" }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [isSigningOut, setIsSigningOut] = useState(false);
-  const user = session?.user;
-  const initial = user?.name?.charAt(0)?.toUpperCase() ?? "A";
-
-  const handleSignOut = async () => {
-    if (isSigningOut) return;
-    setIsSigningOut(true);
-    try {
-      await authClient.signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            router.push("/");
-            router.refresh();
-          },
-        },
-      });
-    } finally {
-      setIsSigningOut(false);
-    }
-  };
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -97,31 +67,7 @@ export default function Sidebar({
 
       {/* Footer */}
       <div className="shrink-0 border-t border-line p-3">
-        
-        {/* User Profile */}
-        <div className="mt-1 flex items-center gap-3 rounded-xl bg-mist px-3 py-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-white">
-            {initial}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-ink">
-              {user?.name ?? "Account"}
-            </p>
-            <p className="truncate text-xs text-fog">
-              {user?.email ?? ""}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            disabled={isSigningOut}
-            title="Sign out"
-            aria-label="Sign out"
-            className="cursor-pointer rounded-full p-2 text-fog transition-colors hover:bg-brand-soft hover:text-brand disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <LogOut size={16} />
-          </button>
-        </div>
+        <UserMenu key={pathname} />
       </div>
     </div>
   );
