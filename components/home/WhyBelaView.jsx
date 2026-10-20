@@ -52,8 +52,8 @@ export default function WhyBelaView() {
               />
             </div>
           </div>
-          <div className="absolute -bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-full bg-ink px-6 py-3 text-white shadow-xl">
-            <span className="font-serif text-2xl text-brand-rose">100%</span>
+          <div className="absolute -bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-7 py-3 text-white shadow-xl">
+            <span className="font-serif text-lg text-brand-rose">100%</span>
             <span className="text-xs font-semibold uppercase text-white/80">
               Crafted for comfort
             </span>
