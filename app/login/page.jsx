@@ -41,7 +41,7 @@ function LoginForm() {
         if (error.status === 403) {
           setError("Please verify your email address before logging in.");
         } else {
-          setError("Wrong email or password. Please try again.");
+          setError(error?.message || "Wrong email or password. Please try again.");
         }
         return;
       }

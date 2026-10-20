@@ -68,7 +68,7 @@ export default function WhyBelaView() {
             Slow moments, made to last
           </h2>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-smoke sm:text-base">
-            Every Dolna starts as natural fibre and hardwood — woven, sanded and
+            Every BelaView starts as natural fibre and hardwood — woven, sanded and
             tested for daily use. No mass production, no shortcuts. Just a quiet
             corner to read, talk, and unwind.
           </p>

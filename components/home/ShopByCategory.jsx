@@ -58,5 +58,5 @@ export default async function ShopByCategory({ products = [], limit = 6 }) {
 
       <CategoryCarousel items={items} />
     </section>
-  );
+  );  
 }

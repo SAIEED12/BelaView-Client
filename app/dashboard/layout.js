@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Dashboard | dolna",
-  description: "Your dolna dashboard.",
+  title: "Dashboard | BelaView",
+  description: "Your BelaView dashboard.",
 };
 
 export default function DashboardLayout({ children }) {

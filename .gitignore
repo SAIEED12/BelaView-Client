@@ -19,6 +19,7 @@
 
 # production
 /build
+/belaview-client-*.zip
 
 # misc
 .DS_Store

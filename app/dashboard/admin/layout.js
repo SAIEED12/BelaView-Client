@@ -5,8 +5,8 @@ import { auth } from "@/lib/auth";
 import { adminBasePath } from "@/lib/dashboard-nav";
 
 export const metadata = {
-  title: "Admin Dashboard | dolna",
-  description: "Manage orders, products, and customers for dolna.",
+  title: "Admin Dashboard | BelaView",
+  description: "Manage orders, products, and customers for BelaView.",
 };
 
 export default async function AdminDashboardLayout({ children }) {

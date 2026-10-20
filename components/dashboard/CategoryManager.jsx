@@ -586,9 +586,6 @@ export function CategoryManager({ categories = [] }) {
               <span className="max-w-xs truncate text-xs text-fog">{newCategoryFile.name} (uploads on Add)</span>
             ) : null}
           </div>
-          {!process.env.NEXT_PUBLIC_IMAGEBB_API_KEY ? (
-            <p className="text-xs text-fog">File upload needs an image host key — you can still paste an image URL.</p>
-          ) : null}
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="submit"

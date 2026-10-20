@@ -38,13 +38,13 @@ const Signup = () => {
       // console.log("Signup response:", { data, error });
 
       if (error) {
-        setError("Something went wrong. Please try again.");
+        setError(error?.message || "Something went wrong. Please try again.");
         return;
       }
 
       router.push("/dashboard");
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(err?.message || "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
