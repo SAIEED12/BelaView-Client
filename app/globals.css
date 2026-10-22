@@ -10,14 +10,14 @@
   --font-sans: var(--font-montserrat);
   --font-serif: var(--font-montserrat);
 
-  /* BelaView logo red family — deeper premium red for UI */
-  --color-brand: #d90429;
-  --color-brand-mid: #b00622;
-  --color-brand-dark: #7a0a1a;
-  --color-brand-ink: #590815;
-  --color-brand-soft: #fde7eb;
-  --color-brand-blush: #f8d0d8;
-  --color-brand-rose: #ff8fa3;
+  /* BelaView deep red family — #7a0a0a base with derived hover/tint shades */
+  --color-brand: #7a0a0a;
+  --color-brand-mid: #5f0808;
+  --color-brand-dark: #4a0606;
+  --color-brand-ink: #320404;
+  --color-brand-soft: #f5e2e2;
+  --color-brand-blush: #eecaca;
+  --color-brand-rose: #d97c7c;
 
   /* Neutrals — white + gray to let logo red dominate */
   --color-paper: #ffffff;
@@ -35,21 +35,16 @@
 }
 
 ::selection {
-  background: #d90429;
+  background: var(--color-brand);
   color: #fff;
 }
 
-/* Swiper overrides */
 .swiper-slide {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* Shared brand pagination — storefront product listings + admin dashboard
-   tables. HeroUI v3 resolves every state through the --pagination-link-*
-   custom properties, so overriding those (instead of raw background-color) is
-   what keeps hover/pressed/active feedback working. */
 .brand-pagination .pagination__content {
   margin-inline: auto;
   flex-wrap: wrap;
