@@ -28,7 +28,7 @@ export default function ProductCard({ product, showCategory = false }) {
           />
         )}
         {!inStock && (
-          <span className="absolute top-2 left-2 z-10 rounded-md bg-red-400/80 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
+          <span className="absolute top-2 left-2 z-10 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
             Out of Stock
           </span>
         )}

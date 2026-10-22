@@ -27,6 +27,21 @@ export default function Navbar() {
   const dashboardHref = getDashboardPathByRole(user?.role);
 
   const pathname = usePathname();
+
+  // Active nav state: "/" is exact-match, everything else claims its subtree.
+  const isActive = (href) =>
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+  const isCategoriesActive = pathname.startsWith("/categories");
+
+  // Active links drop the neutral ink color and carry a brand underline;
+  // color/decoration pairs are never mixed so class conflicts can't occur.
+  const navLink = (href, base) =>
+    isActive(href)
+      ? `${base} text-brand underline decoration-2 underline-offset-[6px] decoration-brand`
+      : `${base} text-ink no-underline hover:text-brand`;
+
   const isCategoryMenuOpen = menuOpenAt === pathname;
   const hasCategories = Array.isArray(categories) && categories.length > 0;
 
@@ -201,12 +216,20 @@ export default function Navbar() {
       <div className="hidden border-t border-line/70 md:block">
         <ul className="mx-auto flex max-w-6xl items-center justify-center gap-10 px-6 py-2.5">
           <li>
-            <Link href="/" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
+            <Link
+              href="/"
+              aria-current={isActive("/") ? "page" : undefined}
+              className={navLink("/", "text-xs font-semibold tracking-[0.15em]")}
+            >
               HOME
             </Link>
           </li>
           <li>
-            <Link href="/products" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
+            <Link
+              href="/products"
+              aria-current={isActive("/products") ? "page" : undefined}
+              className={navLink("/products", "text-xs font-semibold tracking-[0.15em]")}
+            >
               PRODUCTS
             </Link>
           </li>
@@ -216,7 +239,12 @@ export default function Navbar() {
               onClick={handleToggleCategoryMenu}
               aria-expanded={isCategoryMenuOpen}
               aria-haspopup={hasCategories}
-              className="flex cursor-pointer items-center gap-1.5 text-xs font-semibold tracking-[0.15em] text-ink hover:text-brand"
+              aria-current={isCategoriesActive ? "page" : undefined}
+              className={`flex cursor-pointer items-center gap-1.5 text-xs font-semibold tracking-[0.15em] ${
+                isCategoriesActive
+                  ? "cursor-pointer text-brand underline decoration-2 underline-offset-[6px] decoration-brand"
+                  : "text-ink hover:text-brand"
+              }`}
             >
               CATEGORIES
               {hasCategories ? (
@@ -302,14 +330,22 @@ export default function Navbar() {
           </li>
           {user?.role !== "admin" && (
             <li>
-              <Link href="/about" className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
+              <Link
+                href="/about"
+                aria-current={isActive("/about") ? "page" : undefined}
+                className={navLink("/about", "text-xs font-semibold tracking-[0.15em]")}
+              >
                 ABOUT US
               </Link>
             </li>
           )}
           {user && (
             <li>
-              <Link href={dashboardHref} className="text-xs font-semibold tracking-[0.15em] text-ink no-underline hover:text-brand">
+              <Link
+                href={dashboardHref}
+                aria-current={isActive(dashboardHref) ? "page" : undefined}
+                className={navLink(dashboardHref, "text-xs font-semibold tracking-[0.15em]")}
+              >
                 DASHBOARD
               </Link>
             </li>
@@ -332,23 +368,39 @@ export default function Navbar() {
       <div className="overflow-x-auto border-t border-line/70 [-ms-overflow-style:none] [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
         <ul className="mx-auto flex w-max items-center gap-6 px-4 py-2.5 whitespace-nowrap sm:gap-8">
           <li>
-            <Link href="/" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+            <Link
+              href="/"
+              aria-current={isActive("/") ? "page" : undefined}
+              className={navLink("/", "text-[11px] font-semibold tracking-[0.12em]")}
+            >
               HOME
             </Link>
           </li>
           <li>
-            <Link href="/products" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+            <Link
+              href="/products"
+              aria-current={isActive("/products") ? "page" : undefined}
+              className={navLink("/products", "text-[11px] font-semibold tracking-[0.12em]")}
+            >
               PRODUCTS
             </Link>
           </li>
           <li>
-            <Link href="/categories" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+            <Link
+              href="/categories"
+              aria-current={isCategoriesActive ? "page" : undefined}
+              className={navLink("/categories", "text-[11px] font-semibold tracking-[0.12em]")}
+            >
               CATEGORIES
             </Link>
           </li>
           {user?.role !== "admin" && (
             <li>
-              <Link href="/about" className="text-[11px] font-semibold tracking-[0.12em] text-ink no-underline hover:text-brand">
+              <Link
+                href="/about"
+                aria-current={isActive("/about") ? "page" : undefined}
+                className={navLink("/about", "text-[11px] font-semibold tracking-[0.12em]")}
+              >
                 ABOUT US
               </Link>
             </li>
