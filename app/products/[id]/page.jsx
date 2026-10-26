@@ -12,6 +12,8 @@ import ProductGallery from "@/components/ProductGallery";
 import PurchasePanel from "@/components/PurchasePanel";
 import RelatedProducts from "@/components/RelatedProducts";
 import ViewContentTracker from "@/components/ViewContentTracker";
+import { ProductReviews } from "@/components/reviews/ProductReviews";
+import { StarRating } from "@/components/reviews/StarRating";
 import {
   categoryHref,
   findParentBySlug,
@@ -21,6 +23,7 @@ import {
   slugifyCategory,
   subcategoryHref,
 } from "@/lib/categories";
+import { getProductReviews, getReviewerState } from "@/lib/actions/reviews";
 import { getVisiblePolicies } from "@/lib/productPolicies";
 import { getProductSizes } from "@/lib/product-sizes";
 
@@ -53,16 +56,25 @@ const productFilterHref = (category, subcategory) => {
 const ProductsDetailsPage = async ({ params }) => {
   const { id } = await params;
 
-  const [productRes, listRes, categoryTree] = await Promise.all([
-    fetch(`${SERVER_URL}/products/${id}`, { cache: "no-store" }),
-    fetch(`${SERVER_URL}/products`, { cache: "no-store" }).catch(() => null),
-    getCategoryTree().catch(() => []),
-  ]);
+  const [productRes, listRes, categoryTree, reviewsPage, reviewerState] =
+    await Promise.all([
+      fetch(`${SERVER_URL}/products/${id}`, { cache: "no-store" }),
+      fetch(`${SERVER_URL}/products`, { cache: "no-store" }).catch(() => null),
+      getCategoryTree().catch(() => []),
+      getProductReviews(id).catch(() => null),
+      getReviewerState(id).catch(() => ({ signedIn: false, review: null })),
+    ]);
 
   if (!productRes.ok) notFound();
 
   const product = await productRes.json();
   const allProducts = listRes?.ok ? await listRes.json() : [];
+
+  const reviewSummary = {
+    average: Number(reviewsPage?.average ?? product.ratingAvg ?? 0),
+    total: Number(reviewsPage?.total ?? product.ratingCount ?? 0),
+    breakdown: reviewsPage?.breakdown ?? {},
+  };
 
   // Related: same category, excluding this product, max 4
   const related = allProducts
@@ -193,6 +205,23 @@ const ProductsDetailsPage = async ({ params }) => {
                 {product.name}
               </h1>
 
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <StarRating value={reviewSummary.average} size={15} />
+                <span className="text-xs font-medium text-smoke">
+                  {reviewSummary.total > 0
+                    ? `${reviewSummary.average.toFixed(1)} (${reviewSummary.total} review${
+                        reviewSummary.total === 1 ? "" : "s"
+                      })`
+                    : "No reviews yet"}
+                </span>
+                <a
+                  href="#reviews"
+                  className="text-xs font-semibold text-brand transition-colors hover:text-brand-dark hover:underline"
+                >
+                  {reviewSummary.total > 0 ? "Read reviews" : "Write a review"}
+                </a>
+              </div>
+
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xl font-semibold text-brand">
                   <span className="text-lg sm:text-xl">৳</span>
@@ -313,6 +342,21 @@ const ProductsDetailsPage = async ({ params }) => {
           </div>
         </section>
       ) : null}
+
+      {/* Reviews */}
+      <ProductReviews
+        key={String(product._id)}
+        productId={String(product._id)}
+        productName={product.name}
+        summary={reviewSummary}
+        initialReviews={
+          Array.isArray(reviewsPage?.reviews) ? reviewsPage.reviews : []
+        }
+        initialPage={Number(reviewsPage?.page ?? 1)}
+        initialTotalPages={Number(reviewsPage?.totalPages ?? 1)}
+        signedIn={Boolean(reviewerState?.signedIn)}
+        myReview={reviewerState?.review ?? null}
+      />
 
       {/* Related products */}
       <div className="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">

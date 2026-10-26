@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { StarRating } from "@/components/reviews/StarRating";
 import { WishlistHeartButton } from "@/components/wishlist/WishlistHeartButton";
 
 export default function ProductCard({ product, showCategory = false }) {
@@ -44,6 +45,14 @@ export default function ProductCard({ product, showCategory = false }) {
         <h2 className="text-sm line-clamp-1 font-bold text-ink sm:text-sm">
           {product.name}
         </h2>
+        {Number(product.ratingCount ?? 0) > 0 ? (
+          <div className="flex items-center gap-1">
+            <StarRating value={Number(product.ratingAvg ?? 0)} size={11} />
+            <span className="text-[11px] font-medium text-fog">
+              ({Number(product.ratingCount)})
+            </span>
+          </div>
+        ) : null}
         <span className="text-[17px] font-bold text-brand sm:text-sm mt-2">
           ৳{Number(product.price).toLocaleString()}
         </span>
