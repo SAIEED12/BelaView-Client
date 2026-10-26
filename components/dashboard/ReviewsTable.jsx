@@ -8,6 +8,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { StarRating } from "@/components/reviews/StarRating";
 import { deleteReview, setReviewHidden } from "@/lib/actions/reviews";
+import { productHrefFrom } from "@/lib/product-url";
 
 const iconButtonClassName =
   "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#525252] transition-colors outline-none hover:bg-brand-soft hover:text-brand focus-visible:ring-2 focus-visible:ring-brand/40 disabled:cursor-wait disabled:opacity-60";
@@ -220,7 +221,7 @@ export function ReviewsTable({
                     <Table.Cell>
                       {review.productId ? (
                         <Link
-                          href={`/products/${review.productId}`}
+                          href={productHrefFrom(review.productId, review.productSlug)}
                           className="font-bold text-ink transition-colors hover:text-brand"
                         >
                           {review.productName || "View product"}

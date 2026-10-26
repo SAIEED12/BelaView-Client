@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ShoppingCart } from "lucide-react";
+import { productHrefFrom } from "@/lib/product-url";
 import { useCart } from "./CartProvider";
 
 export function AddToCartButton({
   productId,
+  slug = "",
   name = "",
   price = 0,
   image = "",
@@ -26,7 +28,7 @@ export function AddToCartButton({
   const handleClick = () => {
     if (!inStock) return;
     if (needsSize) {
-      router.push(`/products/${productId}`);
+      router.push(productHrefFrom(productId, slug));
       return;
     }
     addItem({

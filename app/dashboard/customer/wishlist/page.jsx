@@ -8,6 +8,7 @@ import { getCheckoutProduct } from "@/lib/actions/orders";
 import { toUserMessage } from "@/lib/error-message";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { WishlistRemoveButton } from "@/components/wishlist/WishlistRemoveButton";
+import { productHref } from "@/lib/product-url";
 
 export const metadata = {
   title: "Wishlist | My Account",
@@ -105,6 +106,7 @@ const CustomerWishlistPage = async () => {
                   <div className="mt-auto flex flex-col gap-2 pt-2">
                     <AddToCartButton
                       productId={id}
+                      slug={product.slug}
                       name={product.name}
                       price={product.price}
                       image={product.image || ""}
@@ -112,7 +114,7 @@ const CustomerWishlistPage = async () => {
                       sizes={product.sizes}
                     />
                     <Link
-                      href={`/products/${id}`}
+                      href={productHref(product)}
                       className="block w-full rounded-full bg-brand px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-brand-dark"
                     >
                       View Details

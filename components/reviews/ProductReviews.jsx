@@ -9,6 +9,7 @@ import { ReviewSummary } from "./ReviewSummary";
 
 export function ProductReviews({
   productId,
+  productSlug = "",
   productName = "this product",
   summary: initialSummary,
   initialReviews = [],
@@ -94,6 +95,7 @@ export function ProductReviews({
           <ReviewSummary summary={summary} />
           <ReviewForm
             productId={productId}
+            productSlug={productSlug}
             productName={productName}
             initialReview={myReviewState}
             signedIn={signedIn}

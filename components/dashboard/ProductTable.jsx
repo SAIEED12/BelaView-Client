@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import { UpdateProductModal } from "./UpdateProductModal";
+import { productHref } from "@/lib/product-url";
 
 const iconButtonClassName =
   "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#525252] transition-colors outline-none hover:bg-brand-soft hover:text-brand focus-visible:ring-2 focus-visible:ring-brand/40";
@@ -94,7 +95,7 @@ export function ProductTable({ products, total = 0, page = 1, limit = 20, totalP
                     <Table.Cell>
                       <div className="flex items-center gap-1">
                         <Link
-                          href={`/products/${id}`}
+                          href={productHref(product)}
                           aria-label={`View ${product.name}`}
                           title="View"
                           className={iconButtonClassName}

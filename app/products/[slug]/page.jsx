@@ -1,5 +1,6 @@
+import { cache } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   PackageOpen,
   RotateCcw,
@@ -28,6 +29,48 @@ import { getVisiblePolicies } from "@/lib/productPolicies";
 import { getProductSizes } from "@/lib/product-sizes";
 
 const SERVER_URL = process.env.SERVER_URL;
+const HEX_ID_RE = /^[0-9a-f]{24}$/i;
+
+// Cached per-request so generateMetadata and the page share one API call.
+const loadProduct = cache(async (param) => {
+  const key = String(param ?? "").trim();
+  if (!key) return null;
+  try {
+    const response = await fetch(
+      `${SERVER_URL}/products/${encodeURIComponent(key)}`,
+      { cache: "no-store" },
+    );
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+});
+
+export const generateMetadata = async ({ params }) => {
+  const { slug } = await params;
+  const product = await loadProduct(slug);
+  if (!product) return { title: "Product not found | BelaView" };
+  // Do the id -> slug redirect during metadata resolution: it runs before the
+  // loading.js Suspense shell is flushed, so crawlers get a real 308 instead of
+  // a client-side meta refresh.
+  if (HEX_ID_RE.test(slug) && product.slug) {
+    permanentRedirect(`/products/${encodeURIComponent(product.slug)}`);
+  }
+  const description =
+    typeof product.description === "string"
+      ? product.description.trim().slice(0, 160)
+      : "";
+  return {
+    title: `${product.name} | BelaView`,
+    description: description || `Buy ${product.name} from BelaView.`,
+    openGraph: {
+      title: product.name,
+      description: description || undefined,
+      images: product.image ? [{ url: product.image }] : undefined,
+    },
+  };
+};
 
 const TRUST_ITEMS = [
   { icon: Truck, title: "Cash on delivery", note: "Pay when it arrives" },
@@ -54,20 +97,25 @@ const productFilterHref = (category, subcategory) => {
 };
 
 const ProductsDetailsPage = async ({ params }) => {
-  const { id } = await params;
+  const { slug: slugParam } = await params;
 
-  const [productRes, listRes, categoryTree, reviewsPage, reviewerState] =
-    await Promise.all([
-      fetch(`${SERVER_URL}/products/${id}`, { cache: "no-store" }),
-      fetch(`${SERVER_URL}/products`, { cache: "no-store" }).catch(() => null),
-      getCategoryTree().catch(() => []),
-      getProductReviews(id).catch(() => null),
-      getReviewerState(id).catch(() => ({ signedIn: false, review: null })),
-    ]);
+  const product = await loadProduct(slugParam);
+  if (!product) notFound();
 
-  if (!productRes.ok) notFound();
+  // Keep one canonical URL per product: an old numeric link is resolved above
+  // and then permanently pointed at /products/<slug>.
+  if (HEX_ID_RE.test(slugParam) && product.slug) {
+    permanentRedirect(`/products/${encodeURIComponent(product.slug)}`);
+  }
 
-  const product = await productRes.json();
+  const productId = String(product._id);
+  const [listRes, categoryTree, reviewsPage, reviewerState] = await Promise.all([
+    fetch(`${SERVER_URL}/products`, { cache: "no-store" }).catch(() => null),
+    getCategoryTree().catch(() => []),
+    getProductReviews(productId).catch(() => null),
+    getReviewerState(productId).catch(() => ({ signedIn: false, review: null })),
+  ]);
+
   const allProducts = listRes?.ok ? await listRes.json() : [];
 
   const reviewSummary = {
@@ -156,7 +204,7 @@ const ProductsDetailsPage = async ({ params }) => {
   return (
     <main className="flex flex-col">
       <ViewContentTracker
-        productId={String(product._id)}
+        productId={productId}
         name={product.name}
         price={price}
       />
@@ -240,8 +288,8 @@ const ProductsDetailsPage = async ({ params }) => {
             </div>
 
             <PurchasePanel
-              key={String(product._id)}
-              productId={String(product._id)}
+              key={productId}
+              productId={productId}
               name={product.name}
               price={price}
               image={images[0] ?? ""}
@@ -345,8 +393,9 @@ const ProductsDetailsPage = async ({ params }) => {
 
       {/* Reviews */}
       <ProductReviews
-        key={String(product._id)}
-        productId={String(product._id)}
+        key={productId}
+        productId={productId}
+        productSlug={product.slug}
         productName={product.name}
         summary={reviewSummary}
         initialReviews={

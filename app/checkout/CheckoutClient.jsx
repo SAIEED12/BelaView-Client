@@ -21,6 +21,7 @@ import { toUserMessage } from "@/lib/error-message";
 import { sendMetaEvent } from "@/lib/meta-pixel";
 import { useCart } from "@/components/cart/CartProvider";
 import { SkeletonBlock } from "@/components/loading/skeletons";
+import { productHrefFrom } from "@/lib/product-url";
 
 const DELIVERY_AREAS = [
   { id: "inside-dhaka", label: "Inside Dhaka", charge: 70 },
@@ -478,6 +479,7 @@ export default function CheckoutClient() {
         return {
           ...it,
           key: it.key ?? it.productId,
+          slug: live?.slug || "",
           name: live?.name || live?.title || it.name || it.productId,
           image: live?.image || live?.images?.[0] || it.image || "",
           price,
@@ -798,7 +800,7 @@ export default function CheckoutClient() {
                           <span className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
                             Choose a size —{" "}
                             <Link
-                              href={`/products/${line.productId}`}
+                              href={productHrefFrom(line.productId, line.slug)}
                               className="font-semibold underline underline-offset-2"
                             >
                               select size
@@ -1047,7 +1049,7 @@ export default function CheckoutClient() {
               <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                 This product needs a size.{" "}
                 <Link
-                  href={`/products/${paramProductId}`}
+                  href={productHrefFrom(paramProductId, product?.slug)}
                   className="font-semibold underline underline-offset-2"
                 >
                   Go back and select one

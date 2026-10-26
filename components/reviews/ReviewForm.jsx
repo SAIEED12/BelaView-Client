@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Label, TextArea, TextField } from "@heroui/react";
 import toast from "react-hot-toast";
 import { submitReview } from "@/lib/actions/reviews";
+import { productHrefFrom } from "@/lib/product-url";
 import { StarPicker } from "./StarPicker";
 
 const RATING_LABELS = {
@@ -22,6 +23,7 @@ const labelClassName = "text-sm font-medium text-[#1A1A1A]";
 
 export function ReviewForm({
   productId,
+  productSlug = "",
   productName = "this product",
   initialReview = null,
   signedIn = false,
@@ -44,7 +46,7 @@ export function ReviewForm({
           confidence.
         </p>
         <Link
-          href={`/login?redirect=${encodeURIComponent(`/products/${productId}`)}`}
+          href={`/login?redirect=${encodeURIComponent(productHrefFrom(productId, productSlug))}`}
           className="mt-4 inline-flex items-center justify-center rounded-full bg-brand px-5 py-2.5 text-xs font-semibold tracking-[0.12em] text-white uppercase transition-colors hover:bg-brand-dark"
         >
           Sign in to review

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { StarRating } from "@/components/reviews/StarRating";
 import { WishlistHeartButton } from "@/components/wishlist/WishlistHeartButton";
+import { productHref } from "@/lib/product-url";
 
 export default function ProductCard({ product, showCategory = false }) {
   const id = String(product?._id ?? product?.id ?? "");
@@ -58,7 +59,7 @@ export default function ProductCard({ product, showCategory = false }) {
         </span>
         <div className="flex items-center gap-2 pt-0.5">
           <Link
-            href={`/products/${id}`}
+            href={productHref(product)}
             className="flex h-7 flex-1 items-center justify-center rounded-lg bg-brand px-0.5 text-[11px] font-semibold tracking-normal text-white uppercase transition-colors hover:bg-brand-dark sm:px-2 sm:text-xs sm:tracking-[0.06em]"
           >
             View Details
@@ -66,6 +67,7 @@ export default function ProductCard({ product, showCategory = false }) {
           <AddToCartButton
             iconOnly
             productId={id}
+            slug={product.slug}
             name={product.name}
             price={product.price}
             image={product.image || ""}
