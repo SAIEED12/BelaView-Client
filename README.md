@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BelaView Client
 
-## Getting Started
+Storefront and admin dashboard for BelaView, a Bangladesh-based home and lifestyle store.
+Built with Next.js 16 (App Router), React 19, HeroUI, and Tailwind CSS 4.
 
-First, run the development server:
+## Features
+
+- Product catalog with search, category filters, price filtering, sorting, and pagination
+- Product pages with image gallery, size selection, and customer reviews
+- Cart drawer, buy-now checkout, and cash-on-delivery orders
+- Customer accounts with order history and wishlist
+- Admin dashboard for products, categories, orders, reviews, and customers
+- Meta Pixel and Conversions API tracking
+
+## Tech stack
+
+- **Framework:** Next.js 16 (App Router, JavaScript)
+- **UI:** React 19, HeroUI, Tailwind CSS 4, lucide-react, Swiper
+- **Auth:** Better Auth with the JWT plugin
+- **Database:** MySQL via Drizzle ORM
+- **Charts:** Recharts
+
+## Getting started
+
+Requires Node.js 20.9+ and a MySQL database.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create a `.env` file in the project root:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```dotenv
+BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_SECRET=your-32-character-secret
+SERVER_URL=https://api.example.com
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+DB_HOST=localhost
+DB_USER=your-db-user
+DB_PASSWORD=your-db-password
+DB_NAME=belaview_database
 
-## Learn More
+NEXT_PUBLIC_META_PIXEL_ID=
+META_CAPI_ACCESS_TOKEN=
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app expects these MySQL tables to already exist: `user`, `session`, `account`,
+`verification`, `jwks`, and `carts`. No migrations are bundled.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
+| `npm run pack:cpanel` | Package the standalone build for cPanel |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+app/          Routes, API handlers, and pages
+components/   UI grouped by domain
+lib/          Auth, database, server actions, and helpers
+public/       Static assets
+proxy.js      Route guards and redirects
+scripts/      cPanel packaging script
+```
+
+## License
+
+Private project. All rights reserved.
